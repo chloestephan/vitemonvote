@@ -83,7 +83,7 @@ module.exports = {
 
     .column-1 {
         flex-shrink: 0;
-        flex-basis: 50%; 
+        flex-basis: 50%;
     }
 
     .column-2 {

@@ -233,7 +233,7 @@ router.get('/admin/maraudesUtilisateurs', async (req, res) =>{
 })
 
 router.post('/admin/trajet', async (req, res) => {
-  if (req.session.admin === true){    
+  if (req.session.admin === true){
     const nom = req.body.nom
     const depart = req.body.depart
     const arrivee = req.body.arrivee
