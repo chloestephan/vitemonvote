@@ -1,51 +1,13 @@
 <template>
   <div>
-      <h2>Liste des utilisateurs</h2>
+      <h2>Nouvelle election</h2>
       <hr>
-    <div v-for="user in users" :key="user.id" class="user">
-        <h3>{{user.prenom}} {{user.nom}} </h3>
-        <p><span>Numéro de téléphone :</span> {{user.telephone}} </p>
-        <p><span>Email :</span> {{user.email}}</p>
-        <p><span>Nombre de participations :</span> {{user.nombre_participations}}</p>
-        <p><span>Participations :</span></p>
-        <ul>
-            <li v-for="(maraude, index) in userMaraude(user)" :key="index">
-                <p v-if="maraude != null">{{maraude.nom_maraude}} du {{maraude.jour}}/{{maraude.mois}}/{{maraude.annee}}</p> 
-                <p v-else>Maraude suprimée.</p>
-            </li>
-        </ul>
-        <p class="delete" @click="deleteUser(user)">Supprimer l'utilisateur</p>
-    </div>
   </div>
 </template>
 
 
 <script>
 module.exports = {
-    data () {
-        return {
-            users: null
-        }
-    },
-
-    created: async function(){
-        const result = await axios.get('/api/admin/users')
-        this.users = result.data
-        console.log({message: this.users})
-    },
-
-    methods: {
-        async deleteUser(user){
-            var result = await axios.delete('/api/admin/user/' + user.id)
-            result = await axios.get('/api/admin/users')
-            this.users = result.data
-        },
-
-        userMaraude(user){
-            console.log({message : user.maraudes})
-            return user.maraudes
-        }
-    }
 }
 </script>
 

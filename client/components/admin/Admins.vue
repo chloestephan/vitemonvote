@@ -40,14 +40,9 @@ module.exports = {
     },
 
     created: async function(){
-        console.log('test1')
         const result = await axios.get('/api/admin/admins')
         this.administrateurs = result.data.administrateurs
         this.currentAdmin = result.data.currentId
-        console.log('test2')
-        console.log(this.administrateurs)
-        console.log(result.data.currentId)
-        console.log(result)
     },
 
     methods: {
