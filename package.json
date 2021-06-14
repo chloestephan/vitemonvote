@@ -13,6 +13,21 @@
     "express-session": "^1.17.1",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
+    "nodemailer": "^6.6.1",
     "pg": "^8.4.1"
-  }
+  },
+  "description": "Louis Clocher - Nicolas Cresseaux - Tristan Fievet - Maxime Leviel - Chloé Stéphan",
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chloestephan/vitemonvote.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chloestephan/vitemonvote/issues"
+  },
+  "homepage": "https://github.com/chloestephan/vitemonvote#readme"
 }

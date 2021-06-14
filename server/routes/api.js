@@ -4,6 +4,8 @@ const router = express.Router()
 const bcrypt = require('bcrypt')
 const { Client } = require('pg')
 
+const nodemailer = require('nodemailer')
+
 const client = new Client({
   user: 'vitemonvote',
   host: 'localhost',
@@ -526,6 +528,32 @@ router.post('/user/register', async (req, res) => {
     text: sqlInsert,
     values: [email, hash]
   })
+
+  let transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: 'vitemonvote@gmail.com',
+      pass: 'NomenclatureSquad',
+    }
+  })
+
+  let mailOptions = {
+    from: 'vitemonvote@gmail.com',
+    to: email,
+    subject: 'Récupération mot de passe - ViteMonVote',
+    text: 'Veuillez retrouver votre mot de passe, ci-joint : ' + password
+  }
+
+  transporter.sendMail(mailOptions, function(err, data) {
+    if (err) {
+      console.log("Error occurs", err)
+    } 
+    else  {
+      console.log("Mail has been sent")
+    }
+  });
 
   res.json({message: 'User has been created'})
 })
