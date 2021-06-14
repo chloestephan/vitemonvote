@@ -1,0 +1,126 @@
+------------------------------------------------------------
+--        Script Postgre 
+------------------------------------------------------------
+
+CREATE TYPE TypeElection AS ENUM ('Municipales','Cantonales','Regionales','Legislatives','Presidentielle','Europeenes','Referundum');
+
+
+------------------------------------------------------------
+-- Table: Admin
+------------------------------------------------------------
+CREATE TABLE public.Admin(
+	email      VARCHAR (50) NOT NULL ,
+	password   VARCHAR (50) NOT NULL  ,
+	CONSTRAINT Admin_PK PRIMARY KEY (email)
+)WITHOUT OIDS;
+
+
+------------------------------------------------------------
+-- Table: User
+------------------------------------------------------------
+CREATE TABLE public.User(
+	numIdent   SERIAL ,
+	email      VARCHAR (50) NOT NULL ,
+	password   VARCHAR (50) NOT NULL  ,
+	CONSTRAINT User_PK PRIMARY KEY (numIdent)
+)WITHOUT OIDS;
+
+
+------------------------------------------------------------
+-- Table: Elections
+------------------------------------------------------------
+CREATE TABLE public.Elections(
+	idElection      SERIAL ,
+	premierTour     DATE  NOT NULL ,
+	deuxiemeTour    DATE  NOT NULL ,
+	troisiemeTour   DATE  NOT NULL ,
+	typeElection    TYPEELECTION NOT NULL  ,
+	CONSTRAINT Elections_PK PRIMARY KEY (idElection)
+)WITHOUT OIDS;
+
+
+------------------------------------------------------------
+-- Table: Liste
+------------------------------------------------------------
+CREATE TABLE public.Liste(
+	idListe          SERIAL ,
+	PartiPolitique   VARCHAR (50) NOT NULL  ,
+	CONSTRAINT Liste_PK PRIMARY KEY (idListe)
+)WITHOUT OIDS;
+
+
+------------------------------------------------------------
+-- Table: Membre
+------------------------------------------------------------
+CREATE TABLE public.Membre(
+	id           SERIAL ,
+	nomComplet   VARCHAR (50) NOT NULL  ,
+	CONSTRAINT Membre_PK PRIMARY KEY (id)
+)WITHOUT OIDS;
+
+
+------------------------------------------------------------
+-- Table: BureauDeVote
+------------------------------------------------------------
+CREATE TABLE public.BureauDeVote(
+	idBureau          SERIAL ,
+	nbrTotalVotants   INT  NOT NULL  ,
+	CONSTRAINT BureauDeVote_PK PRIMARY KEY (idBureau)
+)WITHOUT OIDS;
+
+
+------------------------------------------------------------
+-- Table: appartient
+------------------------------------------------------------
+CREATE TABLE public.appartient(
+	idListe   INT  NOT NULL ,
+	id        INT  NOT NULL  ,
+	CONSTRAINT appartient_PK PRIMARY KEY (idListe,id)
+
+	,CONSTRAINT appartient_Liste_FK FOREIGN KEY (idListe) REFERENCES public.Liste(idListe)
+	,CONSTRAINT appartient_Membre0_FK FOREIGN KEY (id) REFERENCES public.Membre(id)
+)WITHOUT OIDS;
+
+
+------------------------------------------------------------
+-- Table: Votants
+------------------------------------------------------------
+CREATE TABLE public.Votants(
+	idBureau   INT  NOT NULL ,
+	numIdent   INT  NOT NULL ,
+	aVote      BOOL  NOT NULL  ,
+	CONSTRAINT Votants_PK PRIMARY KEY (idBureau,numIdent)
+
+	,CONSTRAINT Votants_BureauDeVote_FK FOREIGN KEY (idBureau) REFERENCES public.BureauDeVote(idBureau)
+	,CONSTRAINT Votants_User0_FK FOREIGN KEY (numIdent) REFERENCES public.User(numIdent)
+)WITHOUT OIDS;
+
+
+------------------------------------------------------------
+-- Table: Postulant
+------------------------------------------------------------
+CREATE TABLE public.Postulant(
+	idBureau   INT  NOT NULL ,
+	idListe    INT  NOT NULL ,
+	nbrVotes   INT  NOT NULL  ,
+	CONSTRAINT Postulant_PK PRIMARY KEY (idBureau,idListe)
+
+	,CONSTRAINT Postulant_BureauDeVote_FK FOREIGN KEY (idBureau) REFERENCES public.BureauDeVote(idBureau)
+	,CONSTRAINT Postulant_Liste0_FK FOREIGN KEY (idListe) REFERENCES public.Liste(idListe)
+)WITHOUT OIDS;
+
+
+------------------------------------------------------------
+-- Table: Organise
+------------------------------------------------------------
+CREATE TABLE public.Organise(
+	idElection   INT  NOT NULL ,
+	idBureau     INT  NOT NULL  ,
+	CONSTRAINT Organise_PK PRIMARY KEY (idElection,idBureau)
+
+	,CONSTRAINT Organise_Elections_FK FOREIGN KEY (idElection) REFERENCES public.Elections(idElection)
+	,CONSTRAINT Organise_BureauDeVote0_FK FOREIGN KEY (idBureau) REFERENCES public.BureauDeVote(idBureau)
+)WITHOUT OIDS;
+
+
+
