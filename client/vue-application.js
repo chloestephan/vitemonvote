@@ -4,6 +4,7 @@ const Admin = window.httpVueLoader('./components/Admin.vue')
 const AdminResultats = window.httpVueLoader('./components/admin/Resultats.vue')
 const AdminAdmins = window.httpVueLoader('./components/admin/Admins.vue')
 const AdminNouvelleElection = window.httpVueLoader('./components/admin/NouvelleElection.vue')
+const AdminElections = window.httpVueLoader('./components/admin/Elections.vue')
 
 const routes = [
   { path: '/', component: Home},
@@ -12,6 +13,7 @@ const routes = [
       {path: 'resultats', component: AdminResultats},
       {path: 'admins', component: AdminAdmins},
       {path: 'nouvelleelection', component: AdminNouvelleElection},
+      {path: 'elections', component: AdminElections},
     ]
   },
 ]

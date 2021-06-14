@@ -12,7 +12,7 @@ CREATE TABLE public.Admins(
 	id         SERIAL ,
 	email      VARCHAR (50) NOT NULL ,
 	password   VARCHAR NOT NULL  ,
-	CONSTRAINT Admins_PK PRIMARY KEY (email)
+	CONSTRAINT Admins_PK PRIMARY KEY (id)
 )WITHOUT OIDS;
 
 
@@ -32,6 +32,7 @@ CREATE TABLE public.User(
 ------------------------------------------------------------
 CREATE TABLE public.Elections(
 	id_election      SERIAL ,
+	nom		 VARCHAR (50) NOT NULL ,
 	premier_tour     DATE  NOT NULL ,
 	deuxieme_tour    DATE  NOT NULL ,
 	troisieme_tour   DATE  NOT NULL ,

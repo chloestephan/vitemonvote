@@ -1,22 +1,9 @@
 <template>
   <div class="site-container">
-    <div v-if="!isUserConnected">
-      <form @submit.prevent="loginUser">
-        <h3>Connexion</h3>
-        <input type="text" v-model="email" placeholder="Email" required>
-        <input type="password" v-model="password" placeholder="Mot de passe" required>
-
-        <button type="submit">Connexion</button>
-      </form>
-    </div>
-    <div v-else>
-      <nav class="navbar-admin">
-        <a><router-link to='/admin/nouvelleelection'>Nouvelle élection</router-link></a>
-        <a><router-link to="'/admin/elections">Elections</router-link></a>
-        <a><router-link to='/admin/resultats'>Résultats</router-link></a>
-        <a><router-link to='/admin/admins'>Gérer les admins</router-link></a>
-      </nav>
-      <router-view></router-view>
+    <div v-for="election in elections" :key="election.id" class="election">
+      <router-link :to="chemin(maraude)">
+        <h3>{{election.nom}}</h3>
+      </router-link>
     </div>
   </div>
 </template>
@@ -32,10 +19,13 @@ module.exports = {
 
   created: async function () {
     const result = await axios.get('/api/admin/elections')
-    this.elections = result.data.admin
+    this.elections = result.data
   },
 
   methods: {
+    chemin(election){
+      return "/admin/election/" + election.id
+    }
   }
 }
 </script>
