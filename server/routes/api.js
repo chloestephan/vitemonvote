@@ -5,10 +5,10 @@ const bcrypt = require('bcrypt')
 const { Client } = require('pg')
 
 const client = new Client({
-  user: 'ViteMonVote',
+  user: 'vitemonvote',
   host: 'localhost',
   password: 'NomenclatureSquad',
-  database: 'ViteMonVote'
+  database: 'vitemonvote'
 })
 
 client.connect()

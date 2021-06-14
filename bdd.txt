@@ -6,12 +6,12 @@ CREATE TYPE TypeElection AS ENUM ('Municipales','Cantonales','Regionales','Legis
 
 
 ------------------------------------------------------------
--- Table: Admin
+-- Table: Admins
 ------------------------------------------------------------
-CREATE TABLE public.Admin(
+CREATE TABLE public.Admins(
 	email      VARCHAR (50) NOT NULL ,
-	password   VARCHAR (50) NOT NULL  ,
-	CONSTRAINT Admin_PK PRIMARY KEY (email)
+	password   VARCHAR NOT NULL  ,
+	CONSTRAINT Admins_PK PRIMARY KEY (email)
 )WITHOUT OIDS;
 
 
@@ -21,7 +21,7 @@ CREATE TABLE public.Admin(
 CREATE TABLE public.User(
 	numIdent   SERIAL ,
 	email      VARCHAR (50) NOT NULL ,
-	password   VARCHAR (50) NOT NULL  ,
+	password   VARCHAR NOT NULL  ,
 	CONSTRAINT User_PK PRIMARY KEY (numIdent)
 )WITHOUT OIDS;
 
