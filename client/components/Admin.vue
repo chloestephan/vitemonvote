@@ -1,6 +1,6 @@
 <template>
   <div class="site-container">
-    <div v-if="!isUserConnected">
+    <div v-if="!isUserConnected" class="vertical-center">
       <form @submit.prevent="loginUser">
         <h3>Connexion</h3>
         <input type="text" v-model="email" placeholder="Email" required>
@@ -58,7 +58,8 @@ module.exports = {
 <style scoped>
 
 .navbar-admin {
-    background-color: #005a87;
+    background-color: #001D6E;
+    margin-bottom: 50px;
     width: 100%;
     height: 50px;
     bottom: 0;

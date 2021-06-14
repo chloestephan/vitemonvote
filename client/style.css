@@ -9,8 +9,14 @@
 .site-container {
     display: flex;
     flex-direction: column;
+    min-height: 55vh;
+}
+
+.site-container {
+    display: flex;
+    flex-direction: column;
     background-color: #f8f9fd;
-    min-height: 55em;
+    min-height: 46em;
 }
 
 hr {
@@ -73,6 +79,97 @@ h2 {
     content: "";
     display: table;
     clear: both;
+}
+
+
+/* --- formulaire de connexion --- */
+
+
+form {
+    max-width: 480px;
+    padding: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    margin-top: 25px;
+    border-radius: 10px;
+    border-width: 100%;
+    background-color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    -moz-box-shadow: 0px 1px 5px 0px #656565;
+    -webkit-box-shadow: 0px 1px 5px 0px #656565;
+    -o-box-shadow: 0px 1px 5px 0px #656565;
+    box-shadow: 0px 1px 5px 0px #656565;
+}
+
+form h3 {
+    text-align: center;
+    color: #001D6E;
+    font-family: Poppins-Bold;
+    font-size: 24px;
+
+    line-height: 1.2;
+    text-align: center;
+    width: 100%;
+    display: block;
+    padding-bottom: 54px;
+}
+
+
+input {
+    font-family: Poppins-Medium;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #666;
+    display: block;
+    width: 100%;
+    background: #e6e6e6;
+    height: 50px;
+    border-radius: 25px;
+    padding: 0 30px 0 68px;
+    border: none;
+    margin-bottom: 15px;
+}
+
+button {
+    font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+    letter-spacing: 3px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #fff;
+    text-transform: uppercase;
+    width: 100%;
+    height: 50px;
+    border-radius: 25px;
+    background: #001D6E;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 25px;
+    transition: all .4s;  
+    border: none;  
+    text-decoration: none;
+}
+  
+button:hover {
+    background: #fff;
+    text-decoration: none;
+    color: #D60920;
+    border: solid;
+    border-width: 2px;
+    border-color: #D60920;
+    cursor: pointer;
+}
+
+.vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
 

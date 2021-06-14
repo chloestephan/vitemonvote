@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="limiter">
 
         <div v-if="!isUserConnected" class="container">
 
@@ -11,7 +11,7 @@
                 </form>
             </div>
 
-            <div class="login">     
+            <div class="login">
                 <form @submit.prevent="loginUser">
                     <h3>Se connecter</h3>
                     <input type="text" v-model="emailLogin" placeholder="Email" required>
@@ -68,15 +68,26 @@ module.exports = {
 <style scoped>
 
 .container {
-    display: flex;
-    justify-content: space-around;
+    /*display: flex;
+    justify-content: space-around;*/
+    padding-top: 50px;
+    padding-bottom: 50px;
+    background-color: #f8f9fd;
+
 }
+
 .getPassword, .login {
     margin-bottom: 30px;
 }
 
 .getPassword {
     margin-top: 30px;
+}
+
+.limiter {
+  width: 100%;
+  margin: 0 auto;
+  background-color: #f8f9fd;
 }
 
 </style>

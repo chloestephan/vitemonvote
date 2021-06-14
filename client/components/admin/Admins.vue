@@ -105,14 +105,14 @@ module.exports = {
         margin-inline-end: 0px;
         text-align: center;
         text-transform: uppercase;
-        color: #fff;
+        color: #001D6E;
     }
 
     hr {
         display: block;
         border: 0;
         border-radius: 3em;
-        border-top: 2px solid orange;
+        border-top: 2px solid #D60920;
         margin-top: 10px;
         margin-bottom: 10px;
         width: 10%;
