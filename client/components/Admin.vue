@@ -11,7 +11,6 @@
         </div>
         <div v-else>
             <nav class="navbar-admin">
-                <a><router-link to='/admin/utilisateurs'>Utilisateurs</router-link></a>
                 <a><router-link to='/admin/admins'>Admins</router-link></a>
             </nav>
             <router-view></router-view>
