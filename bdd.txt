@@ -36,7 +36,9 @@ CREATE TABLE public.Elections(
 	deuxiemeTour    DATE  NOT NULL ,
 	troisiemeTour   DATE  NOT NULL ,
 	typeElection    TYPEELECTION NOT NULL  ,
-	CONSTRAINT Elections_PK PRIMARY KEY (idElection)
+	idAdmin         INT NOT NULL ,
+	CONSTRAINT Elections_PK PRIMARY KEY (idElection) ,
+	CONSTRAINT elections_Admin_FK FOREIGN KEY (idAdmin) REFERENCES public.Admins(id)
 )WITHOUT OIDS;
 
 
@@ -121,6 +123,18 @@ CREATE TABLE public.Organise(
 
 	,CONSTRAINT Organise_Elections_FK FOREIGN KEY (idElection) REFERENCES public.Elections(idElection)
 	,CONSTRAINT Organise_BureauDeVote0_FK FOREIGN KEY (idBureau) REFERENCES public.BureauDeVote(idBureau)
+)WITHOUT OIDS;
+
+------------------------------------------------------------
+-- Table: Acces
+------------------------------------------------------------
+CREATE TABLE public.Acces(
+	idAdmin   INT  NOT NULL ,
+	idElection     INT  NOT NULL  ,
+	CONSTRAINT Acces_PK PRIMARY KEY (idAdmin,idElection)
+
+	,CONSTRAINT Acces_Admins_FK FOREIGN KEY (idAdmin) REFERENCES public.Admins(id)
+	,CONSTRAINT Acces_Elections_FK FOREIGN KEY (idElection) REFERENCES public.Elections(idelection)
 )WITHOUT OIDS;
 
 
