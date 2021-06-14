@@ -9,6 +9,7 @@ CREATE TYPE TypeElection AS ENUM ('Municipales','Cantonales','Regionales','Legis
 -- Table: Admins
 ------------------------------------------------------------
 CREATE TABLE public.Admins(
+	id         SERIAL ,
 	email      VARCHAR (50) NOT NULL ,
 	password   VARCHAR NOT NULL  ,
 	CONSTRAINT Admins_PK PRIMARY KEY (email)
