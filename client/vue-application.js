@@ -1,4 +1,5 @@
 const Home = window.httpVueLoader('./components/Home.vue')
+const Login = window.httpVueLoader('./components/SeConnecter.vue')
 const Admin = window.httpVueLoader('./components/Admin.vue')
 
 const AdminResultats = window.httpVueLoader('./components/admin/Resultats.vue')
@@ -7,6 +8,7 @@ const AdminNouvelleElection = window.httpVueLoader('./components/admin/NouvelleE
 
 const routes = [
   { path: '/', component: Home},
+  { path: '/user', component: Login},
   { path: '/admin', component: Admin,
     children: [
       {path: 'resultats', component: AdminResultats},

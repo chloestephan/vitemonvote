@@ -1,0 +1,82 @@
+<template>
+    <div>
+
+        <div v-if="!isUserConnected" class="container">
+
+            <div class="getPassword">
+                <form @submit.prevent="getPassword">
+                    <h3>Récupérer son mot de passe</h3>
+                    <input type="text" v-model="emailRegister" placeholder="Email" required>
+                    <button type="submit">Récupérer</button>
+                </form>
+            </div>
+
+            <div class="login">     
+                <form @submit.prevent="loginUser">
+                    <h3>Se connecter</h3>
+                    <input type="text" v-model="emailLogin" placeholder="Email" required>
+                    <input type="password" v-model="password" placeholder="Mot de passe" required>
+
+                    <button type="submit">Connexion</button>
+                </form>
+            </div>
+
+        </div>
+
+        <div v-else>
+            <div>ZEBI ZEBI ZEBI ZEBI</div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+module.exports = {
+  data () {
+    return {
+            emailRegister: '',
+            emailLogin: '',
+            password: '',
+            isUserConnected: false,
+    }
+  },
+  methods: {
+      async getPassword() {
+          if (this.email !== '') {
+              const user = {
+                  email: this.emailRegister,
+              }
+
+              const result = await axios.post('/api/user/register', user)
+          }
+      },
+      async loginUser() {
+          if (this.email !== '' && this.password !== '') {
+                const user = {
+                    email: this.emailLogin,
+                    password: this.password,
+                }
+
+                const result = await axios.post('/api/user/login', user)
+                this.isUserConnected = result.data.connected
+          }
+      }
+  }
+}
+</script>
+
+<style scoped>
+
+.container {
+    display: flex;
+    justify-content: space-around;
+}
+.getPassword, .login {
+    margin-bottom: 30px;
+}
+
+.getPassword {
+    margin-top: 30px;
+}
+
+</style>

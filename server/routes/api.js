@@ -474,3 +474,66 @@ router.get('/doleance/trajet/:id', async (req, res) => {
   }
   res.json(result.rows)
 })
+          
+function generateP() {
+  var pass = '';
+  var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + 
+          'abcdefghijklmnopqrstuvwxyz0123456789@#$';
+    
+  for (i = 1; i <= 10; i++) {
+      var char = Math.floor(Math.random()
+                  * str.length + 1);
+        
+      pass += str.charAt(char)
+  }
+    
+  return pass;
+}
+
+router.post('/user/register', async (req, res) => {
+
+  const email = req.body.email
+  const password = generateP()
+  const hash = await bcrypt.hash(password, 10)
+
+  const sqlVerif = "SELECT * FROM public.user WHERE email=$1"
+  const result = await client.query({
+    text: sqlVerif,
+    values: [email]
+  })
+
+  if (result.rowCount !== 0) {
+    res.status(401).json({ message: 'User already exist'})
+    return
+  }
+
+  const sqlInsert = "INSERT INTO public.user (email, password) VALUES ($1, $2)"
+  await client.query({
+    text: sqlInsert,
+    values: [email, hash]
+  })
+
+  res.json({message: 'User has been created'})
+})
+
+router.post('/user/login', async (req, res) => {
+  const email = req.body.email
+  const password = req.body.password
+  const sql = "SELECT * FROM public.user WHERE email=$1"
+  const result = await client.query({
+    text: sql,
+    values: [email]
+  })
+
+  if(result.rowCount === 0){
+    res.status(401).json({ message: 'User does not already exist, please register first.'})
+    return
+  }
+
+  if (! await bcrypt.compare(password, result.rows[0].password)){
+    res.status(401).json({message: 'Wrong password'})
+    return
+  }
+  
+  res.json({connected: true, message: 'You are now logged in as an user.'})
+})
