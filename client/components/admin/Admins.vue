@@ -1,29 +1,27 @@
 <template>
   <div>
-
     <div class="container">
-        <div class="column-1">
-            <h2>Ajouter un administrateur</h2>
-            <hr>
-            <div>
-                <form @submit.prevent="ajouterAdmin">
-                    <input type="text" v-model="email" placeholder="Entrez l'adresse mail" required>
-                    <input type="text" v-model="password" placeholder="Entrez le mot de passe" required>
+      <div class="column-1">
+        <h2>Ajouter un administrateur</h2>
+        <hr>
+        <div>
+          <form @submit.prevent="ajouterAdmin">
+            <input type="text" v-model="email" placeholder="Entrez l'adresse mail" required>
+            <input type="text" v-model="password" placeholder="Entrez le mot de passe" required>
 
-                    <button type="submit">Ajouter</button>
-                </form>
-            </div>
+            <button type="submit">Ajouter</button>
+          </form>
         </div>
-        <div class="column-2">
-            <h2>Liste des administrateurs</h2>
-            <hr>
-            <div v-for="administrateur in administrateurs" :key="administrateur.id" class="admin">
-                <p id="email">{{administrateur.email}}</p>
-                <p v-if="administrateur.id !== currentAdmin" class="cross" @click="deleteAdmin(administrateur)">✖️</p>
-            </div>
+      </div>
+      <div class="column-2">
+        <h2>Liste des administrateurs</h2>
+        <hr>
+        <div v-for="administrateur in administrateurs" :key="administrateur.id" class="admin">
+          <p id="email">{{administrateur.email}}</p>
+          <p v-if="administrateur.id !== currentAdmin" class="cross" @click="deleteAdmin(administrateur)">✖️</p>
         </div>
+      </div>
     </div>
-
   </div>
 </template>
 

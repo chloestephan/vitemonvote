@@ -311,6 +311,20 @@ router.delete('/admin/doleance/:id', async (req, res) =>{
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
+router.get('/admin/elections', async(req, res) =>{
+  if (req.session.admin === true){
+    const adminId = req.session.adminId
+    const sql = "SELECT id_election FROM acces WHERE id_admin=$1"
+    const result = await client.query({
+      text: sql,
+      values: [adminId]
+    })
+    res.json(result.rows)
+    return
+  }
+  res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
+})
+
 //End of admin part
 
 router.get('/maraudes', async (req, res) => {
