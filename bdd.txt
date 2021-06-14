@@ -20,10 +20,10 @@ CREATE TABLE public.Admins(
 -- Table: User
 ------------------------------------------------------------
 CREATE TABLE public.User(
-	numIdent   SERIAL ,
+	num_ident   SERIAL ,
 	email      VARCHAR (50) NOT NULL ,
 	password   VARCHAR NOT NULL  ,
-	CONSTRAINT User_PK PRIMARY KEY (numIdent)
+	CONSTRAINT User_PK PRIMARY KEY (num_ident)
 )WITHOUT OIDS;
 
 
@@ -31,14 +31,14 @@ CREATE TABLE public.User(
 -- Table: Elections
 ------------------------------------------------------------
 CREATE TABLE public.Elections(
-	idElection      SERIAL ,
-	premierTour     DATE  NOT NULL ,
-	deuxiemeTour    DATE  NOT NULL ,
-	troisiemeTour   DATE  NOT NULL ,
-	typeElection    TYPEELECTION NOT NULL  ,
-	idAdmin         INT NOT NULL ,
-	CONSTRAINT Elections_PK PRIMARY KEY (idElection) ,
-	CONSTRAINT elections_Admin_FK FOREIGN KEY (idAdmin) REFERENCES public.Admins(id)
+	id_election      SERIAL ,
+	premier_tour     DATE  NOT NULL ,
+	deuxieme_tour    DATE  NOT NULL ,
+	troisieme_tour   DATE  NOT NULL ,
+	type_election    TYPEELECTION NOT NULL  ,
+	id_admin         INT NOT NULL ,
+	CONSTRAINT Elections_PK PRIMARY KEY (id_election) ,
+	CONSTRAINT elections_Admin_FK FOREIGN KEY (id_admin) REFERENCES public.Admins(id)
 )WITHOUT OIDS;
 
 
@@ -46,9 +46,9 @@ CREATE TABLE public.Elections(
 -- Table: Liste
 ------------------------------------------------------------
 CREATE TABLE public.Liste(
-	idListe          SERIAL ,
-	PartiPolitique   VARCHAR (50) NOT NULL  ,
-	CONSTRAINT Liste_PK PRIMARY KEY (idListe)
+	id_liste          SERIAL ,
+	parti_politique   VARCHAR (50) NOT NULL  ,
+	CONSTRAINT Liste_PK PRIMARY KEY (id_liste)
 )WITHOUT OIDS;
 
 
@@ -57,7 +57,7 @@ CREATE TABLE public.Liste(
 ------------------------------------------------------------
 CREATE TABLE public.Membre(
 	id           SERIAL ,
-	nomComplet   VARCHAR (50) NOT NULL  ,
+	nom_complet   VARCHAR (50) NOT NULL  ,
 	CONSTRAINT Membre_PK PRIMARY KEY (id)
 )WITHOUT OIDS;
 
@@ -66,9 +66,9 @@ CREATE TABLE public.Membre(
 -- Table: BureauDeVote
 ------------------------------------------------------------
 CREATE TABLE public.BureauDeVote(
-	idBureau          SERIAL ,
-	nbrTotalVotants   INT  NOT NULL  ,
-	CONSTRAINT BureauDeVote_PK PRIMARY KEY (idBureau)
+	id_bureau          SERIAL ,
+	nbr_total_votants   INT  NOT NULL  ,
+	CONSTRAINT BureauDeVote_PK PRIMARY KEY (id_bureau)
 )WITHOUT OIDS;
 
 
@@ -76,11 +76,11 @@ CREATE TABLE public.BureauDeVote(
 -- Table: appartient
 ------------------------------------------------------------
 CREATE TABLE public.appartient(
-	idListe   INT  NOT NULL ,
+	id_liste   INT  NOT NULL ,
 	id        INT  NOT NULL  ,
-	CONSTRAINT appartient_PK PRIMARY KEY (idListe,id)
+	CONSTRAINT appartient_PK PRIMARY KEY (id_liste,id)
 
-	,CONSTRAINT appartient_Liste_FK FOREIGN KEY (idListe) REFERENCES public.Liste(idListe)
+	,CONSTRAINT appartient_Liste_FK FOREIGN KEY (id_liste) REFERENCES public.Liste(id_liste)
 	,CONSTRAINT appartient_Membre0_FK FOREIGN KEY (id) REFERENCES public.Membre(id)
 )WITHOUT OIDS;
 
@@ -89,13 +89,13 @@ CREATE TABLE public.appartient(
 -- Table: Votants
 ------------------------------------------------------------
 CREATE TABLE public.Votants(
-	idBureau   INT  NOT NULL ,
-	numIdent   INT  NOT NULL ,
-	aVote      BOOL  NOT NULL  ,
-	CONSTRAINT Votants_PK PRIMARY KEY (idBureau,numIdent)
+	id_bureau   INT  NOT NULL ,
+	num_ident   INT  NOT NULL ,
+	a_vote      BOOL  NOT NULL  ,
+	CONSTRAINT Votants_PK PRIMARY KEY (id_bureau,num_ident)
 
-	,CONSTRAINT Votants_BureauDeVote_FK FOREIGN KEY (idBureau) REFERENCES public.BureauDeVote(idBureau)
-	,CONSTRAINT Votants_User0_FK FOREIGN KEY (numIdent) REFERENCES public.User(numIdent)
+	,CONSTRAINT Votants_BureauDeVote_FK FOREIGN KEY (id_bureau) REFERENCES public.BureauDeVote(id_bureau)
+	,CONSTRAINT Votants_User0_FK FOREIGN KEY (num_ident) REFERENCES public.User(num_ident)
 )WITHOUT OIDS;
 
 
@@ -103,13 +103,13 @@ CREATE TABLE public.Votants(
 -- Table: Postulant
 ------------------------------------------------------------
 CREATE TABLE public.Postulant(
-	idBureau   INT  NOT NULL ,
-	idListe    INT  NOT NULL ,
-	nbrVotes   INT  NOT NULL  ,
-	CONSTRAINT Postulant_PK PRIMARY KEY (idBureau,idListe)
+	id_bureau   INT  NOT NULL ,
+	id_liste    INT  NOT NULL ,
+	nbr_votes   INT  NOT NULL  ,
+	CONSTRAINT Postulant_PK PRIMARY KEY (id_bureau,id_liste)
 
-	,CONSTRAINT Postulant_BureauDeVote_FK FOREIGN KEY (idBureau) REFERENCES public.BureauDeVote(idBureau)
-	,CONSTRAINT Postulant_Liste0_FK FOREIGN KEY (idListe) REFERENCES public.Liste(idListe)
+	,CONSTRAINT Postulant_BureauDeVote_FK FOREIGN KEY (id_bureau) REFERENCES public.BureauDeVote(id_bureau)
+	,CONSTRAINT Postulant_Liste0_FK FOREIGN KEY (id_liste) REFERENCES public.Liste(id_liste)
 )WITHOUT OIDS;
 
 
@@ -117,24 +117,24 @@ CREATE TABLE public.Postulant(
 -- Table: Organise
 ------------------------------------------------------------
 CREATE TABLE public.Organise(
-	idElection   INT  NOT NULL ,
-	idBureau     INT  NOT NULL  ,
-	CONSTRAINT Organise_PK PRIMARY KEY (idElection,idBureau)
+	id_election   INT  NOT NULL ,
+	id_bureau     INT  NOT NULL  ,
+	CONSTRAINT Organise_PK PRIMARY KEY (id_election,id_bureau)
 
-	,CONSTRAINT Organise_Elections_FK FOREIGN KEY (idElection) REFERENCES public.Elections(idElection)
-	,CONSTRAINT Organise_BureauDeVote0_FK FOREIGN KEY (idBureau) REFERENCES public.BureauDeVote(idBureau)
+	,CONSTRAINT Organise_Elections_FK FOREIGN KEY (id_election) REFERENCES public.Elections(id_election)
+	,CONSTRAINT Organise_BureauDeVote0_FK FOREIGN KEY (id_bureau) REFERENCES public.BureauDeVote(id_bureau)
 )WITHOUT OIDS;
 
 ------------------------------------------------------------
 -- Table: Acces
 ------------------------------------------------------------
 CREATE TABLE public.Acces(
-	idAdmin   INT  NOT NULL ,
-	idElection     INT  NOT NULL  ,
-	CONSTRAINT Acces_PK PRIMARY KEY (idAdmin,idElection)
+	id_admin   INT  NOT NULL ,
+	id_election     INT  NOT NULL  ,
+	CONSTRAINT Acces_PK PRIMARY KEY (id_admin,id_election)
 
-	,CONSTRAINT Acces_Admins_FK FOREIGN KEY (idAdmin) REFERENCES public.Admins(id)
-	,CONSTRAINT Acces_Elections_FK FOREIGN KEY (idElection) REFERENCES public.Elections(idelection)
+	,CONSTRAINT Acces_Admins_FK FOREIGN KEY (id_admin) REFERENCES public.Admins(id)
+	,CONSTRAINT Acces_Elections_FK FOREIGN KEY (id_election) REFERENCES public.Elections(id_election)
 )WITHOUT OIDS;
 
 
