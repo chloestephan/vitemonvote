@@ -1,0 +1,92 @@
+/* --- footer --- */
+/* ------ whole footer ------ */
+.footer-distributed {
+	background: #fff;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.12);
+	box-sizing: border-box;
+	width: 100%;
+	text-align: left;
+	font-family:'Montserrat',Arial, Helvetica, sans-serif;
+    font-weight: 600;
+	padding: 45px 50px;
+}
+
+/* ------ left part of the footer ------ */
+.footer-distributed .footer-left p{
+	color: #001D6E;
+	font-size: 18px;
+	margin: 0;
+    letter-spacing: 2px;
+}
+
+/* links - disposition + writing style */
+.footer-distributed p.footer-links{
+	font-size:20px;
+	font-weight: bold;
+	color:  #001D6E;
+	margin: 0 0 10px;
+  	padding: 0;
+}
+
+.footer-distributed p.footer-links a {
+	display:inline-block;
+	line-height: 1.8;
+	position: relative;
+	color: #001D6E;
+	text-decoration: none;
+}
+
+/* underline animation */
+.footer-distributed p.footer-links > a::before {
+	content: "";
+	position: absolute;
+	width: 100%;
+	height: 2px;
+	bottom: 0;
+	left: 0;
+	background-color: #D60920;
+	visibility: hidden;
+	transform: scaleX(0);
+	transition: all 0.3s ease-in-out 0s;
+}
+
+.footer-distributed p.footer-links > a:hover::before {
+	visibility: visible;
+	transform: scaleX(1);
+}
+
+/* ------ right part of the footer ------ */
+.footer-distributed .footer-right{
+	float: right;
+	margin-top: 6px;
+	max-width: 200px;
+}
+
+
+
+.footer-distributed .footer-right a:hover {
+  transform: scale(1.1);
+  transition: all 0.4s;
+}
+
+/* ------ MEDIA QUERIES ------ */
+@media (max-width: 800px) {
+
+	.footer-distributed .footer-left, .footer-distributed .footer-right{
+		text-align: center;
+	}
+
+	.footer-distributed .footer-right{
+		float: none;
+		margin: 0 auto 20px;
+	}
+
+	.footer-distributed .footer-left p.footer-links{
+		line-height: 1.8;
+	}
+}
+
+
+#footer-logo {
+	margin-right: 50px;
+}
