@@ -1,5 +1,7 @@
-# Projet Lucioles
-A school project we developed for an assiciation distributing food to the homeless in Paris. They needed help to organize the distributions.
+# Projet Vite mon Vote
+
+Louis Clocher - Nicolas Cresseaux - Tristan Fievet - Maxime Leviel - Chloé Stéphan
+
 
 # Install
 
