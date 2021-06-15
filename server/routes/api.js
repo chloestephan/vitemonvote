@@ -516,7 +516,7 @@ router.post('/user/register', async (req, res) => {
   const password = generateP()
   const hash = await bcrypt.hash(password, 10)
 
-  if (numCarteElec.length !== 9) {
+  if (numCarteElec.length !== 9) {  // On regarde si la syntaxe du num est correcte
     res.json({popup: 'Le numéro de la carte électorale est incorrect !'})                  // POPUP
     return
   }
@@ -527,6 +527,26 @@ router.post('/user/register', async (req, res) => {
         return
       }
     }
+  }
+
+  if (codePostal.length !== 5) {  // On regarde si la syntaxe du codePostal est correcte
+    res.json({popup: 'Le code postal est incorrect !'})                  // POPUP
+    return
+  }
+  else {
+    for (let i = 0; i < codePostal.length; i++) {
+      if (!isDigit(codePostal[i])) {
+        res.json({popup: 'Le code postal est incorrect !'})                  // POPUP
+        return
+      }
+    }
+  }
+
+  const splitEmail = email.split('@')
+
+  if (splitEmail[1] === undefined || splitEmail[1] === "" || splitEmail[2] !== undefined) {
+    res.json({popup: 'L\'adresse mail est incorrect !'})                  // POPUP
+    return
   }
 
   const sqlVerif = "SELECT * FROM public.Electeur WHERE num_carte_electeur=$1"
@@ -592,7 +612,7 @@ router.post('/user/login', async (req, res) => {
   }
 
   if (! await bcrypt.compare(password, result.rows[0].password)){
-    res.json({popup: 'Le mot de passe renseigné est incorrect !'})                               // POPUP ça fait plante le serveur si on met un email sans @ je crois
+    res.json({popup: 'Le mot de passe renseigné est incorrect !'})                               // POPUP
     return
   }
   
