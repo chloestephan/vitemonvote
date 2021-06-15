@@ -140,5 +140,4 @@ CREATE TABLE public.Acces(
 	,CONSTRAINT Acces_Elections_FK FOREIGN KEY (id_election) REFERENCES public.Elections(id_election)
 )WITHOUT OIDS;
 
-
-
+INSERT INTO admins(email, password) VALUES ('admin', '$2b$10$OwYLLwN.wross8t4LYhbjOaYCfa158eUxF2t/5YE0adZNHlI4otSe')
