@@ -3,14 +3,14 @@
     <h2>Nouvelle election</h2>
     <hr>
 
-    <form @submit.prevent="creerListe">
+    <div>
       <input type="text" v-model="nom" placeholder="Nom de l'élection" required>
 
       <label for="start">Premier tour:</label>
-      <input type="date" id="start" name="premierTourDate">
+      <input type="date" id="start" name="premierTourDate" v-model="date">
 
       <label for="type-election">Choisir le type d'élection:</label>
-      <select name="typeElection" id="type-election">
+      <select name="typeElection" id="type-election" v-model="typeElection">
         <option value="">--Choisir une option--</option>
         <option value="Municipales">Municipales</option>
         <option value="Cantonales">Département</option>
@@ -23,9 +23,10 @@
 
       <label for="votants">Entrer la liste des votants à l'élection:</label>
       <input type="file" id="votants" name="votants" accept=".xlxs">
-      <div v-for="(liste, index1) in candidats" :key="index1" class="">
-        <h2>Nouvelle liste</h2>
-        <hr>
+      <div v-if="typeElection==='Presidentielle'">
+        <div v-for="(liste, index1) in candidats" :key="index1" class="">
+          <h2>Nouvelle liste</h2>
+          <hr>
 
           <input type="text" class="nom-liste" v-model="nomListe" placeholder="Nom de la liste" required>
 
@@ -37,10 +38,11 @@
           </div>
           <button type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
 
-        <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+          <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+        </div>
+        <button type="button" @click="creerEletionPresidentielle">Valider</button>
       </div>
-    <button type="submit">Valider</button>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -51,9 +53,15 @@ module.exports = {
   data () {
     return {
       nom:'',
+      date: null,
+      typeElection: '',
       nomListe: [''],
       candidats: []
     }
+  },
+
+  computed: {
+
   },
 
   created: function(){
@@ -72,21 +80,15 @@ module.exports = {
       this.candidats.push([''])
     },
 
-    async creerEletion(){
-      if(this.etapes.length > 1){
-        const trajet = {
-          nom: this.nom,
-          depart: this.etapes[0],
-          arrivee: this.etapes[this.etapes.length -1],
-          trajet: this.etapes,
-        }
+    async creerEletionPresidentielle(){
+      const election = {
+        nom: this.nom,
+        date: this.date,
+        typeElection: this.typeElection,
+      }
 
-        const result = await axios.post('/api/admin/trajet', trajet)
-        alert(result.data.message)
-      }
-      else{
-        alert("Il faut au moins 2 étapes.")
-      }
+      const result = await axios.post('/api/admin/election', election)
+      alert(result.data.message)
     },
   }
 }
