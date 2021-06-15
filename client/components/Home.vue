@@ -14,7 +14,7 @@
             </div>
 
             <div class="column">
-              <h2>Amene le bureau de vote chez vous</h2>
+              <h2>Votez d'où vous voulez, quand vous voulez.</h2>
               <p>Vous pouvez voter en seulement quelques clics grâce au lien de connexion qui vous est envoyé par mail. En effet, ce lien vous fait part de vos 
                 identifiants de connexion afin de voter en toute sécurité et anonymement.
               </p>
@@ -29,7 +29,7 @@
           <div class="rang-centre">
 
             <div class="column">
-              <h2>Facilite la procédure de vote</h2>
+              <h2>Facilite la procédure de vote.</h2>
               <p>Vous n'avez plus à vos déplacer aux bureaux de vote, à attendre et à respecter scrupuleusement les règles afin de ne pas annuler votre vote. Vous pouvez voter confortablement depuis chez vous, et ce en toute sécurité.</p>
             </div>
 
@@ -50,7 +50,7 @@
             </div>
 
             <div class="column">
-              <h2>Centralise avec sécurité les résultats des élections</h2>
+              <h2>Centralise avec sécurité les résultats des élections.</h2>
               <p>Les résultats sont récupérés et vérifiés directement via Vite Mon Vote. Ainsi, les résultats sont comptés bien plus rapidement.</p>
             </div>
 

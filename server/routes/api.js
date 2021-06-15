@@ -495,27 +495,27 @@ function generateP() {
   var pass = '';
   var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + 
           'abcdefghijklmnopqrstuvwxyz0123456789@#$';
-    
   for (i = 1; i <= 10; i++) {
       var char = Math.floor(Math.random()
                   * str.length + 1);
         
       pass += str.charAt(char)
   }
-    
   return pass;
 }
 
 router.post('/user/register', async (req, res) => {
 
   const email = req.body.email
+  const numCarteElec = req.body.numCarteElec
+  const codePostal = req.body.codePostal
   const password = generateP()
   const hash = await bcrypt.hash(password, 10)
 
-  const sqlVerif = "SELECT * FROM public.user WHERE email=$1"
+  const sqlVerif = "SELECT * FROM public.Electeur WHERE num_carte_electeur=$1"
   const result = await client.query({
     text: sqlVerif,
-    values: [email]
+    values: [numCarteElec]
   })
 
   if (result.rowCount !== 0) {
@@ -523,10 +523,10 @@ router.post('/user/register', async (req, res) => {
     return
   }
 
-  const sqlInsert = "INSERT INTO public.user (email, password) VALUES ($1, $2)"
+  const sqlInsert = "INSERT INTO public.Electeur (num_carte_electeur, email, password, code_postal) VALUES ($1, $2, $3, $4)"
   await client.query({
     text: sqlInsert,
-    values: [email, hash]
+    values: [numCarteElec, email, hash, codePostal]
   })
 
   let transporter = nodemailer.createTransport({
@@ -561,7 +561,7 @@ router.post('/user/register', async (req, res) => {
 router.post('/user/login', async (req, res) => {
   const email = req.body.email
   const password = req.body.password
-  const sql = "SELECT * FROM public.user WHERE email=$1"
+  const sql = "SELECT * FROM public.Electeur WHERE email=$1"
   const result = await client.query({
     text: sql,
     values: [email]
