@@ -504,6 +504,10 @@ function generateP() {
   return pass;
 }
 
+function isDigit(c) {
+  return c >= '0' && c <= '9';
+}
+
 router.post('/user/register', async (req, res) => {
 
   const email = req.body.email
@@ -512,6 +516,19 @@ router.post('/user/register', async (req, res) => {
   const password = generateP()
   const hash = await bcrypt.hash(password, 10)
 
+  if (numCarteElec.length !== 9) {
+    res.json({popup: 'Le numéro de la carte électorale est incorrect !'})                  // POPUP
+    return
+  }
+  else {
+    for (let i = 0; i < numCarteElec.length; i++) {
+      if (!isDigit(numCarteElec[i])) {
+        res.json({popup: 'Le numéro de la carte électorale est incorrect !'})                  // POPUP
+        return
+      }
+    }
+  }
+
   const sqlVerif = "SELECT * FROM public.Electeur WHERE num_carte_electeur=$1"
   const result = await client.query({
     text: sqlVerif,
@@ -519,15 +536,9 @@ router.post('/user/register', async (req, res) => {
   })
 
   if (result.rowCount !== 0) {
-    res.status(401).json({ message: 'User already exist'})
+    res.json({popup: 'Le numéro de la carte électorale a déjà été utilisée !'})             // POPUP
     return
   }
-
-  const sqlInsert = "INSERT INTO public.Electeur (num_carte_electeur, email, password, code_postal) VALUES ($1, $2, $3, $4)"
-  await client.query({
-    text: sqlInsert,
-    values: [numCarteElec, email, hash, codePostal]
-  })
 
   let transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -549,11 +560,19 @@ router.post('/user/register', async (req, res) => {
   transporter.sendMail(mailOptions, function(err, data) {
     if (err) {
       console.log("Error occurs", err)
+      res.json({popup: 'Le mail donné n\'existe pas !'})
+      return
     } 
     else  {
       console.log("Mail has been sent")
     }
   });
+
+  const sqlInsert = "INSERT INTO public.Electeur (num_carte_electeur, email, password, code_postal) VALUES ($1, $2, $3, $4)"
+  await client.query({
+    text: sqlInsert,
+    values: [numCarteElec, email, hash, codePostal]
+  })
 
   res.json({message: 'User has been created'})
 })
@@ -568,12 +587,12 @@ router.post('/user/login', async (req, res) => {
   })
 
   if(result.rowCount === 0){
-    res.status(401).json({ message: 'User does not already exist, please register first.'})
+    res.json({ popup: 'L\'email renseigné n\'est pas associé à un compte, veuillez récupérer votre mot de passe avant de vous connecter !'})                // POPUP
     return
   }
 
   if (! await bcrypt.compare(password, result.rows[0].password)){
-    res.status(401).json({message: 'Wrong password'})
+    res.json({popup: 'Le mot de passe renseigné est incorrect !'})                               // POPUP ça fait plante le serveur si on met un email sans @ je crois
     return
   }
   

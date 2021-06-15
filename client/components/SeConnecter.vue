@@ -26,7 +26,15 @@
         </div>
 
         <div v-else>
-            <div>ZEBI ZEBI ZEBI ZEBI</div>
+            <div>Vous êtes connectés ! Mais on a pas fait la suite :(</div>
+        </div>
+
+        <div :class="{displayPop : isError}" class="overlay">
+            <div class="popup">
+                <h2>Erreur</h2>
+                <p>{{ popup }}</p>
+                <button v-on:click="closePopup" class="cross">&times;</button>
+            </div>
         </div>
 
     </div>
@@ -41,12 +49,15 @@ module.exports = {
             emailRegister: '',
             emailLogin: '',
             password: '',
+            popup: '',
+            isError: false,
             isUserConnected: false,
     }
   },
   methods: {
       async getPassword() {
-          if (this.email !== '') {
+          this.popup = ''
+          if (this.email !== '' && this.numCarteElec !== '' && this.codePostal !== '') {
               const user = {
                   numCarteElec: this.numCarteElec,
                   codePostal: this.codePostal,
@@ -54,9 +65,16 @@ module.exports = {
               }
 
               const result = await axios.post('/api/user/register', user)
+              this.popup = result.data.popup
+              console.log(this.popup)
+
+              if (!(this.popup === undefined)) {
+                  this.isError = true
+              }
           }
       },
       async loginUser() {
+          this.popup = ''
           if (this.email !== '' && this.password !== '') {
                 const user = {
                     email: this.emailLogin,
@@ -64,8 +82,17 @@ module.exports = {
                 }
 
                 const result = await axios.post('/api/user/login', user)
+                this.popup = result.data.popup
+                console.log(this.popup)
                 this.isUserConnected = result.data.connected
+                
+                if (!(this.popup === undefined)) {
+                  this.isError = true
+                }
           }
+      },
+      closePopup() {
+          this.isError = false
       }
   }
 }
@@ -74,8 +101,9 @@ module.exports = {
 <style scoped>
 
 .container {
-    /*display: flex;
-    justify-content: space-around;*/
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
     padding-top: 50px;
     padding-bottom: 50px;
     background-color: #f8f9fd;
@@ -86,7 +114,7 @@ module.exports = {
     margin-bottom: 30px;
 }
 
-.getPassword {
+.login {
     margin-top: 30px;
 }
 
@@ -96,4 +124,36 @@ module.exports = {
   background-color: #f8f9fd;
 }
 
+.overlay {
+    text-align: center;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7);
+    transition: opacity .4s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.displayPop {
+    visibility: visible;
+    opacity: 3;
+}
+
+.popup {
+    margin: 6rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 5px;
+    width: 45%;
+    position: relative;
+    transition: all 0.4s ease-in-out;
+}
+
+
+
 </style>
+
+
