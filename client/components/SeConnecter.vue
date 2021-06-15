@@ -6,6 +6,8 @@
             <div class="getPassword">
                 <form @submit.prevent="getPassword">
                     <h3>Récupérer son mot de passe</h3>
+                    <input type="text" v-model="numCarteElec" placeholder="Numéro de carte électorale" required>
+                    <input type="text" v-model="codePostal" placeholder="Code postal" required>
                     <input type="text" v-model="emailRegister" placeholder="Email" required>
                     <button type="submit">Récupérer</button>
                 </form>
@@ -34,6 +36,8 @@
 module.exports = {
   data () {
     return {
+            numCarteElec: '',
+            codePostal: '',
             emailRegister: '',
             emailLogin: '',
             password: '',
@@ -44,6 +48,8 @@ module.exports = {
       async getPassword() {
           if (this.email !== '') {
               const user = {
+                  numCarteElec: this.numCarteElec,
+                  codePostal: this.codePostal,
                   email: this.emailRegister,
               }
 
