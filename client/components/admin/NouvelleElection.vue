@@ -1,14 +1,96 @@
 <template>
   <div>
-      <h2>Nouvelle election</h2>
-      <hr>
+    <h2>Nouvelle election</h2>
+    <hr>
+
+    <form @submit.prevent="creerListe">
+      <input type="text" v-model="nom" placeholder="Nom de l'élection" required>
+
+      <label for="start">Premier tour:</label>
+      <input type="date" id="start" name="premierTourDate">
+
+      <label for="type-election">Choisir le type d'élection:</label>
+      <select name="typeElection" id="type-election">
+        <option value="">--Choisir une option--</option>
+        <option value="Municipales">Municipales</option>
+        <option value="Cantonales">Département</option>
+        <option value="Regionales">Regionales</option>
+        <option value="Legislatives">Legislatives</option>
+        <option value="Presidentielle">Presidentielle</option>
+        <option value="Europeenes">Européennes</option>
+        <option value="Referundum">Referundum</option>
+      </select>
+
+      <label for="votants">Entrer la liste des votants à l'élection:</label>
+      <input type="file" id="votants" name="votants" accept=".xlxs">
+      <div v-for="(liste, index1) in candidats" :key="index1" class="">
+        <h2>Nouvelle liste</h2>
+        <hr>
+
+          <input type="text" class="nom-liste" v-model="nomListe" placeholder="Nom de la liste" required>
+
+          <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
+            <div class="">
+              <input type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat ' + index2" required>
+              <p class="delete" @click="deleteCandidat(index1, index2)">✖️</p>
+            </div>
+          </div>
+          <button type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
+
+        <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+      </div>
+    <button type="submit">Valider</button>
+    </form>
   </div>
 </template>
 
 
 <script>
+
 module.exports = {
+  data () {
+    return {
+      nom:'',
+      nomListe: [''],
+      candidats: []
+    }
+  },
+
+  created: function(){
+    this.candidats.push([''])
+  },
+
+  methods:{
+    deleteCandidat(index1, index2){
+      this.candidats[index1].splice(index2, 1)
+    },
+    ajouterCandidat(index){
+      this.candidats[index].push('')
+    },
+
+    async ajouterListe(){
+      this.candidats.push([''])
+    },
+
+    async creerEletion(){
+      if(this.etapes.length > 1){
+        const trajet = {
+          nom: this.nom,
+          depart: this.etapes[0],
+          arrivee: this.etapes[this.etapes.length -1],
+          trajet: this.etapes,
+        }
+
+        const result = await axios.post('/api/admin/trajet', trajet)
+        alert(result.data.message)
+      }
+      else{
+        alert("Il faut au moins 2 étapes.")
+      }
+    },
+  }
 }
+
 </script>
 
 <style scoped>
