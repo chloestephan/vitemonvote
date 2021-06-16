@@ -32,8 +32,9 @@
         <div :class="{displayPop : isError}" class="overlay">
             <div class="popup">
                 <h2>Erreur</h2>
+                <br>
                 <p>{{ popup }}</p>
-                <button v-on:click="closePopup" class="cross">&times;</button>
+                <button v-on:click="closePopup" class="cross">X</button>
             </div>
         </div>
 
@@ -139,7 +140,7 @@ module.exports = {
 
 .displayPop {
     visibility: visible;
-    opacity: 3;
+    opacity: 1;
 }
 
 .popup {
@@ -147,12 +148,24 @@ module.exports = {
     padding: 2rem;
     background: #fff;
     border-radius: 5px;
-    width: 45%;
+    width: 35%;
     position: relative;
-    transition: all 0.4s ease-in-out;
+    transition: all .4s ease-in-out;
 }
 
+.cross {
+    position: absolute;
+    top: 7px;
+    bottom: 0;
+    right: 7px;
+    width: 10px;
+}
 
+h2 {
+    color: #001D6E;
+    font-family: Poppins-Bold;
+    font-size: 30px;
+}
 
 </style>
 

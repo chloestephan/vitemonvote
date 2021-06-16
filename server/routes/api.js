@@ -556,7 +556,7 @@ router.post('/user/register', async (req, res) => {
   })
 
   if (result.rowCount !== 0) {
-    res.json({popup: 'Le numéro de la carte électorale a déjà été utilisée !'})             // POPUP
+    res.json({popup: 'Le numéro de la carte électorale a déjà été utilisé !'})             // POPUP
     return
   }
 
