@@ -49,7 +49,7 @@ CREATE TABLE public.Elections(
 ------------------------------------------------------------
 CREATE TABLE public.Liste(
 	id_liste          SERIAL ,
-	parti_politique   VARCHAR (50) NOT NULL  ,
+	nom_liste   VARCHAR (50) NOT NULL  ,
 	CONSTRAINT Liste_PK PRIMARY KEY (id_liste)
 )WITHOUT OIDS;
 
@@ -58,9 +58,9 @@ CREATE TABLE public.Liste(
 -- Table: Membre
 ------------------------------------------------------------
 CREATE TABLE public.Membre(
-	id           SERIAL ,
+	id_liste      INT NOT NULL ,
 	nom_complet   VARCHAR (50) NOT NULL  ,
-	CONSTRAINT Membre_PK PRIMARY KEY (id)
+	CONSTRAINT Membre_PK PRIMARY KEY (id_liste, nom_complet)
 )WITHOUT OIDS;
 
 
@@ -68,23 +68,9 @@ CREATE TABLE public.Membre(
 -- Table: BureauDeVote
 ------------------------------------------------------------
 CREATE TABLE public.BureauDeVote(
-	id_bureau          SERIAL ,
 	code_postal       Varchar (50) NOT NULL ,
 	nbr_total_votants   INT  NOT NULL  ,
-	CONSTRAINT BureauDeVote_PK PRIMARY KEY (id_bureau)
-)WITHOUT OIDS;
-
-
-------------------------------------------------------------
--- Table: appartient
-------------------------------------------------------------
-CREATE TABLE public.appartient(
-	id_liste   INT  NOT NULL ,
-	id        INT  NOT NULL  ,
-	CONSTRAINT appartient_PK PRIMARY KEY (id_liste,id)
-
-	,CONSTRAINT appartient_Liste_FK FOREIGN KEY (id_liste) REFERENCES public.Liste(id_liste)
-	,CONSTRAINT appartient_Membre0_FK FOREIGN KEY (id) REFERENCES public.Membre(id)
+	CONSTRAINT BureauDeVote_PK PRIMARY KEY (code_postal)
 )WITHOUT OIDS;
 
 
@@ -92,12 +78,12 @@ CREATE TABLE public.appartient(
 -- Table: Votants
 ------------------------------------------------------------
 CREATE TABLE public.Votants(
-	id_bureau   INT  NOT NULL ,
+	code_postal_bureau   Varchar (50)  NOT NULL ,
 	num_carte_electeur   Varchar (50) NOT NULL ,
 	a_vote      BOOL  NOT NULL  ,
-	CONSTRAINT Votants_PK PRIMARY KEY (id_bureau,num_carte_electeur)
+	CONSTRAINT Votants_PK PRIMARY KEY (code_postal_bureau,num_carte_electeur)
 
-	,CONSTRAINT Votants_BureauDeVote_FK FOREIGN KEY (id_bureau) REFERENCES public.BureauDeVote(id_bureau)
+	,CONSTRAINT Votants_BureauDeVote_FK FOREIGN KEY (code_postal_bureau) REFERENCES public.BureauDeVote(code_postal)
 	,CONSTRAINT Votants_Electeur0_FK FOREIGN KEY (num_carte_electeur) REFERENCES public.Electeur(num_carte_electeur)
 )WITHOUT OIDS;
 
@@ -106,12 +92,12 @@ CREATE TABLE public.Votants(
 -- Table: Postulant
 ------------------------------------------------------------
 CREATE TABLE public.Postulant(
-	id_bureau   INT  NOT NULL ,
+	code_postal_bureau   Varchar (50)  NOT NULL ,
 	id_liste    INT  NOT NULL ,
 	nbr_votes   INT  NOT NULL  ,
-	CONSTRAINT Postulant_PK PRIMARY KEY (id_bureau,id_liste)
+	CONSTRAINT Postulant_PK PRIMARY KEY (code_postal_bureau,id_liste)
 
-	,CONSTRAINT Postulant_BureauDeVote_FK FOREIGN KEY (id_bureau) REFERENCES public.BureauDeVote(id_bureau)
+	,CONSTRAINT Postulant_BureauDeVote_FK FOREIGN KEY (code_postal_bureau) REFERENCES public.BureauDeVote(code_postal)
 	,CONSTRAINT Postulant_Liste0_FK FOREIGN KEY (id_liste) REFERENCES public.Liste(id_liste)
 )WITHOUT OIDS;
 
@@ -121,11 +107,11 @@ CREATE TABLE public.Postulant(
 ------------------------------------------------------------
 CREATE TABLE public.Organise(
 	id_election   INT  NOT NULL ,
-	id_bureau     INT  NOT NULL  ,
-	CONSTRAINT Organise_PK PRIMARY KEY (id_election,id_bureau)
+	code_postal_bureau     Varchar (50)  NOT NULL  ,
+	CONSTRAINT Organise_PK PRIMARY KEY (id_election,code_postal_bureau)
 
 	,CONSTRAINT Organise_Elections_FK FOREIGN KEY (id_election) REFERENCES public.Elections(id_election)
-	,CONSTRAINT Organise_BureauDeVote0_FK FOREIGN KEY (id_bureau) REFERENCES public.BureauDeVote(id_bureau)
+	,CONSTRAINT Organise_BureauDeVote0_FK FOREIGN KEY (code_postal_bureau) REFERENCES public.BureauDeVote(code_postal)
 )WITHOUT OIDS;
 
 ------------------------------------------------------------

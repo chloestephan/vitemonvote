@@ -20,15 +20,13 @@
         <option value="Europeenes">Européennes</option>
         <option value="Referundum">Referundum</option>
       </select>
-
-      <label for="votants">Entrer la liste des votants à l'élection:</label>
-      <input type="file" id="votants" name="votants" accept=".xlxs">
+      
       <div v-if="typeElection==='Presidentielle'">
         <div v-for="(liste, index1) in candidats" :key="index1" class="">
           <h2>Nouvelle liste</h2>
           <hr>
 
-          <input type="text" class="nom-liste" v-model="nomListe" placeholder="Nom de la liste" required>
+          <input type="text" class="nom-liste" v-model="nomListes" placeholder="Nom de la liste" required>
 
           <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
             <div class="">
@@ -55,7 +53,7 @@ module.exports = {
       nom:'',
       date: null,
       typeElection: '',
-      nomListe: [''],
+      nomListes: [''],
       candidats: []
     }
   },
@@ -84,7 +82,8 @@ module.exports = {
       const election = {
         nom: this.nom,
         date: this.date,
-        typeElection: this.typeElection,
+        nomListes: this.nomListes,
+        candidats: this.candidats,
       }
 
       const result = await axios.post('/api/admin/election', election)

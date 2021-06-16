@@ -313,6 +313,38 @@ router.delete('/admin/doleance/:id', async (req, res) =>{
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
+router.post('/admin/election', async(req, res) =>{
+  if (req.session.admin === true){
+    const nom = req.body.nom
+    const date = req.body.date
+    const nomListes = req.body.nomListes
+    const candidats = req.body.candidats
+
+    let sql = "SELECT num_carte_electeur, code_postal FROM electeur"
+    let result = await client.query({
+      text: sql,
+      values: []
+    })
+
+    sql = "INSERT INTO votants VALUES ($1, $2, $3)"
+    let i;
+    for( i = 0; i < result.rows.length; i++){
+      await client.query({
+        text: sql,
+        values: [result.rows[i].num_carte_electeur, result.rows[i].code_postal, false]
+      })
+    }
+
+    for(i = 0; i < nomListes.length; i++){
+      await 
+    }
+        
+    res.json(result.rows)
+    return
+  }
+  res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
+})
+
 router.get('/admin/elections', async(req, res) =>{
   if (req.session.admin === true){
     const adminId = req.session.adminId
