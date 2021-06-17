@@ -26,7 +26,7 @@
           <h2>Nouvelle liste</h2>
           <hr>
 
-          <input type="text" class="nom-liste" v-model="nomListes" placeholder="Nom de la liste" required>
+          <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
 
           <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
             <div class="">
@@ -52,6 +52,7 @@ module.exports = {
     return {
       nom:'',
       date: null,
+      tour: '',
       typeElection: '',
       nomListes: [''],
       candidats: []
@@ -82,6 +83,7 @@ module.exports = {
       const election = {
         nom: this.nom,
         date: this.date,
+        tour: 1,
         nomListes: this.nomListes,
         candidats: this.candidats,
       }

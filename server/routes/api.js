@@ -317,29 +317,55 @@ router.post('/admin/election', async(req, res) =>{
   if (req.session.admin === true){
     const nom = req.body.nom
     const date = req.body.date
+    const tour = req.body.tour
+    let tour_precedent = null
+    if (tour !== 1){
+      tour_precedent = req.body.precedent_tour
+    }
     const nomListes = req.body.nomListes
     const candidats = req.body.candidats
 
-    let sql = "SELECT num_carte_electeur, code_postal FROM electeur"
+    let sql = "INSERT INTO elections(nom, date, tour, tour_precedent, type_election, id_admin, ouvert) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id_election"
     let result = await client.query({
+      text: sql,
+      values: [nom, date, tour, tour_precedent, "Presidentielle", req.session.adminId, false]
+    })
+
+    const id_election = result.rows[0].id_election
+
+    sql = "SELECT code_postal FROM bureaudevote"
+    result = await client.query({
       text: sql,
       values: []
     })
 
-    sql = "INSERT INTO votants VALUES ($1, $2, $3)"
-    let i;
-    for( i = 0; i < result.rows.length; i++){
+    const code_postaux = result.rows
+    for(let code_postal in code_postaux){
+      sql = "INSERT INTO organise VALUES ($1, $2)"
       await client.query({
         text: sql,
-        values: [result.rows[i].num_carte_electeur, result.rows[i].code_postal, false]
+        values: [id_election, code_postal.code_postal]
       })
     }
 
-    for(i = 0; i < nomListes.length; i++){
-      await 
+    for(let i = 0; i < nomListes.length; i++){
+      sql = "INSERT INTO liste(nom_liste, id_election, nbr_votes) VALUES ($1, $2, $3) RETURNING id_liste"
+      result = await client.query({
+        text: sql,
+        values: [nomListes[i], id_election, 0]
+      })
+      const id_liste = result.rows[0].id_liste
+      console.log({id_liste: id_liste, listes: candidats, candidats: candidats[i] })
+      for(let j = 0; j < candidats[i].length; j++){
+        sql = "INSERT INTO candidat VALUES ($1, $2)"
+        await client.query({
+          text: sql,
+          values: [id_liste, candidats[i][j]]
+        })
+      }
     }
         
-    res.json(result.rows)
+    res.json({message: "Election créée."})
     return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
