@@ -13,6 +13,7 @@
       <nav class="navbar-admin">
         <a><router-link to='/admin/nouvelleelection'>Nouvelle élection</router-link></a>
         <a><router-link to='/admin/elections'>Elections</router-link></a>
+        <a><router-link to='/admin/electeurs'>Gérer les électeurs</router-link></a>
         <a><router-link to='/admin/resultats'>Résultats</router-link></a>
         <a><router-link to='/admin/admins'>Gérer les admins</router-link></a>
       </nav>
