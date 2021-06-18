@@ -51,6 +51,18 @@ router.post('/admin/login', async (req, res) => {
   res.json({connected: true, message: 'You are now logged in as an admin.'})
 })
 
+router.post('/admin/logout', async (req, res) => {
+  const email = req.body.email
+  const password = req.body.password
+  req.email = ''
+  req.password = ''
+  req.session.adminId = null
+  req.session.admin = false 
+  res.json({connected: false, message: 'You just logged out.'})
+  
+
+})
+
 //admin management
 router.post('/admin/register', async (req, res) =>{
   if (req.session.admin === true){

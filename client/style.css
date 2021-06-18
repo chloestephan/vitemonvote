@@ -5,18 +5,17 @@
     font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
 }
 
-
 .site-container {
     display: flex;
     flex-direction: column;
-    min-height: 55vh;
 }
 
 .site-container {
     display: flex;
     flex-direction: column;
     background-color: #f8f9fd;
-    min-height: 46em;
+    padding-bottom : 70px;
+    min-height: 30em;
 }
 
 hr {
@@ -28,7 +27,7 @@ hr {
     margin-bottom: 30px;
 }
 
- /* TODO : a changer avec le logo de louis */
+/* --- logo --- */
 .logo {
     height: 80px;
     width: auto;
