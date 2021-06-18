@@ -5,7 +5,7 @@
 
             <div class="getPassword">
                 <form @submit.prevent="getPassword">
-                    <h3>Récupérer son mot de passe</h3>
+                    <h3>Récupérer son mot de passe <br> Mot de passe oublié</h3>
                     <input type="text" v-model="numCarteElec" placeholder="Numéro de carte électorale" required>
                     <input type="text" v-model="codePostal" placeholder="Code postal" required>
                     <input type="text" v-model="emailRegister" placeholder="Email" required>
@@ -17,24 +17,26 @@
                 <form @submit.prevent="loginUser">
                     <h3>Se connecter</h3>
                     <input type="text" v-model="emailLogin" placeholder="Email" required>
-                    <input type="password" v-model="password" placeholder="Mot de passe" required>
-
+                    <input type="text" v-model="password" placeholder="Mot de passe" required>
                     <button type="submit">Connexion</button>
                 </form>
             </div>
-
         </div>
 
         <div v-else>
             <div>Vous êtes connectés ! Mais on a pas fait la suite :(</div>
+            <button @click="LogOut()">oui le pain bonjour</button>
         </div>
 
-        <div :class="{displayPop : isError}" class="overlay">
+        <div :class="[{displayPop : isError}, {displayPop : mailSent}]" class="overlay">
             <div class="popup">
-                <h2>Erreur</h2>
+                <h2 v-if="isError">Erreur</h2>
+                <h2 v-else>Nouveau mot de passe</h2>
                 <br>
                 <p>{{ popup }}</p>
-                <button v-on:click="closePopup" class="cross">X</button>
+                <button v-on:click="closePopup" class="cross">
+                    X
+                </button>
             </div>
         </div>
 
@@ -52,10 +54,15 @@ module.exports = {
             password: '',
             popup: '',
             isError: false,
+            mailSent: false,
             isUserConnected: false,
     }
   },
-  methods: {
+    created: async function () {
+        const result = await axios.get('/api/user/me')
+        this.isUserConnected = result.data.user
+    },
+    methods: {
       async getPassword() {
           this.popup = ''
           if (this.email !== '' && this.numCarteElec !== '' && this.codePostal !== '') {
@@ -67,9 +74,10 @@ module.exports = {
 
               const result = await axios.post('/api/user/register', user)
               this.popup = result.data.popup
-              console.log(this.popup)
-
-              if (!(this.popup === undefined)) {
+              if (this.popup === "Un mot de passe vous a été envoyé sur votre adresse mail. Veuillez le saisir pour vous connecter !") {
+                  this.mailSent = true
+              }
+              else if (this.popup !== undefined) {
                   this.isError = true
               }
           }
@@ -94,7 +102,19 @@ module.exports = {
       },
       closePopup() {
           this.isError = false
-      }
+          this.mailSent = false
+      },
+        async LogOut(){
+            const user = {
+                email: this.email,
+                password: this.password,
+            }
+            const result = await axios.post('/api/user/logout', user)
+
+            this.emailLogin = result.data.email 
+            this.password = result.data.password
+            this.isUserConnected = result.data.connected
+        }
   }
 }
 </script>
@@ -108,7 +128,6 @@ module.exports = {
     padding-top: 50px;
     padding-bottom: 50px;
     background-color: #f8f9fd;
-
 }
 
 .getPassword, .login {
@@ -116,7 +135,7 @@ module.exports = {
 }
 
 .login {
-    margin-top: 30px;
+    margin-top: 45px;
 }
 
 .limiter {
@@ -154,11 +173,20 @@ module.exports = {
 }
 
 .cross {
+    color: black;
     position: absolute;
-    top: 7px;
+    top: 2px;
     bottom: 0;
-    right: 7px;
+    right: 2px;
     width: 10px;
+    background: #fff;
+    border: 0px;
+    font-weight: bold;
+    font-size: 120%;
+}
+
+.cross:hover {
+    color: #001D6E;
 }
 
 h2 {
@@ -166,6 +194,7 @@ h2 {
     font-family: Poppins-Bold;
     font-size: 30px;
 }
+
 
 </style>
 

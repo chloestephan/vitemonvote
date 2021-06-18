@@ -59,8 +59,6 @@ router.post('/admin/logout', async (req, res) => {
   req.session.adminId = null
   req.session.admin = false 
   res.json({connected: false, message: 'You just logged out.'})
-  
-
 })
 
 //admin management
@@ -254,7 +252,45 @@ router.delete('/admin/electeur/:id', async (req, res) => {
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
+<<<<<<< Updated upstream
 //End of admin part
+=======
+router.get('/doleance/trajet/:id', async (req, res) => {
+  const trajet_id = req.params.id
+  const sql = "SELECT * FROM doleances WHERE trajet_associe = $1 AND visible = true"
+  const result = await client.query(({
+    text: sql,
+    values: [trajet_id]
+  }))
+  if(result.rowCount === 0){
+    res.json(null)
+    return
+  }
+  res.json(result.rows)
+})
+
+/*******************************************/
+/*              PARTIE CLIENT              */
+/*******************************************/
+
+router.get('/user/me', async (req, res) => {
+  if(req.session.user === true){
+    res.json({user: true})
+    return
+  }
+  res.json({user: false})
+})
+
+router.post('/user/logout', async (req, res) => {
+  const email = req.body.email
+  const password = req.body.password
+  req.email = ''
+  req.password = ''
+  req.session.userId = null
+  req.session.user = false 
+  res.json({connected: false, message: 'You just logged out.'})
+})
+>>>>>>> Stashed changes
 
 function generateP() {
   var pass = '';
@@ -280,7 +316,7 @@ router.post('/user/register', async (req, res) => {
   const codePostal = req.body.codePostal
   const password = generateP()
   const hash = await bcrypt.hash(password, 10)
-
+  
   if (numCarteElec.length !== 9) {  // On regarde si la syntaxe du num est correcte
     res.json({popup: 'Le numéro de la carte électorale est incorrect !'})                  // POPUP
     return
@@ -309,57 +345,54 @@ router.post('/user/register', async (req, res) => {
 
   const splitEmail = email.split('@')
 
-  if (splitEmail[1] === undefined || splitEmail[1] === "" || splitEmail[2] !== undefined) {
+  if (splitEmail[0] === "" || splitEmail[1] === undefined || splitEmail[1] === "" || splitEmail[2] !== undefined) {
     res.json({popup: 'L\'adresse mail est incorrect !'})                  // POPUP
     return
   }
 
-  const sqlVerif = "SELECT * FROM public.Electeur WHERE num_carte_electeur=$1"
+  const sqlVerif = "SELECT * FROM public.Electeur WHERE num_carte_electeur=$1 AND email=$2 AND code_postal=$3"
   const result = await client.query({
     text: sqlVerif,
-    values: [numCarteElec]
+    values: [numCarteElec, email, codePostal]
   })
 
-  if (result.rowCount !== 0) {
-    res.json({popup: 'Le numéro de la carte électorale a déjà été utilisé !'})             // POPUP
-    return
-  }
-
-  let transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: 'vitemonvote@gmail.com',
-      pass: 'NomenclatureSquad',
+  if (result.rowCount !== 0) {    
+    let transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'vitemonvote@gmail.com',
+        pass: 'NomenclatureSquad',
+      }
+    })
+  
+    let mailOptions = {
+      from: 'vitemonvote@gmail.com',
+      to: email,
+      subject: 'Récupération mot de passe - ViteMonVote',
+      text: 'Veuillez retrouver votre mot de passe, ci-joint : ' + password
     }
-  })
+  
+    transporter.sendMail(mailOptions, function(err, data) {
+      if (err) {
+        console.log("Error occurs", err)
+        res.json({popup: 'Le mail donné n\'existe pas !'})
+        return
+      } 
+    })
 
-  let mailOptions = {
-    from: 'vitemonvote@gmail.com',
-    to: email,
-    subject: 'Récupération mot de passe - ViteMonVote',
-    text: 'Veuillez retrouver votre mot de passe, ci-joint : ' + password
+    const sqlVerif = "UPDATE public.electeur SET password=$1 WHERE num_carte_electeur=$2"
+    const result = await client.query({
+      text: sqlVerif,
+      values: [hash, numCarteElec]
+    })
+
+    res.json({popup: 'Un mot de passe vous a été envoyé sur votre adresse mail. Veuillez le saisir pour vous connecter !'})             // POPUP
   }
-
-  transporter.sendMail(mailOptions, function(err, data) {
-    if (err) {
-      console.log("Error occurs", err)
-      res.json({popup: 'Le mail donné n\'existe pas !'})
-      return
-    } 
-    else  {
-      console.log("Mail has been sent")
-    }
-  });
-
-  const sqlInsert = "INSERT INTO public.Electeur (num_carte_electeur, email, password, code_postal) VALUES ($1, $2, $3, $4)"
-  await client.query({
-    text: sqlInsert,
-    values: [numCarteElec, email, hash, codePostal]
-  })
-
-  res.json({message: 'User has been created'})
+  else {
+    res.json({popup: 'Les informations sont incorrectes, vous n\'êtes pas enregistrés sur la liste electorale !'})
+  }
 })
 
 router.post('/user/login', async (req, res) => {
@@ -381,5 +414,8 @@ router.post('/user/login', async (req, res) => {
     return
   }
   
+  req.session.userId = result.rows[0].num_carte_electeur
+  req.session.user = true
+
   res.json({connected: true, message: 'You are now logged in as an user.'})
 })
