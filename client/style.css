@@ -9,7 +9,6 @@
 .site-container {
     display: flex;
     flex-direction: column;
-    min-height: 55vh;
 }
 
 .site-container {
@@ -28,7 +27,7 @@ hr {
     margin-bottom: 30px;
 }
 
- /* TODO : a changer avec le logo de louis */
+/* --- logo --- */
 .logo {
     height: 80px;
     width: auto;

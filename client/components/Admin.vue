@@ -10,14 +10,16 @@
       </form>
     </div>
     <div v-else>
-      <nav class="navbar-admin">
-        <a><router-link to='/admin/nouvelleelection'>Nouvelle élection</router-link></a>
-        <a><router-link to='/admin/elections'>Elections</router-link></a>
-        <a><router-link to='/admin/resultats'>Résultats</router-link></a>
-        <a><router-link to='/admin/admins'>Gérer les admins</router-link></a>
-      </nav>
+        <nav class="navbar">
+            <ul class="nav-links">
+                <li class="nav-item"><a><router-link to='/admin/nouvelleelection'>Nouvelle élection</router-link></a></li>
+                <li class="nav-item"><a><router-link to='/admin/elections'>Elections</router-link></a></li>
+                <li class="nav-item"><a><router-link to='/admin/resultats'>Résultats</router-link></a></li>
+                <li class="nav-item"><a><router-link to='/admin/admins'>Gérer les administrateurs</router-link></a></li>
+            </ul>
+            <a class="deconnexionBouton" @click="LogOut()">Se déconnecter</a>
+        </nav>
       <router-view></router-view>
-      <button id="deconnexionBouton" @click="LogOut()">Se déconnecter</button>
     </div>
   </div>
 </template>
@@ -71,29 +73,52 @@ module.exports = {
 
 <style scoped>
 
-.navbar-admin {
-    background-color: #001D6E;
-    margin-bottom: 50px;
-    width: 100%;
-    height: 50px;
-    bottom: 0;
-    text-align: center;
-    overflow: hidden;
-    position: fixed;
-    position: sticky;
-    padding-top: 10px;
+nav {
+  width: 100%;
+  background-color: #001D6E;
+  padding-left: 30px;
+  padding-right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
 }
 
-a {
-    color:lightgrey;
-    margin: 10px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    text-decoration: none;
+.logo {
+  display: inline-block;
 }
 
-a:hover {
-    color: #fff;
+.nav-links {
+  list-style: none;
+  display: flex;
 }
+
+.nav-item a {
+  display: inline-block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: white;
+}
+
+.nav-item:hover {
+  background-color: white;
+}
+
+.nav-item:hover a {
+  color: #001D6E;
+}
+
+.deconnexionBouton {
+     border-style:solid 2px #D60920;
+    background-color: #fff;
+    color: #D60920;
+    border-radius: 4px;
+    padding: 10px;
+}
+.deconnexionBouton:hover {
+  cursor: pointer;
+  color:#fff;
+  background-color: #D60920;
+}
+
 </style>

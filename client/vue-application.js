@@ -1,6 +1,7 @@
 const Home = window.httpVueLoader('./components/Home.vue')
 const Login = window.httpVueLoader('./components/SeConnecter.vue')
 const Admin = window.httpVueLoader('./components/Admin.vue')
+const ResultatsVotants = window.httpVueLoader('./components/ResultatsVotants.vue')
 
 const AdminResultats = window.httpVueLoader('./components/admin/Resultats.vue')
 const AdminAdmins = window.httpVueLoader('./components/admin/Admins.vue')
