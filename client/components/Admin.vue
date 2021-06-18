@@ -98,6 +98,7 @@ nav {
   padding: 10px 15px;
   text-decoration: none;
   color: white;
+  transition: 0.4s;
 }
 
 .nav-item:hover {
@@ -114,7 +115,9 @@ nav {
     color: #D60920;
     border-radius: 4px;
     padding: 10px;
+      transition: 0.4s;
 }
+
 .deconnexionBouton:hover {
   cursor: pointer;
   color:#fff;
