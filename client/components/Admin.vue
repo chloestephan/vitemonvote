@@ -17,6 +17,7 @@
         <a><router-link to='/admin/admins'>Gérer les admins</router-link></a>
       </nav>
       <router-view></router-view>
+      <button id="deconnexionBouton" @click="LogOut()">Se déconnecter</button>
     </div>
   </div>
 </template>
@@ -51,6 +52,19 @@ module.exports = {
                 this.isUserConnected = result.data.connected
             }
         },
+        async LogOut(){
+            const user = {
+                email: this.email,
+                password: this.password,
+            }
+            const result = await axios.post('/api/admin/logout', user)
+
+            this.email = result.data.email 
+            this.password = result.data.password
+
+            this.isUserConnected = result.data.connected
+
+        }
     }
 }
 </script>
@@ -69,7 +83,6 @@ module.exports = {
     position: sticky;
     padding-top: 10px;
 }
-
 
 a {
     color:lightgrey;
