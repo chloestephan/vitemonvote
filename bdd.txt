@@ -40,6 +40,7 @@ CREATE TABLE public.Elections(
 	type_election    TYPEELECTION NOT NULL  ,
 	id_admin         INT NOT NULL ,
 	ouvert           BOOL NOT NULL ,
+	resultats_visibles  BOOL NOT NULL ,
 
 	CONSTRAINT Elections_PK PRIMARY KEY (id_election) ,
 	CONSTRAINT elections_Admin_FK FOREIGN KEY (id_admin) REFERENCES public.Admins(id) ,

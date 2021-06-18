@@ -52,7 +52,6 @@ module.exports = {
     return {
       nom:'',
       date: null,
-      tour: '',
       typeElection: '',
       nomListes: [''],
       candidats: []
@@ -79,19 +78,45 @@ module.exports = {
       this.candidats.push([''])
     },
 
-    async creerEletionPresidentielle(){
-      const election = {
-        nom: this.nom,
-        date: this.date,
-        tour: 1,
-        nomListes: this.nomListes,
-        candidats: this.candidats,
+    isDone(){
+      if (this.nom != ''){
+        if (this.date != null){
+          if (this.typeElection != ''){
+            for (let nomListe in this.nomListes){
+              if (nomListe == ''){
+                return false
+              }
+            }
+            for (let candidatsListe in this.candidats){
+              for (let candidat in candidatsListe){
+                if (candidat == ''){
+                  return false
+                }
+              }
+            }
+            return true
+          }
+        }
       }
-
-      const result = await axios.post('/api/admin/election', election)
-      alert(result.data.message)
+      return false
     },
-  }
+
+    async creerEletionPresidentielle(){
+      if (this.isDone() === true){
+        const election = {
+          nom: this.nom,
+          date: this.date,
+          tour: 1,
+          nomListes: this.nomListes,
+          candidats: this.candidats,
+        }
+
+        const result = await axios.post('/api/admin/election', election)
+        alert(result.data.message)
+      }
+    },
+  },
+
 }
 
 </script>
