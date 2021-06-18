@@ -15,6 +15,7 @@
                 <li class="nav-item"><a><router-link to='/admin/nouvelleelection'>Nouvelle élection</router-link></a></li>
                 <li class="nav-item"><a><router-link to='/admin/elections'>Elections</router-link></a></li>
                 <li class="nav-item"><a><router-link to='/admin/resultats'>Résultats</router-link></a></li>
+              <li class="nav-item"><a><router-link to='/admin/electeurs'>Electeurs</router-link></a></li>
                 <li class="nav-item"><a><router-link to='/admin/admins'>Gérer les administrateurs</router-link></a></li>
             </ul>
             <a class="deconnexionBouton" @click="LogOut()">Se déconnecter</a>
