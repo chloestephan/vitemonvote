@@ -5,7 +5,7 @@
 
             <div class="getPassword">
                 <form @submit.prevent="getPassword">
-                    <h3>Récupérer son mot de passe <br> Mot de passe oublié</h3>
+                    <h3>Récupérer son mot de passe</h3>
                     <input type="text" v-model="numCarteElec" placeholder="Numéro de carte électorale" required>
                     <input type="text" v-model="codePostal" placeholder="Code postal" required>
                     <input type="text" v-model="emailRegister" placeholder="Email" required>
@@ -14,14 +14,20 @@
             </div>
 
             <div class="login">
-                <form @submit.prevent="loginUser">
+                <form>
                     <h3>Se connecter</h3>
                     <input type="text" v-model="emailLogin" placeholder="Email" required>
-                    <input type="text" v-model="password" placeholder="Mot de passe" required>
-                    <button type="submit">Connexion</button>
+                    <input v-bind:type="typeMdp" v-model="password" placeholder="Mot de passe" required>
+                    <img src="img/hide_password.png" class="showMDP" @click="showMDP" v-if="hidden">
+                    <img src="img/show_password.png" class="showMDP" @click="showMDP" v-else>
+                    <button type="submit" @click="loginUser">Connexion</button>
                 </form>
+
+                
             </div>
         </div>
+
+        
 
         <div v-else>
             <div>Vous êtes connectés ! Mais on a pas fait la suite :(</div>
@@ -40,6 +46,8 @@
             </div>
         </div>
 
+        
+
     </div>
 </template>
 
@@ -56,6 +64,8 @@ module.exports = {
             isError: false,
             mailSent: false,
             isUserConnected: false,
+            typeMdp: 'password',
+            hidden: true,
     }
   },
     created: async function () {
@@ -76,6 +86,9 @@ module.exports = {
               this.popup = result.data.popup
               if (this.popup === "Un mot de passe vous a été envoyé sur votre adresse mail. Veuillez le saisir pour vous connecter !") {
                   this.mailSent = true
+                  this.emailRegister = ''
+                  this.codePostal = ''
+                  this.numCarteElec = ''
               }
               else if (this.popup !== undefined) {
                   this.isError = true
@@ -114,10 +127,22 @@ module.exports = {
             this.emailLogin = result.data.email 
             this.password = result.data.password
             this.isUserConnected = result.data.connected
+        },
+        showMDP() {
+            if (this.typeMdp === 'text') {
+                this.typeMdp = 'password'
+                this.hidden = true
+            }
+            else {
+                this.typeMdp = 'text'
+                this.hidden = false
+            }
         }
   }
 }
 </script>
+
+
 
 <style scoped>
 
@@ -125,17 +150,10 @@ module.exports = {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
+    align-content: center;
     padding-top: 50px;
     padding-bottom: 50px;
     background-color: #f8f9fd;
-}
-
-.getPassword, .login {
-    margin-bottom: 30px;
-}
-
-.login {
-    margin-top: 45px;
 }
 
 .limiter {
@@ -193,6 +211,24 @@ h2 {
     color: #001D6E;
     font-family: Poppins-Bold;
     font-size: 30px;
+}
+
+.showMDP {
+    margin-bottom: 10px;
+    width: 75px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all .4s;  
+    border: none;  
+    text-decoration: none;
+    border-radius: 50%;
+}
+
+.showMDP:hover {
+    cursor: pointer;
+    background-color: rgba(245, 245, 245, 0.5);
 }
 
 

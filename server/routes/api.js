@@ -252,9 +252,9 @@ router.delete('/admin/electeur/:id', async (req, res) => {
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-<<<<<<< Updated upstream
+
 //End of admin part
-=======
+
 router.get('/doleance/trajet/:id', async (req, res) => {
   const trajet_id = req.params.id
   const sql = "SELECT * FROM doleances WHERE trajet_associe = $1 AND visible = true"
@@ -290,7 +290,8 @@ router.post('/user/logout', async (req, res) => {
   req.session.user = false 
   res.json({connected: false, message: 'You just logged out.'})
 })
->>>>>>> Stashed changes
+
+// Generation de password
 
 function generateP() {
   var pass = '';
@@ -305,12 +306,15 @@ function generateP() {
   return pass;
 }
 
+// Verif si c'est un nombre
+
 function isDigit(c) {
   return c >= '0' && c <= '9';
 }
 
-router.post('/user/register', async (req, res) => {
+// RecupMdp
 
+router.post('/user/register', async (req, res) => {
   const email = req.body.email
   const numCarteElec = req.body.numCarteElec
   const codePostal = req.body.codePostal
@@ -394,6 +398,8 @@ router.post('/user/register', async (req, res) => {
     res.json({popup: 'Les informations sont incorrectes, vous n\'êtes pas enregistrés sur la liste electorale !'})
   }
 })
+
+// Login
 
 router.post('/user/login', async (req, res) => {
   const email = req.body.email
