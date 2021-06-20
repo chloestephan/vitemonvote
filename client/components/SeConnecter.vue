@@ -18,16 +18,15 @@
                     <h3>Se connecter</h3>
                     <input type="text" v-model="emailLogin" placeholder="Email" required>
                     <input v-bind:type="typeMdp" v-model="password" placeholder="Mot de passe" required>
+
                     <img src="img/hide_password.png" class="showMDP" @click="showMDP" v-if="hidden">
                     <img src="img/show_password.png" class="showMDP" @click="showMDP" v-else>
+
                     <button type="submit" @click="loginUser">Connexion</button>
-                </form>
-
-                
+                </form>                
             </div>
-        </div>
 
-        
+        </div>
 
         <div v-else>
             <div>Vous êtes connectés ! Mais on a pas fait la suite :(</div>
@@ -46,15 +45,13 @@
             </div>
         </div>
 
-        
-
     </div>
 </template>
 
 <script>
 module.exports = {
-  data () {
-    return {
+    data () {
+        return {
             numCarteElec: '',
             codePostal: '',
             emailRegister: '',
@@ -66,38 +63,38 @@ module.exports = {
             isUserConnected: false,
             typeMdp: 'password',
             hidden: true,
-    }
-  },
+        }
+    },
     created: async function () {
         const result = await axios.get('/api/user/me')
         this.isUserConnected = result.data.user
     },
     methods: {
-      async getPassword() {
-          this.popup = ''
-          if (this.email !== '' && this.numCarteElec !== '' && this.codePostal !== '') {
-              const user = {
-                  numCarteElec: this.numCarteElec,
-                  codePostal: this.codePostal,
-                  email: this.emailRegister,
-              }
+        async getPassword() {
+            this.popup = ''
+            if (this.email !== '' && this.numCarteElec !== '' && this.codePostal !== '') {
+                const user = {
+                    numCarteElec: this.numCarteElec,
+                    codePostal: this.codePostal,
+                    email: this.emailRegister,
+                }
 
-              const result = await axios.post('/api/user/register', user)
-              this.popup = result.data.popup
-              if (this.popup === "Un mot de passe vous a été envoyé sur votre adresse mail. Veuillez le saisir pour vous connecter !") {
-                  this.mailSent = true
-                  this.emailRegister = ''
-                  this.codePostal = ''
-                  this.numCarteElec = ''
-              }
-              else if (this.popup !== undefined) {
-                  this.isError = true
-              }
-          }
-      },
-      async loginUser() {
-          this.popup = ''
-          if (this.email !== '' && this.password !== '') {
+                const result = await axios.post('/api/user/register', user)
+                this.popup = result.data.popup
+                if (this.popup === "Un mot de passe vous a été envoyé sur votre adresse mail. Veuillez le saisir pour vous connecter !") {
+                    this.mailSent = true
+                    this.emailRegister = ''
+                    this.codePostal = ''
+                    this.numCarteElec = ''
+                }
+                else if (this.popup !== undefined) {
+                    this.isError = true
+                }
+            }
+        },
+        async loginUser() {
+            this.popup = ''
+            if (this.email !== '' && this.password !== '') {
                 const user = {
                     email: this.emailLogin,
                     password: this.password,
@@ -109,14 +106,14 @@ module.exports = {
                 this.isUserConnected = result.data.connected
                 
                 if (!(this.popup === undefined)) {
-                  this.isError = true
+                    this.isError = true
                 }
-          }
-      },
-      closePopup() {
-          this.isError = false
-          this.mailSent = false
-      },
+            }
+        },
+        closePopup() {
+            this.isError = false
+            this.mailSent = false
+        },
         async LogOut(){
             const user = {
                 email: this.email,
@@ -140,6 +137,8 @@ module.exports = {
         }
   }
 }
+
+
 </script>
 
 
@@ -230,7 +229,6 @@ h2 {
     cursor: pointer;
     background-color: rgba(245, 245, 245, 0.5);
 }
-
 
 </style>
 
