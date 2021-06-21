@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="site-container">
     <div class="container">
       <div class="column-1">
         <h2>Ajouter un administrateur</h2>

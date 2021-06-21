@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="site-container">
     <h2>Veuillez sélectionner une élection.</h2>
     <hr>
   </div>
