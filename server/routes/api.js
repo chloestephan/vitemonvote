@@ -212,14 +212,18 @@ router.get('/admin/elections', async(req, res) =>{
 router.post('/admin/electeurs', async(req, res) => {
   if (req.session.admin === true){
     const electeurs = req.body.electeurs
+    console.log({oui: electeurs})
 
     const sql = "INSERT INTO electeur VALUES ($1, $2, $3, $4)"
-    for(let electeur in electeurs){
+    console.log("L218")
+    for(let i = 0; i < electeurs.length; i++){
+      console.log({test: electeurs[i]})
       await client.query({
         text: sql,
-        values: [electeur[0], electeur[1], null, electeur[2]]
+        values: [electeurs[i][0], electeurs[i][1], null, electeurs[i][2]]
       })
     }
+    res.json({message: "Electeurs ajoutés"})
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })

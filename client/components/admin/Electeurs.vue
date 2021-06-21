@@ -52,20 +52,57 @@ module.exports = {
     },
 
     async ajouterUtilisateurs() {
-      let reader = new FileReader()
-      let file = document.getElementById('electeurs').files[0]
-      let fileText
-      reader.onload = function () {
-        fileText = reader.result;
+
+      const file = document.getElementById('electeurs').files[0];
+      let fileText = ''
+      const reader = new FileReader();
+      reader.onload = async function (progressEvent) {
+        // Entire file
+        //console.log(this.result);
+
+        // By lines
+        const lines = this.result.split('\n');
+        fileText = this.result.split('\n')
+        for (let line = 0; line < lines.length; line++) {
+          //console.log(lines[line]);
+          //console.log(fileText[line])
+          fileText[line] = fileText[line].split(';')
+        }
+        console.log(fileText)
+
+        function checkElecteurs(electeurs) {
+          for (let i = 0; i < electeurs.length; i++){
+            console.log({electeur: electeurs[i]})
+            console.log({length: electeurs[i].length})
+            if( electeurs[i].length !== 3){
+              return false
+            }
+            console.log("first")
+            for(let j = 0; j < electeurs[i]; j++){
+              if( electeurs[i][j] == ''){
+                return false
+              }
+            }
+            console.log("second")
+          }
+          return true
+        }
+
+        if (checkElecteurs(fileText) === false) {
+          alert("Erreur dans le fichier importé (données manquantes dans un utilisateur ou ligne vide)")
+        }
+        else{
+          const electeurs = {
+            electeurs: fileText
+          }
+          const result = await axios.post('/api/admin/electeurs', electeurs)
+          alert(result.data.message)
+        }
+
       };
       reader.readAsText(file);
-      console.log(fileText)
-      fileText = fileText.split("\n")
-      for (let i = 0; i < fileText.length; i++) {
-        fileText[i] = fileText[i].split(";")
-      }
-      console.log(fileText)
-    }
+
+    },
   }
 }
 
