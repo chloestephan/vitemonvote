@@ -19,16 +19,12 @@
 
 
         <div class="ajouterElecteurs">
-          <label for="electeurs"><h3>Choisissez le fichier pour ajouter les électeurs:</h3></label>
-          <hr>
+          <label for="electeurs">Choisissez le fichier pour ajouter les électeurs:</label>
           <input type="file" id="electeurs" name="electeurs" accept=".csv">
           <button type="button" @click="ajouterUtilisateurs">Importer</button>
+          <button type="button" @click="importerBureauDeVote">Importer Bureaux de vote</button>
       </div>
     </div>
-    <label for="electeurs">Choisissez le fichier pour ajouter les électeurs:</label>
-    <input type="file" id="electeurs" name="electeurs" accept=".csv">
-    <button type="button" @click="ajouterUtilisateurs">Importer</button>
-    <button type="button" @click="importerBureauDeVote">Importer Bureaux de vote</button>
   </div>
 </template>
 
