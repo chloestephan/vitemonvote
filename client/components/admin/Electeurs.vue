@@ -25,6 +25,10 @@
           <button type="button" @click="ajouterUtilisateurs">Importer</button>
       </div>
     </div>
+    <label for="electeurs">Choisissez le fichier pour ajouter les électeurs:</label>
+    <input type="file" id="electeurs" name="electeurs" accept=".csv">
+    <button type="button" @click="ajouterUtilisateurs">Importer</button>
+    <button type="button" @click="importerBureauDeVote">Importer Bureaux de vote</button>
   </div>
 </template>
 
@@ -57,6 +61,37 @@ module.exports = {
       await this.rechercher()
     },
 
+    async importerBureauDeVote() {
+      const file = document.getElementById('electeurs').files[0];
+      let fileText = ''
+      let final = []
+      const reader = new FileReader();
+      reader.onload = async function (progressEvent) {
+        const fileText = this.result.split('\n');
+        for (let line = 0; line < fileText.length; line++) {
+          fileText[line] = fileText[line].split(';')
+        }
+        console.log(fileText)
+
+        for(let i = 0; i < fileText.length; i++) {
+          final.push(fileText[i][2])
+        }
+
+        for(let i = 0; i < final.length; i += 1000){
+          const intermediare = final.slice(i, i + 1000)
+
+          console.log(intermediare)
+          const bureaux = {
+            bureaux: intermediare
+          }
+          const result = await axios.post('/api/admin/bureaux', bureaux)
+
+        }
+
+      };
+      reader.readAsText(file);
+    },
+
     async ajouterUtilisateurs() {
 
       const file = document.getElementById('electeurs').files[0];
@@ -67,9 +102,8 @@ module.exports = {
         //console.log(this.result);
 
         // By lines
-        const lines = this.result.split('\n');
         fileText = this.result.split('\n')
-        for (let line = 0; line < lines.length; line++) {
+        for (let line = 0; line < fileText.length; line++) {
           //console.log(lines[line]);
           //console.log(fileText[line])
           fileText[line] = fileText[line].split(';')

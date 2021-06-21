@@ -256,6 +256,21 @@ router.delete('/admin/electeur/:id', async (req, res) => {
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
+router.post('/admin/bureaux', async (req, res) => {
+  if (req.session.admin === true){
+    const bureaux = req.body.bureaux
+
+    const sql = "INSERT INTO bureaudevote VALUES ($1, $2) ON CONFLICT DO NOTHING"
+    for(let i = 0; i < bureaux.length; i++){
+      await client.query({
+        text: sql,
+        values: [bureaux[i], 0]
+      })
+    }
+    res.json({message: "Bureaux ajoutés"})
+  }
+  res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
+})
 
 //End of admin part
 
@@ -429,3 +444,5 @@ router.post('/user/login', async (req, res) => {
 
   res.json({connected: true, message: 'You are now logged in as an user.'})
 })
+
+router.get('')
