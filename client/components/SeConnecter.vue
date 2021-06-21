@@ -150,22 +150,6 @@ module.exports = {
 
 <style scoped>
 
-.container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    align-content: center;
-    padding-top: 50px;
-    padding-bottom: 50px;
-    background-color: #f8f9fd;
-}
-
-.limiter {
-  width: 100%;
-  margin: 0 auto;
-  background-color: #f8f9fd;
-}
-
 .overlay {
     text-align: center;
     position: fixed;

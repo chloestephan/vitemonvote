@@ -157,13 +157,29 @@ button:hover {
     cursor: pointer;
 }
 
-.vertical-center {
+/*.vertical-center {
     margin: 0;
     position: absolute;
     top: 50%;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
+}*/
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    background-color: #f8f9fd;
+}
+
+.limiter {
+  width: 100%;
+  margin: 0 auto;
+  background-color: #f8f9fd;
 }
 
 /* ------ MEDIA QUERIES ------ */
@@ -184,6 +200,11 @@ button:hover {
     .column p {
         margin-top: 20px;
         margin-bottom: 20px;
+    }
+
+    .container {
+        width: 95%;
+        margin: auto;
     }
 }
 
