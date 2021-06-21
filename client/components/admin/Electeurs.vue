@@ -1,24 +1,30 @@
 <template>
   <div class="site-container">
-    <h2>Electeurs</h2>
-    <hr>
+    <div class="limiter">
+      <div class="container">
+        <div class="recherche">
+          <h3>Rechercher un électeur</h3>
+          <hr>
+          <input type="text" v-model="num_carte_electeur" placeholder="Numéro de carte électeur">
+          <input type="text" v-model="email" placeholder="Email">
+          <input type="text" v-model="code_postal" placeholder="Code postal">
+          <button type="button" @click="rechercher">Rechercher</button>
 
-    <p>Recherche</p>
-    <input type="text" v-model="num_carte_electeur" placeholder="Numéro de carte électeur">
-    <input type="text" v-model="email" placeholder="Email">
-    <input type="text" v-model="code_postal" placeholder="Code postal">
-    <button type="button" @click="rechercher">Rechercher</button>
+          <div v-for="electeur in electeurs" :key="electeur.num_carte_electeur">
+            <p>{{electeur.num_carte_electeur}}</p>
+            <p>{{electeur.email}}</p>
+            <p>{{electeur.code_postal}}</p>
+            <p class="cross" @click="deleteElecteur(electeur.num_carte_electeur)">✖️</p>
+          </div>
 
-    <div v-for="electeur in electeurs" :key="electeur.num_carte_electeur">
-      <p>{{electeur.num_carte_electeur}}</p>
-      <p>{{electeur.email}}</p>
-      <p>{{electeur.code_postal}}</p>
-      <p class="cross" @click="deleteElecteur(electeur.num_carte_electeur)">✖️</p>
+
+        <div class="ajouterElecteurs">
+          <label for="electeurs"><h3>Choisissez le fichier pour ajouter les électeurs:</h3></label>
+          <hr>
+          <input type="file" id="electeurs" name="electeurs" accept=".csv">
+          <button type="button" @click="ajouterUtilisateurs">Importer</button>
+      </div>
     </div>
-
-    <label for="electeurs">Choisissez le fichier pour ajouter les électeurs:</label>
-    <input type="file" id="electeurs" name="electeurs" accept=".csv">
-    <button type="button" @click="ajouterUtilisateurs">Importer</button>
   </div>
 </template>
 
@@ -109,4 +115,64 @@ module.exports = {
 </script>
 
 <style scoped>
+
+h2 {
+  font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+  font-size: 36px;
+  line-height: 1.1em;
+  margin-bottom: 10px;
+  display: block;
+  font-size: 1.5em;
+  margin-block-start: 0.83em;
+  margin-block-end: 0.83em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #001D6E;
+}
+
+hr {
+  height:2px;
+  border-width:0;
+  color:#D60920;
+  background-color:#D60920;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  margin-left: 40%;
+  width: 20%;
+}
+
+h3 {
+  font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  line-height: 1.1em;
+  margin-bottom: 10px;
+  display: block;
+  font-size: 1.5em;
+  margin-block-start: 0.83em;
+  margin-block-end: 0.83em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #001D6E;
+}
+
+input {
+  width: 100%;
+  border-radius: 8px;
+}
+
+::placeholder {
+  color:#001D6E;
+}
+
+button {
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+
 </style>

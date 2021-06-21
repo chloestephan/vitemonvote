@@ -6,11 +6,8 @@
     <div>
       <input type="text" v-model="nom" placeholder="Nom de l'élection" required>
 
-      <label for="start">Premier tour:</label>
-      <input type="date" id="start" name="premierTourDate" v-model="date">
-
-      <label for="type-election">Choisir le type d'élection:</label>
-      <select name="typeElection" id="type-election" v-model="typeElection">
+      <label for="type-election"><h3>Choisir le type d'élection:</h3></label>
+      <select name="typeElection" id="type-election" class="box" v-model="typeElection">
         <option value="">--Choisir une option--</option>
         <option value="Municipales">Municipales</option>
         <option value="Cantonales">Département</option>
@@ -20,7 +17,10 @@
         <option value="Europeenes">Européennes</option>
         <option value="Referundum">Referundum</option>
       </select>
-      
+
+      <label for="start"><h3>Date du premier tour:</h3></label>
+      <input type="date" id="start" name="premierTourDate" v-model="date">
+
       <div v-if="typeElection==='Presidentielle'">
         <div v-for="(liste, index1) in candidats" :key="index1" class="">
           <h2>Nouvelle liste</h2>
@@ -29,8 +29,8 @@
           <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
 
           <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
-            <div class="">
-              <input type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat ' + index2" required>
+            <div class="ligne">
+              <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat ' + index2" required>
               <p class="delete" @click="deleteCandidat(index1, index2)">✖️</p>
             </div>
           </div>
@@ -146,13 +146,14 @@ module.exports = {
 }
 
 .delete {
-    text-align: center;
-    color: grey;
+  font-size: 24px;
+  margin-top: 7px;
+  text-align: center;
+  color: grey;
 }
 
 .delete:hover{
     cursor: pointer;
-    text-decoration: underline;
 }
 
 h2 {
@@ -171,18 +172,74 @@ h2 {
   color: #001D6E;
 }
 
-hr {
-  display: block;
-  border: 0;
-  border-radius: 3em;
-  border-top: 2px solid #D60920;
-  margin-top: 10px;
+h3 {
+  font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  line-height: 1.1em;
   margin-bottom: 10px;
-  width: 10%;
-  margin: auto;
+  display: block;
+  font-size: 1.5em;
+  margin-block-start: 0.83em;
+  margin-block-end: 0.83em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #001D6E;
+}
+
+hr {
+  height:2px;
+  border-width:0;
+  color:#D60920;
+  background-color:#D60920;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  margin-left: 40%;
+  width: 20%;
 }
 
 ul {
     margin-left: 20px;
 }
+
+input {
+  width: 40%;
+  margin-left: 30%;
+  border-radius: 8px;
+}
+
+::placeholder {
+  color:#001D6E;
+}
+
+.box {
+  width: 20%;
+  height: 50px;
+  margin-left: 40%;
+  border: 1px solid #666;
+  font-size: 18px;
+  color: #001D6E;
+  background-color: #e6e6e6;
+  border-radius: 8px;
+}
+
+button {
+  width: 20%;
+  margin: 20px;
+}
+
+.ligne {
+    width:100%;
+    display: flex;
+}
+
+.nouveauCandidat {
+  display:flex;
+}
+
+.delete {
+  display:flex;
+}
+
 </style>
