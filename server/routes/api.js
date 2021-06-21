@@ -444,3 +444,5 @@ router.post('/user/login', async (req, res) => {
 
   res.json({connected: true, message: 'You are now logged in as an user.'})
 })
+
+router.get('')

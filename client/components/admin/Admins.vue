@@ -1,26 +1,28 @@
 <template>
   <div class="site-container">
-    <div class="container">
-      <div class="column-1">
-        <h2>Ajouter un administrateur</h2>
-        <hr>
-        <div>
-          <form @submit.prevent="ajouterAdmin">
-            <input type="text" v-model="email" placeholder="Entrez l'adresse mail" required>
-            <input type="text" v-model="password" placeholder="Entrez le mot de passe" required>
+        <div class="limiter">
+            <div class="container">
+                <div>
+                    <h2>Ajouter un administrateur</h2>
+                    <hr>
+                    <div>
+                        <form @submit.prevent="ajouterAdmin">
+                            <input type="text" v-model="email" placeholder="Entrez l'adresse mail" required>
+                            <input type="text" v-model="password" placeholder="Entrez le mot de passe" required>
 
-            <button type="submit">Ajouter</button>
-          </form>
+                            <button type="submit">Ajouter</button>
+                        </form>
+                    </div>
+                </div>
+            <div>
+                <h2>Liste des administrateurs</h2>
+                <hr>
+                <div v-for="administrateur in administrateurs" :key="administrateur.id" class="admin">
+                    <p id="email">{{administrateur.email}}</p>
+                    <p v-if="administrateur.id !== currentAdmin" class="cross" @click="deleteAdmin(administrateur)">✖️</p>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="column-2">
-        <h2>Liste des administrateurs</h2>
-        <hr>
-        <div v-for="administrateur in administrateurs" :key="administrateur.id" class="admin">
-          <p id="email">{{administrateur.email}}</p>
-          <p v-if="administrateur.id !== currentAdmin" class="cross" @click="deleteAdmin(administrateur)">✖️</p>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -67,28 +69,6 @@ module.exports = {
 
     :root {
         box-sizing: border-box;
-    }
-
-    .container {
-        display: flex;
-        width: 100%;
-    }
-
-    .column-1 {
-        flex-shrink: 0;
-        flex-basis: 50%;
-    }
-
-    .column-2 {
-        margin: auto;
-        margin-top: 0;
-    }
-
-
-    @media only screen and (max-width: 900px) {
-        .container {
-            flex-direction: column;
-        }
     }
 
 
@@ -153,5 +133,12 @@ module.exports = {
     .id {
         text-decoration: bold;
     }
+
+/* ------ MEDIA QUERIES ------ */
+@media screen and (max-width: 600px) {
+    .nav {
+        
+    }
+}
 
 </style>
