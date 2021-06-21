@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="site-container">
     <h2>Nouvelle election</h2>
     <hr>
 

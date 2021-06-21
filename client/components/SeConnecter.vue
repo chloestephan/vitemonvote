@@ -1,50 +1,55 @@
 <template>
-    <div class="limiter">
+    <div class="site-container">
+        <div class="limiter">
 
-        <div v-if="!isUserConnected" class="container">
+            <div v-if="!isUserConnected" class="container">
 
-            <div class="getPassword">
-                <form @submit.prevent="getPassword">
-                    <h3>Récupérer son mot de passe</h3>
-                    <input type="text" v-model="numCarteElec" placeholder="Numéro de carte électorale" required>
-                    <input type="text" v-model="codePostal" placeholder="Code postal" required>
-                    <input type="text" v-model="emailRegister" placeholder="Email" required>
-                    <button type="submit">Récupérer</button>
-                </form>
+                <div class="getPassword">
+                    <form @submit.prevent="getPassword">
+                        <h3>Récupérer son mot de passe</h3>
+                        <input type="text" v-model="numCarteElec" placeholder="Numéro de carte électorale" required>
+                        <input type="text" v-model="codePostal" placeholder="Code postal" required>
+                        <input type="text" v-model="emailRegister" placeholder="Email" required>
+                        <button type="submit">Récupérer</button>
+                    </form>
+                </div>
+
+                <div class="login">
+                    <form>
+                        <h3>Se connecter</h3>
+
+                        <input type="text" v-model="emailLogin" placeholder="Email" required>
+                        <div class="ligne">
+                            <input v-bind:type="typeMdp" v-model="password" placeholder="Mot de passe" required>
+                            <img src="img/hide_password.png" class="showMDP" @click="showMDP" v-if="hidden">
+                            <img src="img/show_password.png" class="showMDP" @click="showMDP" v-else>
+                        </div>
+
+
+                        <button type="submit" @click="loginUser">Connexion</button>
+                    </form>
+                </div>
+
             </div>
 
-            <div class="login">
-                <form>
-                    <h3>Se connecter</h3>
-                    <input type="text" v-model="emailLogin" placeholder="Email" required>
-                    <input v-bind:type="typeMdp" v-model="password" placeholder="Mot de passe" required>
+            <div v-else>
+                <div>Vous êtes connectés ! Mais on a pas fait la suite :(</div>
+                <button @click="LogOut()">oui le pain bonjour</button>
+            </div>
 
-                    <img src="img/hide_password.png" class="showMDP" @click="showMDP" v-if="hidden">
-                    <img src="img/show_password.png" class="showMDP" @click="showMDP" v-else>
-
-                    <button type="submit" @click="loginUser">Connexion</button>
-                </form>                
+            <div :class="[{displayPop : isError}, {displayPop : mailSent}]" class="overlay">
+                <div class="popup">
+                    <h2 v-if="isError">Erreur</h2>
+                    <h2 v-else>Nouveau mot de passe</h2>
+                    <br>
+                    <p>{{ popup }}</p>
+                    <button v-on:click="closePopup" class="cross">
+                        X
+                    </button>
+                </div>
             </div>
 
         </div>
-
-        <div v-else>
-            <div>Vous êtes connectés ! Mais on a pas fait la suite :(</div>
-            <button @click="LogOut()">oui le pain bonjour</button>
-        </div>
-
-        <div :class="[{displayPop : isError}, {displayPop : mailSent}]" class="overlay">
-            <div class="popup">
-                <h2 v-if="isError">Erreur</h2>
-                <h2 v-else>Nouveau mot de passe</h2>
-                <br>
-                <p>{{ popup }}</p>
-                <button v-on:click="closePopup" class="cross">
-                    X
-                </button>
-            </div>
-        </div>
-
     </div>
 </template>
 
@@ -104,7 +109,7 @@ module.exports = {
                 this.popup = result.data.popup
                 console.log(this.popup)
                 this.isUserConnected = result.data.connected
-                
+
                 if (!(this.popup === undefined)) {
                     this.isError = true
                 }
@@ -121,7 +126,7 @@ module.exports = {
             }
             const result = await axios.post('/api/user/logout', user)
 
-            this.emailLogin = result.data.email 
+            this.emailLogin = result.data.email
             this.password = result.data.password
             this.isUserConnected = result.data.connected
         },
@@ -212,22 +217,24 @@ h2 {
     font-size: 30px;
 }
 
+.ligne {
+    width:100%;
+    display: flex;
+}
 .showMDP {
-    margin-bottom: 10px;
-    width: 75px;
-    height: 50px;
+    height: 30px;
+    width: auto;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all .4s;  
-    border: none;  
+    transition: all .4s;
+    border: none;
     text-decoration: none;
-    border-radius: 50%;
+    margin: 10px;
 }
 
 .showMDP:hover {
     cursor: pointer;
-    background-color: rgba(245, 245, 245, 0.5);
 }
 
 </style>
