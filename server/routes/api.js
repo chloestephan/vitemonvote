@@ -445,4 +445,11 @@ router.post('/user/login', async (req, res) => {
   res.json({connected: true, message: 'You are now logged in as an user.'})
 })
 
-router.get('')
+router.get('/user/voirelections', async (req, res) => {
+
+    const sql = "SELECT * FROM public.elections"
+    const result = await client.query({
+      text: sql
+    })    
+    res.json({elections: result.rows})
+})
