@@ -138,8 +138,8 @@ module.exports = {
         showMDP() {
             this.typeMdp = this.hidden ? "text" : "password"
             this.hidden = !this.hidden
-        }
-  }
+        },
+    }
 }
 
 

@@ -116,9 +116,9 @@ CREATE TABLE public.Acces(
 	id_election     INT  NOT NULL  ,
 	CONSTRAINT Acces_PK PRIMARY KEY (id_admin,id_election)
 
-	,CONSTRAINT Acces_Admins_FK FOREIGN KEY (id_admin) REFERENCES public.Admins(id)
 	,CONSTRAINT Acces_Elections_FK FOREIGN KEY (id_election) REFERENCES public.Elections(id_election)
 )WITHOUT OIDS;
 
-INSERT INTO admins(email, password) VALUES ('admin', '$2b$10$OwYLLwN.wross8t4LYhbjOaYCfa158eUxF2t/5YE0adZNHlI4otSe')
-INSERT INTO Electeur(num_carte_electeur, email, password, code_postal) VALUES ('1234', 'email','$2b$10$OwYLLwN.wross8t4LYhbjOaYCfa158eUxF2t/5YE0adZNHlI4otSe', '76')
+INSERT INTO admins(email, password) VALUES ('admin', '$2b$10$OwYLLwN.wross8t4LYhbjOaYCfa158eUxF2t/5YE0adZNHlI4otSe');
+INSERT INTO Electeur(num_carte_electeur, email, password, code_postal) VALUES ('111111111', 'admin','$2b$10$OwYLLwN.wross8t4LYhbjOaYCfa158eUxF2t/5YE0adZNHlI4otSe', '75000')
+
