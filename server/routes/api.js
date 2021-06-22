@@ -149,7 +149,7 @@ router.post('/admin/election', async(req, res) =>{
     const nomListes = req.body.nomListes
     const candidats = req.body.candidats
 
-    let sql = "INSERT INTO elections(nom, date, tour, tour_precedent, type_election, id_admin, ouvert) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id_election"
+    let sql = "INSERT INTO elections(nom, date, tour, tour_precedent, type_election, id_admin, ouvert, resultats_visibles) VALUES ($1, $2, $3, $4, $5, $6, $7, false) RETURNING id_election"
     let result = await client.query({
       text: sql,
       values: [nom, date, tour, tour_precedent, "Presidentielle", req.session.adminId, false]
@@ -462,4 +462,13 @@ router.get('/user/voirelections', async (req, res) => {
       text: sql
     })    
     res.json({elections: result.rows})
+})
+
+router.get('/user/resultats', async (req, res) => {
+
+  const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE resultats_visibles = true ORDER BY id_election"
+  const result = await client.query({
+    text: sql
+  })    
+  res.json({elections: result.rows})
 })

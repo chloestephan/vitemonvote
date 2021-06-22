@@ -6,7 +6,7 @@
     <div>
       <input type="text" v-model="nom" placeholder="Nom de l'élection" required>
 
-      <label for="type-election"><h3>Choisir le type d'élection:</h3></label>
+      <label for="type-election"><h3>Choisir le type d'élection :</h3></label>
       <select name="typeElection" id="type-election" class="box" v-model="typeElection">
         <option value="">--Choisir une option--</option>
         <option value="Municipales">Municipales</option>
@@ -18,7 +18,7 @@
         <option value="Referundum">Referundum</option>
       </select>
 
-      <label for="start"><h3>Date du premier tour:</h3></label>
+      <label for="start"><h3>Date du premier tour :</h3></label>
       <input type="date" id="start" name="premierTourDate" v-model="date">
 
       <div v-if="typeElection==='Presidentielle'">

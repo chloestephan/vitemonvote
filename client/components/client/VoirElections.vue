@@ -8,7 +8,7 @@
             <div> <strong>Tour : </strong> {{ election.tour }}</div>
         </li>
     </ul>
-    <h2 v-else class="noElection">Auncune élection disponible !</h2>
+    <h2 v-else class="noElection">Aucune élection disponible !</h2>
 </template>
 
 <script>
@@ -16,15 +16,7 @@
 module.exports = {
     data () {
         return {
-            elections: [{
-                id: "",
-                nom: "",
-                année: "",
-                mois: "",
-                jour: "",
-                tour: "",
-                type: "",
-            }],
+            elections: [{}],
         }
     },
     mounted: async function() {
