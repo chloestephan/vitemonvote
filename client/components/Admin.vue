@@ -98,6 +98,10 @@ nav {
   display: flex;
 }
 
+.nav-item {
+  transition: 0.6s;
+}
+
 .nav-item a {
   display: inline-block;
   padding: 10px 15px;
