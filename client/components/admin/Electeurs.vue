@@ -16,14 +16,21 @@
             <p>{{electeur.code_postal}}</p>
             <p class="cross" @click="deleteElecteur(electeur.num_carte_electeur)">✖️</p>
           </div>
-
+        </div>
 
         <div class="ajouterElecteurs">
-          <label for="electeurs">Choisissez le fichier pour ajouter les électeurs:</label>
+          <label for="electeurs"><h3>Ajouter les électeurs</h3></label>
+          <hr>
           <input type="file" id="electeurs" name="electeurs" accept=".csv">
-          <button type="button" @click="ajouterUtilisateurs">Importer</button>
-          <button type="button" @click="importerBureauDeVote">Importer Bureaux de vote</button>
-      </div>
+          <button type="button" @click="ajouterUtilisateurs">Importer les électeurs</button>
+        </div>
+
+        <div class="ajouterBureauxDeVote">
+          <label for="bureauxDeVote"><h3>Importer un bureau de vote</h3></label>
+          <hr>
+          <input type="file" id="bureaux" name="electeurs" accept=".csv">
+          <button type="button" @click="importerBureauDeVote">Importer les bureaux de vote</button>
+        </div>
     </div>
   </div>
 </template>
@@ -58,7 +65,7 @@ module.exports = {
     },
 
     async importerBureauDeVote() {
-      const file = document.getElementById('electeurs').files[0];
+      const file = document.getElementById('bureaux').files[0];
       let fileText = ''
       let final = []
       const reader = new FileReader();
