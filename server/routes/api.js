@@ -164,11 +164,11 @@ router.post('/admin/election', async(req, res) =>{
     })
 
     const code_postaux = result.rows
-    for(let code_postal in code_postaux){
+    for(let i = 0; i < code_postaux.length; i++){
       sql = "INSERT INTO organise VALUES ($1, $2)"
       await client.query({
         text: sql,
-        values: [id_election, code_postal.code_postal]
+        values: [id_election, code_postaux[i].code_postal]
       })
     }
 
@@ -188,6 +188,12 @@ router.post('/admin/election', async(req, res) =>{
         })
       }
     }
+
+    sql = "INSERT INTO acces VALUES ($1, $2)"
+    await client.query({
+      text: sql,
+      values: [req.session.adminId, id_election]
+    })
         
     res.json({message: "Election créée."})
     return
@@ -198,11 +204,28 @@ router.post('/admin/election', async(req, res) =>{
 router.get('/admin/elections', async(req, res) =>{
   if (req.session.admin === true){
     const adminId = req.session.adminId
-    const sql = "SELECT id_election FROM acces WHERE id_admin=$1"
-    const result = await client.query({
+    let sql = "SELECT id_election FROM acces WHERE id_admin=$1"
+    let result = await client.query({
       text: sql,
       values: [adminId]
     })
+    console.log(result.rows)
+
+    sql = "SELECT * FROM elections WHERE id_election IN ($1)"
+
+    let tmp = []
+    for (let i = 0; i < result.rows.length; i++){
+      tmp.push(result.rows[i].id_election)
+    }
+    const data = tmp.join()
+    console.log({data: '{' + data + '}'})
+    result = await client.query({
+      text: sql,
+      values: [data]
+    })
+
+    console.log(result.rows)
+
     res.json(result.rows)
     return
   }
@@ -274,20 +297,6 @@ router.post('/admin/bureaux', async (req, res) => {
 
 //End of admin part
 
-router.get('/doleance/trajet/:id', async (req, res) => {
-  const trajet_id = req.params.id
-  const sql = "SELECT * FROM doleances WHERE trajet_associe = $1 AND visible = true"
-  const result = await client.query(({
-    text: sql,
-    values: [trajet_id]
-  }))
-  if(result.rowCount === 0){
-    res.json(null)
-    return
-  }
-  res.json(result.rows)
-})
-
 /*******************************************/
 /*              PARTIE CLIENT              */
 /*******************************************/
@@ -306,7 +315,8 @@ router.post('/user/logout', async (req, res) => {
   req.email = ''
   req.password = ''
   req.session.userId = null
-  req.session.user = false 
+  req.session.user = false
+  //add req.session.adminId = null
   res.json({connected: false, message: 'You just logged out.'})
 })
 
