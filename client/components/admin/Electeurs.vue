@@ -21,14 +21,14 @@
         <div class="ajouterElecteurs">
           <label for="electeurs"><h3>Ajouter les électeurs</h3></label>
           <hr>
-          <input type="file" id="electeurs" name="electeurs" accept=".csv">
+          <input class="fichier" type="file" id="electeurs" name="electeurs" accept=".csv">
           <button type="button" @click="ajouterUtilisateurs">Importer les électeurs</button>
         </div>
 
         <div class="ajouterBureauxDeVote">
           <label for="bureauxDeVote"><h3>Importer un bureau de vote</h3></label>
           <hr>
-          <input type="file" id="bureaux" name="electeurs" accept=".csv">
+          <input class="fichier" type="file" id="bureaux" name="electeurs" accept=".csv">
           <button type="button" @click="importerBureauDeVote">Importer les bureaux de vote</button>
         </div>
     </div>
@@ -211,5 +211,7 @@ button {
   margin-bottom: 20px;
 }
 
-
+.fichier {
+  padding-top:10px;
+}
 </style>

@@ -77,10 +77,6 @@ module.exports = {
 
 <style scoped>
 
-.vertical-center {
-  margin-top: -10%;
-}
-
 nav {
   width: 100%;
   background-color: #001D6E;
