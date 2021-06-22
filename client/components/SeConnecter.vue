@@ -113,7 +113,6 @@ module.exports = {
 
                 const result = await axios.post('/api/user/login', user)
                 this.popup = result.data.popup
-                console.log(this.popup)
                 this.isUserConnected = result.data.connected
 
                 if (!(this.popup === undefined)) {
@@ -137,14 +136,8 @@ module.exports = {
             this.isUserConnected = result.data.connected
         },
         showMDP() {
-            if (this.typeMdp === 'text') {
-                this.typeMdp = 'password'
-                this.hidden = true
-            }
-            else {
-                this.typeMdp = 'text'
-                this.hidden = false
-            }
+            this.typeMdp = this.hidden ? "text" : "password"
+            this.hidden = !this.hidden
         }
   }
 }

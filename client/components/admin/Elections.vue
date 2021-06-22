@@ -1,17 +1,18 @@
 <template>
-  <div class="site-container">
-    <h2>Veuillez sélectionner une élection.</h2>
-    <hr>
-  </div>
-  <div class="site-container">
-    <div v-for="election in elections" :key="election.id" class="election">
-      <router-link :to="chemin(maraude)">
-        <h3>{{election.nom}}</h3>
-      </router-link>
+  <div>
+    <div class="site-container">
+      <h2>Veuillez sélectionner une élection.</h2>
+      <hr>
+    </div>
+    <div class="site-container">
+      <div v-for="election in elections" :key="election.id_election" class="election">
+        <router-link :to="chemin(election)">
+          <h3>{{election.nom}}</h3>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
-
 
 <script>
 module.exports = {
@@ -24,11 +25,15 @@ module.exports = {
   created: async function () {
     const result = await axios.get('/api/admin/elections')
     this.elections = result.data
+    console.log(this.elections)
+    let test = [5, 6, 7, 8]
+    let data = test.join()
+    console.log(data)
   },
 
   methods: {
     chemin(election){
-      return "/admin/election/" + election.id
+      return "/admin/election/" + election.id_election
     }
   }
 }
