@@ -2,12 +2,13 @@
     <ul v-if="elections.length">
         <li :key="election.id" v-for="election in elections" class="election">
             <h2>{{ election.nom }}</h2>
+            <br>
             <div> <strong>Type d'élection : </strong> {{ election.type }}</div>
-            <div>{{ election.date }}</div>
-            <div>{{ election.tour }}</div>
+            <div> <strong>Date du vote : </strong> {{ election.jour }} / {{ election.mois }} / {{ election.année }}</div>
+            <div> <strong>Tour : </strong> {{ election.tour }}</div>
         </li>
     </ul>
-    <p v-else>Auncune élection disponible !</p>
+    <h2 v-else class="noElection">Auncune élection disponible !</h2>
 </template>
 
 <script>
@@ -18,27 +19,33 @@ module.exports = {
             elections: [{
                 id: "",
                 nom: "",
-                date: "",
+                année: "",
+                mois: "",
+                jour: "",
                 tour: "",
                 type: "",
             }],
         }
     },
     mounted: async function() {
+        
         const result = await axios.get('/api/user/voirelections')
         this.elections.pop()
+
         for (var i = 0; i < result.data.elections.length; i++) {
+            var date = result.data.elections[i].date.substring(0,10).split('-')
+            
             this.elections.push({
                 id: result.data.elections[i].id_election,
                 nom: result.data.elections[i].nom,
-                date: result.data.elections[i].date,
+                année: date[0],
+                mois: date[1],
+                jour: date[2],
                 tour: result.data.elections[i].tour,
                 type: result.data.elections[i].type_election,
             })
         }     
     },
-    methods: {
-    } 
 }
 
 </script>
@@ -70,6 +77,11 @@ ul {
 .election:hover {
     scale: 1.05;
     cursor: pointer;
+}
+
+.election div {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 </style>
