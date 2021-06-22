@@ -516,9 +516,16 @@ router.get('/user/voirelections', async (req, res) => {
 
 router.get('/user/resultats', async (req, res) => {
 
-  const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE resultats_visibles = true ORDER BY id_election"
+  const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true ORDER BY id_election"
   const result = await client.query({
     text: sql
   })    
   res.json({elections: result.rows})
+})
+
+router.get('/user/resultats/:idElection', async (req, res) => {
+
+  console.log("JE SUIS LA")
+
+  res.json({message: "Sa marche un peu quoi"})
 })

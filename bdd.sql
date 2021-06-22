@@ -8,6 +8,7 @@ CREATE TYPE TypeElection AS ENUM ('Municipales','Cantonales','Regionales','Legis
 ------------------------------------------------------------
 -- Table: Admins
 ------------------------------------------------------------
+
 CREATE TABLE public.Admins(
 	id         SERIAL ,
 	email      VARCHAR (50) NOT NULL ,
@@ -31,6 +32,7 @@ CREATE TABLE public.Electeur(
 ------------------------------------------------------------
 -- Table: Elections
 ------------------------------------------------------------
+
 CREATE TABLE public.Elections(
 	id_election      SERIAL ,
 	nom		         VARCHAR (50) NOT NULL ,
@@ -51,6 +53,7 @@ CREATE TABLE public.Elections(
 ------------------------------------------------------------
 -- Table: Liste
 ------------------------------------------------------------
+
 CREATE TABLE public.Liste(
 	id_liste          SERIAL ,
 	nom_liste   VARCHAR (50) NOT NULL  ,
@@ -66,6 +69,7 @@ CREATE TABLE public.Liste(
 ------------------------------------------------------------
 -- Table: Candidat
 ------------------------------------------------------------
+
 CREATE TABLE public.Candidat(
 	id_liste      INT NOT NULL ,
 	nom_complet   VARCHAR (50) NOT NULL  ,
@@ -76,6 +80,7 @@ CREATE TABLE public.Candidat(
 ------------------------------------------------------------
 -- Table: BureauDeVote
 ------------------------------------------------------------
+
 CREATE TABLE public.BureauDeVote(
 	code_postal       Varchar (50) NOT NULL ,
 	nbr_total_votants   INT  NOT NULL  ,
@@ -86,6 +91,7 @@ CREATE TABLE public.BureauDeVote(
 ------------------------------------------------------------
 -- Table: AVote
 ------------------------------------------------------------
+
 CREATE TABLE public.AVote(
 	id_election   INT NOT NULL ,
 	num_carte_electeur   Varchar (50) NOT NULL ,
@@ -99,6 +105,7 @@ CREATE TABLE public.AVote(
 ------------------------------------------------------------
 -- Table: Organise
 ------------------------------------------------------------
+
 CREATE TABLE public.Organise(
 	id_election   INT  NOT NULL ,
 	code_postal_bureau     Varchar (50)  NOT NULL  ,
@@ -111,6 +118,7 @@ CREATE TABLE public.Organise(
 ------------------------------------------------------------
 -- Table: Acces
 ------------------------------------------------------------
+
 CREATE TABLE public.Acces(
 	id_admin   INT  NOT NULL ,
 	id_election     INT  NOT NULL  ,
