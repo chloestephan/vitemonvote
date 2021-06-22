@@ -26,7 +26,7 @@
         </div>
 
         <div class="ajouterBureauxDeVote">
-          <label for="bureauxDeVote"><h3>Importer un bureau de vote</h3></label>
+          <label for="bureaux"><h3>Importer un bureau de vote</h3></label>
           <hr>
           <input class="fichier" type="file" id="bureaux" name="electeurs" accept=".csv">
           <button type="button" @click="importerBureauDeVote">Importer les bureaux de vote</button>

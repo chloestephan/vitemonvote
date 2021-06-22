@@ -1,6 +1,13 @@
 <template>
-<div class="site-container"></div>
-
+  <div class="site-container" v-if="election!=null">
+    <p>{{election.nom}}</p>
+    <p>Paramètres</p>
+    <input type="checkbox" id="ouvert" name="ouvert">
+    <label for="ouvert">Ouvert aux votes</label>
+    <input type="checkbox" id="visible" name="visible">
+    <label for="visible">Résultats visibles</label>
+    <button type="button" @click="valider">Valider</button>
+  </div>
 </template>
 
 <script>
@@ -8,14 +15,33 @@
 module.exports = {
   data () {
     return {
+      election: null,
     }
   },
 
   created: async function() {
     const electionId = this.$route.params.id
+    console.log(electionId)
+    const id_election = {
+      id_election: electionId,
+    }
+    console.log(id_election)
+    const result = await axios.get('/api/admin/election', id_election)
+    console.log(result.data)
+    this.election = result.data
   },
 
   methods: {
+    async valider(){
+      let ouvert = document.getElementById("ouvert").checked
+      let visible = document.getElementById("visible").checked
+      const data = {
+        id_election: this.election.id_election,
+        ouvert: ouvert,
+        visible: visible
+      }
+      await axios.put('/api/admin/election/')
+    }
   }
 }
 </script>

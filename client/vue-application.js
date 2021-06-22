@@ -7,6 +7,7 @@ const AdminResultats = window.httpVueLoader('./components/admin/Resultats.vue')
 const AdminAdmins = window.httpVueLoader('./components/admin/Admins.vue')
 const AdminNouvelleElection = window.httpVueLoader('./components/admin/NouvelleElection.vue')
 const AdminElections = window.httpVueLoader('./components/admin/Elections.vue')
+const AdminElection = window.httpVueLoader('./components/admin/Election.vue')
 const AdminElecteurs = window.httpVueLoader('./components/admin/Electeurs.vue')
 
 const LoginResultats = window.httpVueLoader('./components/client/Resultats.vue')
@@ -29,6 +30,7 @@ const routes = [
       {path: 'admins', component: AdminAdmins},
       {path: 'nouvelleelection', component: AdminNouvelleElection},
       {path: 'elections', component: AdminElections},
+      {path: 'election/:id', component: AdminElection},
       {path: 'electeurs', component: AdminElecteurs},
     ]
   },
