@@ -234,7 +234,8 @@ router.get('/admin/elections', async(req, res) =>{
 
 router.get('/admin/election', async (req, res) => {
   if(req.session.admin === true){
-    const id_election = req.body.id_election
+    const id_election = req.body.id
+    console.log({id: id_election})
     const sql = "SELECT * FROM elections WHERE id_election = $1"
     const result = await client.query({
       text: sql,
@@ -248,24 +249,25 @@ router.get('/admin/election', async (req, res) => {
 
 router.put('/admin/election', async (req, res) => {
   if(req.session.admin === true){
-    const id_election = req.body.id_election
+    const electionId = req.body.electionId
+    console.log(id_election)
     const ouvert = req.body.ouvert
     const visible = req.body.visible
     if(ouvert === true && visible === true){
       res.json({message: "Vous ne pouvez pas afficher les résulats d'une élection en cours."})
     }
     else{
-      let sql = "SELECT * FROM election WHERE id_election = $1"
+      let sql = "SELECT * FROM elections WHERE id_election = $1"
       const result = await client.query({
         text: sql,
-        values: [id_election]
+        values: [electionId]
       })
       let election = result.rows[0]
       if(ouvert !== election.ouvert){
-        sql = "UPDATE election SET ouvert = $1 WHERE id_election = $2"
+        sql = "UPDATE elections SET ouvert = $1 WHERE id_election = $2"
         await client.query({
           text: sql,
-          values: [ouvert, id_election]
+          values: [ouvert, electionId]
         })
       }
       else{
@@ -273,7 +275,7 @@ router.put('/admin/election', async (req, res) => {
           sql = "UPDATE election SET visible = $1 WHERE id_election = $2"
           await client.query({
             text: sql,
-            values: [visible, id_election]
+            values: [visible, electionId]
           })
         }
       }

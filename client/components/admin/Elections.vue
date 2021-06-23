@@ -6,16 +6,16 @@
       <div class="container">
         <div>
           <ul>
-            <li  class="election">
-              <div v-for="election in elections" :key="election.id">
-                <router-link :to="chemin(election)">
-                  <h3>{{election.nom}}</h3>
+            <li :key="election.id_election" v-for="election in elections" class="election">
+              <router-link :to="chemin(election)">
+                <div>
+                  <h3>{{ election.nom }}</h3>
                   <br>
-                  <div> <strong>Type d'élection : </strong> {{ election.type }}</div>
-                  <div> <strong>Date du vote : </strong> {{ election.jour }} / {{ election.mois }} / {{ election.année }}</div>
+                  <div> <strong>Type d'élection : </strong> {{ election.type_election }}</div>
+                  <div> <strong>Date du vote : </strong> {{ election.date }}</div>
                   <div> <strong>Tour : </strong> {{ election.tour }}</div>
-                </router-link>
-              </div>
+                </div>
+              </router-link>
             </li>
           </ul>
         </div>

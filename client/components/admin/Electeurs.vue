@@ -101,14 +101,8 @@ module.exports = {
       let fileText = ''
       const reader = new FileReader();
       reader.onload = async function (progressEvent) {
-        // Entire file
-        //console.log(this.result);
-
-        // By lines
         fileText = this.result.split('\n')
         for (let line = 0; line < fileText.length; line++) {
-          //console.log(lines[line]);
-          //console.log(fileText[line])
           fileText[line] = fileText[line].split(';')
         }
         console.log(fileText)

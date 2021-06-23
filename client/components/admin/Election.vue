@@ -20,13 +20,11 @@ module.exports = {
   },
 
   created: async function() {
-    const electionId = this.$route.params.id
-    console.log(electionId)
-    const id_election = {
-      id_election: electionId,
+    const electionId = {
+      electionId: this.$route.params.id
     }
-    console.log(id_election)
-    const result = await axios.get('/api/admin/election', id_election)
+    console.log(electionId)
+    const result = await axios.get('/api/admin/election', electionId)
     console.log(result.data)
     this.election = result.data
   },
