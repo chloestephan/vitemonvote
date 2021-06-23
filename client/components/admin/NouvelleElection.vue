@@ -1,44 +1,47 @@
 <template>
   <div class="site-container">
-    <h2>Nouvelle election</h2>
-    <hr>
+    <div class="limiter">
+      <h2>Nouvelle election</h2>
+      <hr>
 
-    <div>
-      <input type="text" v-model="nom" placeholder="Nom de l'élection" required>
+      <div>
+        <input type="text" v-model="nom" placeholder="Nom de l'élection" required>
 
-      <label for="type-election"><h3>Choisir le type d'élection :</h3></label>
-      <select name="typeElection" id="type-election" class="box" v-model="typeElection">
-        <option value="">--Choisir une option--</option>
-        <option value="Municipales">Municipales</option>
-        <option value="Cantonales">Département</option>
-        <option value="Regionales">Regionales</option>
-        <option value="Legislatives">Legislatives</option>
-        <option value="Presidentielle">Presidentielle</option>
-        <option value="Europeenes">Européennes</option>
-        <option value="Referundum">Referundum</option>
-      </select>
+        <label for="type-election"><h3>Choisir le type d'élection :</h3></label>
+        <select name="typeElection" id="type-election" class="box" v-model="typeElection">
+          <option value="">Choisir une option</option>
+          <option value="Municipales">Municipales</option>
+          <option value="Cantonales">Département</option>
+          <option value="Regionales">Regionales</option>
+          <option value="Legislatives">Legislatives</option>
+          <option value="Presidentielle">Presidentielle</option>
+          <option value="Europeenes">Européennes</option>
+          <option value="Referundum">Referundum</option>
+        </select>
 
-      <label for="start"><h3>Date du premier tour :</h3></label>
-      <input type="date" id="start" name="premierTourDate" v-model="date">
+        <label for="start"><h3>Date du premier tour :</h3></label>
+        <input type="date" id="start" name="premierTourDate" v-model="date">
 
-      <div v-if="typeElection==='Presidentielle'">
-        <div v-for="(liste, index1) in candidats" :key="index1" class="">
-          <h2>Nouvelle liste</h2>
-          <hr>
+        <div v-if="typeElection==='Presidentielle'">
+          <div v-for="(liste, index1) in candidats" :key="index1" class="">
+            <h2>Nouvelle liste</h2>
+            <hr>
 
-          <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
+            <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
 
-          <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
-            <div class="ligne">
-              <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat ' + index2" required>
-              <p class="delete" @click="deleteCandidat(index1, index2)">✖️</p>
+            <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
+              <div class="ligne">
+                <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat ' + index2" required>
+                <p class="delete" @click="deleteCandidat(index1, index2)">✖️</p>
+              </div>
             </div>
-          </div>
-          <button type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
+            <button type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
 
-          <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+            <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+          </div>
+          <hr>
+          <button type="button" @click="creerEletionPresidentielle">Valider</button>
         </div>
-        <button type="button" @click="creerEletionPresidentielle">Valider</button>
       </div>
     </div>
   </div>
@@ -225,8 +228,9 @@ input {
 }
 
 button {
-  width: 20%;
+  width: 30%;
   margin: 20px;
+  margin-left: 35%;
 }
 
 .ligne {
@@ -241,5 +245,6 @@ button {
 .delete {
   display:flex;
 }
+
 
 </style>

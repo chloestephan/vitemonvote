@@ -80,7 +80,7 @@ hr {
 
 .election {
   background: #FFF;
-  width: 600px;
+  max-width: 550px;
   height: 200px;
   margin: 40px;
   padding: 20px;
