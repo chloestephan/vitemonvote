@@ -431,7 +431,7 @@ router.post('/user/register', async (req, res) => {
     }
   }
 
-  const splitEmail = email.split('@')
+  const splitEmail = email.split('@')  // On regarde si la syntaxe du mail est correcte
 
   if (splitEmail[0] === "" || splitEmail[1] === undefined || splitEmail[1] === "" || splitEmail[2] !== undefined) {
     res.json({popup: 'L\'adresse mail est incorrect !'})                  // POPUP
@@ -512,7 +512,7 @@ router.post('/user/login', async (req, res) => {
 
 router.get('/user/voirelections', async (req, res) => {
 
-    const sql = "SELECT * FROM public.elections"
+    const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat ORDER BY id_election"
     const result = await client.query({
       text: sql
     })    
@@ -526,11 +526,4 @@ router.get('/user/resultats', async (req, res) => {
     text: sql
   })    
   res.json({elections: result.rows})
-})
-
-router.get('/user/resultats/:idElection', async (req, res) => {
-
-  console.log("JE SUIS LA")
-
-  res.json({message: "Sa marche un peu quoi"})
 })
