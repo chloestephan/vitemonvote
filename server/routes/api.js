@@ -332,15 +332,18 @@ router.delete('/admin/electeur/:id', async (req, res) => {
 router.post('/admin/bureaux', async (req, res) => {
   if (req.session.admin === true){
     const bureaux = req.body.bureaux
-
+    console.log("test1")
     const sql = "INSERT INTO bureaudevote VALUES ($1, $2) ON CONFLICT DO NOTHING"
     for(let i = 0; i < bureaux.length; i++){
+      console.log("Value :" + i)
       await client.query({
         text: sql,
         values: [bureaux[i], 0]
       })
     }
+    console.log("test2")
     res.json({message: "Bureaux ajoutés"})
+    return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
