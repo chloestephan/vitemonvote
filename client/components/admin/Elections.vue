@@ -103,8 +103,8 @@ ul {
 }
 
 .election:hover {
-    scale: 1.05;
-    cursor: pointer;
+    transform: scale(1.1);
+    transition: 0.7s;
 }
 
 .election div {

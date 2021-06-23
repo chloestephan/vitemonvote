@@ -89,7 +89,8 @@ hr {
 }
 
 .election:hover {
-    
+    transform: scale(1.1);
+    transition: 0.7s;
 }
 
 ul {
