@@ -10,18 +10,14 @@ const AdminElections = window.httpVueLoader('./components/admin/Elections.vue')
 const AdminElection = window.httpVueLoader('./components/admin/Election.vue')
 const AdminElecteurs = window.httpVueLoader('./components/admin/Electeurs.vue')
 
-const LoginResultats = window.httpVueLoader('./components/client/Resultats.vue')
 const LoginVoirElection = window.httpVueLoader('./components/client/VoirElections.vue')
-const LoginVoter = window.httpVueLoader('./components/client/Voter.vue')
 
 const routes = [
   { path: '/', component: Home},
   { path: '/commentVoter', component: commentVoter},
   { path: '/user', component: Login,
     children: [
-      {path: 'resultats', component: LoginResultats},
       {path: 'voirelections', component: LoginVoirElection},
-      {path: 'voter', component: LoginVoter},
     ]
   },
   { path: '/admin', component: Admin,

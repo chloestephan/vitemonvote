@@ -33,8 +33,8 @@ module.exports = {
   },
 
   created: async function () {
-    const result = await axios.get('/api/admin/elections')
-    this.elections = result.data
+    const result = await axios.get('/api/user/voirelections')
+    this.elections = result.data.elections
     console.log(this.elections)
     let test = [5, 6, 7, 8]
     let data = test.join()
