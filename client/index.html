@@ -21,7 +21,7 @@
 
       <header>
         <div class="header">
-          <img class="logo" id="header-logo" src="img/logo_horizontal.png" alt="Logo de Vite Mon Vote."/>
+          <a href="/"><img src="img/logo_horizontal.png" alt="Logo de Vite Mon Vote" class="logo"  id="header-logo"></a>
 
           <div class="header-right">
             <a><router-link to='/commentVoter'>Comment voter ?</router-link></a>
@@ -39,10 +39,9 @@
       <footer class="footer-distributed">
 
         <div class="footer-right">
-          <!--<a href="/index.html" class="logo">ViteMonVote</a>-->
-          <a><img class="logo" id="footer-logo" src="img/logo.png" alt="Logo de Vite Mon Vote."/></a>
+          <a href="/"><img class="logo" id="footer-logo" src="img/logo.png" alt="Logo de Vite Mon Vote."/></a>
         </div>
-  
+
         <div class="footer-left">
           <p class="footer-links">
             <a><router-link to='/'>Accueil</router-link></a>
@@ -52,17 +51,17 @@
             <a><router-link to='/ResultatsVotants'>Résultats</router-link></a>
             ·
             <a><router-link to='/admin/Admins'>Admin</router-link></a>
-  
+
           </p>
           <p>VITE MON VOTE &copy; 2021 - EFREI PARIS</p>
         </div>
-        
+
       </footer>
 
     </div>
 
     <script src="/vue-application.js"></script>
-    
+
   </body>
 
 </html>
