@@ -44,6 +44,12 @@ module.exports = {
         this.isUserConnected = result.data.admin
         console.log(result.data.admin)
     },
+    
+    beforeMount() {
+      window.addEventListener("beforeunload", this.preventNav())
+    },
+      
+    
 
     methods: {
         async loginUser(){
@@ -56,6 +62,8 @@ module.exports = {
                 const result = await axios.post('/api/admin/login', user)
 
                 this.isUserConnected = result.data.connected
+
+                
             }
         },
         async LogOut(){
@@ -69,8 +77,16 @@ module.exports = {
             this.password = result.data.password
 
             this.isUserConnected = result.data.connected
-
+        },
+        
+        preventNav(event) {
+          if (this.isUserConnected == true){
+            event.preventDefault()
+            event.returnValue = ""
+            this.LogOut()
+          }
         }
+        
     }
 }
 </script>

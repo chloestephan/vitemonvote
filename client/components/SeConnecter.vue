@@ -80,6 +80,11 @@ module.exports = {
         const result = await axios.get('/api/user/me')
         this.isUserConnected = result.data.user
     },
+
+    beforeMount() {
+      window.addEventListener("beforeunload", this.preventNav)
+    },
+
     methods: {
         async getPassword() {
             this.popup = ''
