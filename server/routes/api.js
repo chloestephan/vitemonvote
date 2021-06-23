@@ -299,6 +299,7 @@ router.post('/admin/electeurs', async(req, res) => {
       })
     }
     res.json({message: "Electeurs ajoutés"})
+    return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
@@ -314,6 +315,9 @@ router.get('/admin/electeur', async(req, res) => {
       text: sql,
       values: [num_carte_electeur + "%", email + "%", code_postal + "%"]
     })
+
+    res.json(result.rows)
+    return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
@@ -327,6 +331,7 @@ router.delete('/admin/electeur/:id', async (req, res) => {
       values: [id],
     })
     res.json({message: "Utilisateur supprimé."})
+    return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
@@ -334,16 +339,13 @@ router.delete('/admin/electeur/:id', async (req, res) => {
 router.post('/admin/bureaux', async (req, res) => {
   if (req.session.admin === true){
     const bureaux = req.body.bureaux
-    console.log("test1")
     const sql = "INSERT INTO bureaudevote VALUES ($1, $2) ON CONFLICT DO NOTHING"
     for(let i = 0; i < bureaux.length; i++){
-      console.log("Value :" + i)
       await client.query({
         text: sql,
         values: [bureaux[i], 0]
       })
     }
-    console.log("test2")
     res.json({message: "Bureaux ajoutés"})
     return
   }
@@ -515,7 +517,7 @@ router.get('/user/voirelections', async (req, res) => {
     const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat ORDER BY id_election"
     const result = await client.query({
       text: sql
-    })    
+    })
     res.json({elections: result.rows})
 })
 
