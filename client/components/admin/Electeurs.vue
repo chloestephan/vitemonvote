@@ -70,8 +70,7 @@ module.exports = {
       let final = []
       const reader = new FileReader();
       reader.onload = async function (progressEvent) {
-        fileText = this.result.split('\n');
-        let error = false
+        const fileText = this.result.split('\n');
         for (let line = 0; line < fileText.length; line++) {
           fileText[line] = fileText[line].split(';')
         }
@@ -84,28 +83,14 @@ module.exports = {
         for(let i = 0; i < final.length; i += 1000){
           const intermediare = final.slice(i, i + 1000)
 
-          for(let j = 0; j < intermediare.length; j++){
-            if(intermediare[j] == null || intermediare[j] == undefined){
-              console.log("Null at i=" + i + " j=" + j)
-              intermediare.splice(j, 1)
-            }
-          }
-
           console.log(intermediare)
           const bureaux = {
             bureaux: intermediare
           }
           const result = await axios.post('/api/admin/bureaux', bureaux)
-          if(result.data.message !== 'Bureaux ajoutés'){
-            error = true
-          }
+
         }
-        if(error === false){
-          alert('Bureaux ajoutés')
-        }
-        else{
-          alert('Une erreur est survenue')
-        }
+
       };
       reader.readAsText(file);
     },

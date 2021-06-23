@@ -1,7 +1,7 @@
 <template>
     <ul v-if="elections.length">
         <li :key="election.id" v-for="election in elections" class="election">
-            <h2>{{ election.nom }}</h2>
+            <h3>{{ election.nom }}</h3>
             <br>
             <div> <strong>Type d'élection : </strong> {{ election.type }}</div>
             <div> <strong>Date du vote : </strong> {{ election.jour }} / {{ election.mois }} / {{ election.année }}</div>
@@ -44,19 +44,52 @@ module.exports = {
 
 <style scoped>
 
+h2 {
+  font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+  font-size: 28px;
+  line-height: 1.1em;
+  margin-bottom: 10px;
+  display: block;
+  font-size: 1.5em;
+  margin-block-start: 0.83em;
+  margin-block-end: 0.83em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #001D6E;
+}
+
+hr {
+  height:2px;
+  border-width:0;
+  color:#D60920;
+  background-color:#D60920;
+  margin-top: 40px;
+  margin-bottom: 30px;
+  margin-left: 40%;
+  width: 20%;
+}
+
 .election {
-    background: #FFF;
-    width: 600px;
-    height: 200px;
-    margin: 40px;
-    padding: 20px;
-    border-radius: 2%;
-    transition: 0.4s;
-    border-radius: 10px;
-    -moz-box-shadow: 0px 1px 5px 0px #656565;
-    -webkit-box-shadow: 0px 1px 5px 0px #656565;
-    -o-box-shadow: 0px 1px 5px 0px #656565;
-    box-shadow: 0px 1px 5px 0px #656565;
+  background: #FFF;
+  width: 600px;
+  height: 200px;
+  margin: 40px;
+  padding: 20px;
+  border-radius: 2%;
+  transition: 0.4s;
+  border-radius: 10px;
+  -moz-box-shadow: 0px 1px 5px 0px #656565;
+  -webkit-box-shadow: 0px 1px 5px 0px #656565;
+  -o-box-shadow: 0px 1px 5px 0px #656565;
+  box-shadow: 0px 1px 5px 0px #656565;
+  color:#001D6E;
+  text-decoration: none;
+}
+
+.election:hover {
+    
 }
 
 ul {
@@ -75,6 +108,25 @@ ul {
     padding-top: 10px;
     padding-bottom: 10px;
 }
+
+h3 {
+  font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #001D6E;
+}
+
+a:link { text-decoration: none; color: #001D6E;}
+
+
+a:visited { text-decoration: none; color: #001D6E;}
+
+
+a:hover { text-decoration: none; color: #001D6E;}
+
+
+a:active { text-decoration: none; color: #001D6E; }
 
 </style>
 
