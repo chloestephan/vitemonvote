@@ -490,6 +490,7 @@ router.post('/user/register', async (req, res) => {
 router.post('/user/login', async (req, res) => {
   const email = req.body.email
   const password = req.body.password
+
   const sql = "SELECT * FROM public.Electeur WHERE email=$1"
   const result = await client.query({
     text: sql,
@@ -497,12 +498,12 @@ router.post('/user/login', async (req, res) => {
   })
 
   if(result.rowCount === 0){
-    res.json({ popup: 'L\'email renseigné n\'est pas associé à un compte, veuillez récupérer votre mot de passe avant de vous connecter !'})                // POPUP
+    res.json({ popup: 'L\'email et/ou le mot de passe sont incorrectes !'})                // POPUP
     return
   }
 
   if (! await bcrypt.compare(password, result.rows[0].password)){
-    res.json({popup: 'Le mot de passe renseigné est incorrect !'})                               // POPUP
+    res.json({popup: 'L\'email et/ou le mot de passe sont incorrectes !'})                               // POPUP
     return
   }
   
@@ -512,20 +513,106 @@ router.post('/user/login', async (req, res) => {
   res.json({connected: true, message: 'You are now logged in as an user.'})
 })
 
-router.get('/user/voirelections', async (req, res) => {
+router.post('/user/voirelections', async (req, res) => {
 
+  const typeSort = req.body.typeSort
+
+  if (typeSort === "noSort") {
     const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat ORDER BY id_election"
     const result = await client.query({
-      text: sql
+      text: sql,
     })
     res.json({elections: result.rows})
+  }
+  else if (typeSort === "sortByVote") {
+    const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = false ORDER BY id_election"
+    const result = await client.query({
+      text: sql,
+    })
+    res.json({elections: result.rows})
+  }
+  else if (typeSort === "sortByResult") {
+    const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true ORDER BY id_election"
+    const result = await client.query({
+      text: sql,
+    })
+    res.json({elections: result.rows})
+  }
+  else {
+    res.status(401).json({message: "Le type de tri n'est pas accepté ! "})
+  }
 })
 
-router.get('/user/resultats', async (req, res) => {
+router.post('/user/voirelections/vote', async (req, res) => {
+  
+  // INFO NECESSAIRE
 
-  const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true ORDER BY id_election"
-  const result = await client.query({
-    text: sql
-  })    
-  res.json({elections: result.rows})
+  const id_election = req.body.id_election
+  const id_liste = req.body.id_liste
+  const num_carte_electeur = req.session.userId
+
+  const getCP = "SELECT code_postal FROM public.electeur WHERE num_carte_electeur=$1"
+  const resultGetCP = await client.query({
+    text: getCP,
+    values: [num_carte_electeur]
+  })
+
+  const code_postal = resultGetCP.rows[0].code_postal
+
+  // ON VERIF S'IL A DEJA VOTE OU NON
+
+  const verifAVote = "SELECT * FROM avote WHERE id_election = $1 and num_carte_electeur = $2"
+  const resultVerifAVote = await client.query({
+    text: verifAVote,
+    values: [id_election, num_carte_electeur]
+  })
+
+  if (resultVerifAVote.rowCount === 0) {
+
+
+    // AJOUT DU VOTE DANS BUREAUDEVOTE
+
+    const getNbrVoteBureau = "SELECT nbr_total_votants FROM bureaudevote WHERE code_postal = $1"
+    const resultGetNbrVoteBureau = await client.query({
+      text: getNbrVoteBureau,
+      values: [code_postal]
+    })
+
+    const nbr_total_votants = resultGetNbrVoteBureau.rows[0].nbr_total_votants
+
+    const addVoteToBureau = "UPDATE bureaudevote SET nbr_total_votants = $1 + 1 WHERE code_postal = $2"
+    const resultAddVoteBureau = await client.query({
+      text: addVoteToBureau,
+      values: [nbr_total_votants, code_postal]
+    })
+
+    // CREATION DE LA TABLE AVOTE
+
+    const createAVote = "INSERT INTO AVote VALUES ($1, $2)"
+    const resultCreateAVote = await client.query({
+      text: createAVote,
+      values: [id_election, num_carte_electeur]
+    })
+
+    // AJOUT DU VOTE A LA LISTE
+
+    const getNbrVoteListe = "SELECT nbr_votes FROM liste WHERE id_liste = $1 and id_election = $2"
+    const resultGetNbrVoteListe = await client.query({
+      text: getNbrVoteListe,
+      values: [id_liste, id_election]
+    })
+
+    const nbr_votes = resultGetNbrVoteListe.rows[0].nbr_votes
+
+    const addVoteToListe = "UPDATE liste SET nbr_votes = $1 + 1 WHERE id_liste = $2 and id_election = $3"
+    const resultAddVoteToListe = await client.query({
+      text: addVoteToListe,
+      values: [nbr_votes, id_liste, id_election]
+    })
+
+    res.json({popup: "Le vote a été pris en compte ! Merci de votre participation !"})
+  }
+  else {
+    res.json({popup: "Vous avez déjà voté, vous ne pouvez pas voter plusieurs fois !"})
+  }
 })

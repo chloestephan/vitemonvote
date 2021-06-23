@@ -4,30 +4,16 @@
         <!--  AFFICHAGE SELON SI UNE ELECTION EST SELECTIONNEE OU NON  -->
         <div v-if="!electionInDetail">
             <h2>Cliquez sur une élection pour voter ou pour voir les résultats !</h2>
-            <button @click="sortByVote">TRIER PAR VOTE DISPONIBLES</button>
-            <button @click="sortByResult">TRIER PAR RESULTATS DISPONIBLES</button>
+            <button @click="sortByVote()">TRIER PAR VOTE DISPONIBLES</button>
+            <button  @click="sortByResult()">TRIER PAR RESULTATS DISPONIBLES</button>
+            <button  @click="noSort()">ANNULER LE TRI</button>
         </div>
         
         <button v-else @click="showAll" class="return">Annuler la recherche</button>
 
         <!--  AFFICHAGE SI DES ELECTIONS SONT DISPO  -->
 
-        <ul v-if="elections.length && !noSort && sortVote" class="election_container">
-            <div :key="election.id" v-for="election in elections">
-                <li v-if="!election.resultats_visibles" class="election" @click="detailElection(election.id)">
-
-                    <h2>{{ election.nom }}</h2>
-                    <br>
-                    <div> <strong>Type d'élection : </strong> {{ election.type }}</div>
-                    <div> <strong>Date du vote : </strong> {{ election.jour }} / {{ election.mois }} / {{ election.année }}</div>
-                    <div> <strong>Tour : </strong> {{ election.tour }}</div>
-                    <div><strong>VOTE DISPONIBLES</strong></div>
-                      
-                </li>
-            </div>
-        </ul>
-
-        <ul v-else-if="elections.length && !electionInDetail" class="election_container">
+        <ul v-if="elections.length && !electionInDetail" class="election_container">
             <li :key="election.id" v-for="election in elections" class="election" @click="detailElection(election.id)">
                 <h2>{{ election.nom }}</h2>
                 <br>
@@ -77,7 +63,7 @@
                             <div> {{ candidat.nom_complet }} </div>
                         </li>
                     </ul>
-                    <button>VOTER</button>
+                    <button @click="vote(elections[idSelected], liste)">VOTER</button>
                 </li>
             </ul>
 
@@ -86,8 +72,23 @@
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
 
         <h2 v-else class="noElection">Aucun résultat disponible !</h2>
-    
+
+        <!--  POPUP  -->
+
+        <div :class="[{displayPop : isError}, {displayPop : voted}]" class="overlay">
+            <div class="popup">
+                <h2 v-if="isError">Erreur</h2>
+                <h2 v-else>Confirmation de vote</h2>
+                <br>
+                <p>{{ popup }}</p>
+                <button @click="closePopup" class="cross">
+                    X
+                </button>
+            </div>
+        </div>
+
     </div>
+
 </template>
 
 <script>
@@ -100,53 +101,24 @@ module.exports = {
             candidats: [{}],
             electionInDetail: false,
             idSelected: -1,
-            noSort: true,
-            sortVote: false,
-            sortResult: false,
+            popup: '',
+            isError: false,
+            voted: false,
         }
     },
     mounted: async function() {
         
-        const result = await axios.get('/api/user/voirelections')
+        const sort = {
+            typeSort: "noSort"
+        }
+
+        const result = await axios.post('/api/user/voirelections', sort)
+
         this.elections.pop()
         this.listes.pop()
         this.candidats.pop()
 
-        for (var i = 0; i < result.data.elections.length; i++) {
-            var date = result.data.elections[i].date.substring(0,10).split('-')
-            
-            this.candidats.push({
-                nom_complet: result.data.elections[i].nom_complet
-            })
-
-            if ( (i === result.data.elections.length - 1) || ( result.data.elections[i].id_liste !== result.data.elections[i + 1].id_liste ) ) {
-                this.listes.push({
-                    id_election: result.data.elections[i].id_election,
-                    id_liste: result.data.elections[i].id_liste,
-                    nom_liste: result.data.elections[i].nom_liste,
-                    nbr_votes: result.data.elections[i].nbr_votes,
-                    candidats: this.candidats
-                })
-                this.candidats = [{}]
-                this.candidats.pop()
-            }
-
-            if ( (i === result.data.elections.length - 1) || (result.data.elections[i].id_election !== result.data.elections[i + 1].id_election) ) {
-                this.elections.push({
-                    id: result.data.elections[i].id_election,
-                    nom: result.data.elections[i].nom,
-                    année: date[0],
-                    mois: date[1],
-                    jour: date[2],
-                    tour: result.data.elections[i].tour,
-                    type: result.data.elections[i].type_election,
-                    resultats_visibles: result.data.elections[i].resultats_visibles,
-                    listes: this.listes
-                })
-                this.listes = [{}]
-                this.listes.pop()
-            }
-        }
+        this.fillElection(result)
     },
     methods: {
         async detailElection(idElection) {
@@ -154,20 +126,123 @@ module.exports = {
             this.idSelected = this.elections.findIndex(findId)
             this.electionInDetail = true
         },
+        fillElection(result) {
+            for (var i = 0; i < result.data.elections.length; i++) {
+                var date = result.data.elections[i].date.substring(0,10).split('-')
+                
+                this.candidats.push({
+                    nom_complet: result.data.elections[i].nom_complet
+                })
+
+                if ( (i === result.data.elections.length - 1) || ( result.data.elections[i].id_liste !== result.data.elections[i + 1].id_liste ) ) {
+                    this.listes.push({
+                        id_election: result.data.elections[i].id_election,
+                        id_liste: result.data.elections[i].id_liste,
+                        nom_liste: result.data.elections[i].nom_liste,
+                        nbr_votes: result.data.elections[i].nbr_votes,
+                        candidats: this.candidats
+                    })
+                    this.candidats = [{}]
+                    this.candidats.pop()
+                }
+
+                if ( (i === result.data.elections.length - 1) || (result.data.elections[i].id_election !== result.data.elections[i + 1].id_election) ) {
+                    this.elections.push({
+                        id: result.data.elections[i].id_election,
+                        nom: result.data.elections[i].nom,
+                        année: date[0],
+                        mois: date[1],
+                        jour: date[2],
+                        tour: result.data.elections[i].tour,
+                        type: result.data.elections[i].type_election,
+                        resultats_visibles: result.data.elections[i].resultats_visibles,
+                        listes: this.listes
+                    })
+                    this.listes = [{}]
+                    this.listes.pop()
+                }
+            }
+        },
         showAll() {
             this.idSelected = -1
             this.electionInDetail = false
         },
-        sortByVote() {
-            this.noSort = false
-            this.sortResult = false
-            this.sortVote = true
+        async sortByVote() {
+
+            this.elections = [{}]
+            this.listes = [{}]
+            this.candidats = [{}]
+
+            const sort = {
+                typeSort: "sortByVote"
+            }
+
+            const result = await axios.post('/api/user/voirelections', sort)
+
+            this.elections.pop()
+            this.listes.pop()
+            this.candidats.pop()
+
+            this.fillElection(result)
         },
-        sortByResult() {
-            this.noSort = false
-            this.sortResult = true
-            this.sortVote = false
-        }
+        async sortByResult() {
+
+            this.elections = [{}]
+            this.listes = [{}]
+            this.candidats = [{}]
+
+            const sort = {
+                typeSort: "sortByResult"
+            }
+
+            const result = await axios.post('/api/user/voirelections', sort)
+
+            this.elections.pop()
+            this.listes.pop()
+            this.candidats.pop()
+
+            this.fillElection(result)
+        },
+        async noSort() {
+
+            this.elections = [{}]
+            this.listes = [{}]
+            this.candidats = [{}]
+
+            const sort = {
+                typeSort: "noSort"
+            }
+
+            const result = await axios.post('/api/user/voirelections', sort)
+
+            this.elections.pop()
+            this.listes.pop()
+            this.candidats.pop()
+
+            this.fillElection(result)
+        },
+        async vote(election, liste) {
+            console.log(election)
+            const information = {
+                id_election: election.id,
+                id_liste: liste.id_liste,
+            }
+            const result = await axios.post('/api/user/voirelections/vote', information)
+
+            this.popup = result.data.popup
+
+            if (this.popup === "Le vote a été pris en compte ! Merci de votre participation !") {
+                this.voted = true
+            }
+            else if (this.popup !== undefined) {
+                this.isError = true
+            }
+
+        },
+        closePopup() {
+            this.isError = false
+            this.voted = false
+        },
     }
 }
 
@@ -254,6 +329,50 @@ ul {
     list-style-type: none;
 }
 
+.overlay {
+    text-align: center;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7);
+    transition: opacity .4s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.displayPop {
+    visibility: visible;
+    opacity: 1;
+}
+
+.popup {
+    margin: 6rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 5px;
+    width: 35%;
+    position: relative;
+    transition: all 0s ease-in-out;
+}
+
+.cross {
+    color: black;
+    position: absolute;
+    top: 2px;
+    bottom: 0;
+    right: 2px;
+    width: 10px;
+    background: #fff;
+    border: 0px;
+    font-weight: bold;
+    font-size: 120%;
+}
+
+.cross:hover {
+    color: #001D6E;
+}
 
 </style>
 
