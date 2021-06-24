@@ -580,7 +580,7 @@ router.post('/user/voirelections', async (req, res) => {
 // VOTE
 
 router.post('/user/voirelections/vote', async (req, res) => {   
-  
+
   if (req.session.user) {
 
     // INFO NECESSAIRE
@@ -647,11 +647,10 @@ router.post('/user/voirelections/vote', async (req, res) => {
         text: addVoteToListe,
         values: [nbr_votes, id_liste, id_election]
       })
-
-      res.json({popup: "Le vote a été pris en compte ! Merci de votre participation !"})
+      setTimeout(() => res.json({popup: "Le vote a été pris en compte ! Merci de votre participation !"}), 1500)
     }
     else {
-      res.json({popup: "Vous avez déjà voté, vous ne pouvez pas voter plusieurs fois !"})
+      setTimeout(() => res.json({popup: "Vous avez déjà voté, vous ne pouvez pas voter plusieurs fois !"}), 1500)
     }
   }
   else {
