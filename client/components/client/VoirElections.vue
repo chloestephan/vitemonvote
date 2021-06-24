@@ -6,7 +6,9 @@
             <h2>Cliquez sur une élection pour voter ou pour voir les résultats !</h2>
             <button @click="sortByVote()">TRIER PAR VOTE DISPONIBLES</button>
             <button  @click="sortByResult()">TRIER PAR RESULTATS DISPONIBLES</button>
-            <button  @click="noSort()">ANNULER LE TRI</button>
+            <input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required>
+            <button  @click="sortBySearch()">RECHERCHER</button>
+            <button  @click="noSort()">ANNULER LE TRI / LA RECHERCHE</button>
         </div>
         
         <button v-else @click="showAll" class="return">Annuler la recherche</button>
@@ -63,7 +65,7 @@
                             <div> {{ candidat.nom_complet }} </div>
                         </li>
                     </ul>
-                    <button @click="vote(elections[idSelected], liste)">VOTER</button>
+                    <button @click="popupConfirmation(elections[idSelected], liste)">VOTER</button>
                 </li>
             </ul>
 
@@ -73,7 +75,19 @@
 
         <h2 v-else class="noElection">Aucun résultat disponible !</h2>
 
-        <!--  POPUP  -->
+        <!--  POPUP AVANT VOTE  -->
+
+        <div :class="[{displayPop : wantsToVote}]" class="overlay">
+            <div class="popup">
+                <h2>ATTENTION</h2>
+                <br>
+                <p>Êtes-vous sur de vouloir voter ? Une fois le vote comptabilisé, il ne vous sera plus possible de le mofidifier !</p>
+                <button @click="confirmation" id="button">Confirmer le vote</button>
+                <button @click="closePopup" id="button">Annuer le vote</button>
+            </div>
+        </div>
+
+        <!--  POPUP APRES VOTE  -->
 
         <div :class="[{displayPop : isError}, {displayPop : voted}]" class="overlay">
             <div class="popup">
@@ -100,8 +114,17 @@ module.exports = {
             listes: [{}],
             candidats: [{}],
             electionInDetail: false,
+            sortedByVote: false,
+            sortedByResult: false,
+            sortedBySearch: false,
+            noSorted: true,
             idSelected: -1,
+            research: '',
             popup: '',
+            wantsToVote: false,
+            confirmVote: false,
+            idElectionVote: -1,
+            idListeVote: -1,
             isError: false,
             voted: false,
         }
@@ -167,14 +190,14 @@ module.exports = {
             this.idSelected = -1
             this.electionInDetail = false
         },
-        async sortByVote() {
-
+        async sort (typeOfSort) {
             this.elections = [{}]
             this.listes = [{}]
             this.candidats = [{}]
 
             const sort = {
-                typeSort: "sortByVote"
+                typeSort: typeOfSort,
+                searchName: this.research
             }
 
             const result = await axios.post('/api/user/voirelections', sort)
@@ -184,65 +207,76 @@ module.exports = {
             this.candidats.pop()
 
             this.fillElection(result)
+        },
+        async sortByVote() {
+            if (!this.sortedByVote) {
+                this.sort("sortByVote")
+                this.sortedByVote = true
+                this.sortedByResult = false
+                this.sortedBySearch = false
+                this.noSorted = false
+            }
         },
         async sortByResult() {
-
-            this.elections = [{}]
-            this.listes = [{}]
-            this.candidats = [{}]
-
-            const sort = {
-                typeSort: "sortByResult"
+            if (!this.sortedByResult) {
+                this.sort("sortByResult")
+                this.sortedByVote = false
+                this.sortedByResult = true
+                this.sortedBySearch = false
+                this.noSorted = false
             }
-
-            const result = await axios.post('/api/user/voirelections', sort)
-
-            this.elections.pop()
-            this.listes.pop()
-            this.candidats.pop()
-
-            this.fillElection(result)
+        },
+        async sortBySearch() {
+            if (!this.sortedBySearch) {
+                this.sort("sortBySearch")
+                this.sortedByVote = false
+                this.sortedByResult = false
+                this.sortedBySearch = true
+                this.noSorted = false
+            }
         },
         async noSort() {
-
-            this.elections = [{}]
-            this.listes = [{}]
-            this.candidats = [{}]
-
-            const sort = {
-                typeSort: "noSort"
+            if (!this.noSorted) {
+                this.sort("noSort")
+                this.sortedByVote = false
+                this.sortedByResult = false
+                this.sortedBySearch = false
+                this.noSorted = true
             }
-
-            const result = await axios.post('/api/user/voirelections', sort)
-
-            this.elections.pop()
-            this.listes.pop()
-            this.candidats.pop()
-
-            this.fillElection(result)
         },
-        async vote(election, liste) {
-            console.log(election)
-            const information = {
-                id_election: election.id,
-                id_liste: liste.id_liste,
-            }
-            const result = await axios.post('/api/user/voirelections/vote', information)
+        async vote() {
+            if (this.confirmVote) {
+                const information = {
+                    id_election: this.idElectionVote,
+                    id_liste: this.idListeVote,
+                }
+                const result = await axios.post('/api/user/voirelections/vote', information)
 
-            this.popup = result.data.popup
+                this.popup = result.data.popup
 
-            if (this.popup === "Le vote a été pris en compte ! Merci de votre participation !") {
-                this.voted = true
+                if (this.popup === "Le vote a été pris en compte ! Merci de votre participation !") {
+                    this.voted = true
+                }
+                else if (this.popup !== undefined) {
+                    this.isError = true
+                }
             }
-            else if (this.popup !== undefined) {
-                this.isError = true
-            }
-
         },
         closePopup() {
+            this.wantsToVote = false
             this.isError = false
             this.voted = false
         },
+        popupConfirmation(election, liste) {
+            this.wantsToVote = true
+            this.idElectionVote = election.id
+            this.idListeVote = liste.id_liste
+        },
+        confirmation() {
+           this.confirmVote = true
+           this.wantsToVote = false
+           this.vote()
+        }
     }
 }
 
@@ -368,10 +402,15 @@ ul {
     border: 0px;
     font-weight: bold;
     font-size: 120%;
+    transition: 0s;
 }
 
 .cross:hover {
     color: #001D6E;
+}
+
+#button {
+    transition: 0s;
 }
 
 </style>
