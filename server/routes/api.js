@@ -232,9 +232,9 @@ router.get('/admin/elections', async(req, res) =>{
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.get('/admin/election', async (req, res) => {
+router.get('/admin/election/:id', async (req, res) => {
   if(req.session.admin === true){
-    const id_election = req.body.id
+    const id_election = req.params.id
     console.log({id: id_election})
     const sql = "SELECT * FROM elections WHERE id_election = $1"
     const result = await client.query({
@@ -251,34 +251,51 @@ router.put('/admin/election', async (req, res) => {
   if(req.session.admin === true){
     const electionId = req.body.electionId
     console.log(id_election)
-    const ouvert = req.body.ouvert
-    const visible = req.body.visible
-    if(ouvert === true && visible === true){
-      res.json({message: "Vous ne pouvez pas afficher les résulats d'une élection en cours."})
+    const sql = "SELECT id_election FROM acces WHERE id_admin = $1"
+    const result = await client.query({
+      text: sql,
+      values: [req.session.adminId]
+    })
+    let allowed = false
+    for (let i = 0; i < result.rows.length; i++){
+      if (result.rows.id_election === electionId){
+        allowed = true
+      }
     }
-    else{
-      let sql = "SELECT * FROM elections WHERE id_election = $1"
-      const result = await client.query({
-        text: sql,
-        values: [electionId]
-      })
-      let election = result.rows[0]
-      if(ouvert !== election.ouvert){
-        sql = "UPDATE elections SET ouvert = $1 WHERE id_election = $2"
-        await client.query({
-          text: sql,
-          values: [ouvert, electionId]
-        })
+    if (allowed){
+      const ouvert = req.body.ouvert
+      const visible = req.body.visible
+      if(ouvert === true && visible === true){
+        res.json({message: "Vous ne pouvez pas afficher les résulats d'une élection en cours."})
       }
       else{
-        if(visible !== election.visible){
-          sql = "UPDATE election SET visible = $1 WHERE id_election = $2"
+        let sql = "SELECT * FROM elections WHERE id_election = $1"
+        const result = await client.query({
+          text: sql,
+          values: [electionId]
+        })
+        let election = result.rows[0]
+        if(ouvert !== election.ouvert){
+          sql = "UPDATE elections SET ouvert = $1 WHERE id_election = $2"
           await client.query({
             text: sql,
-            values: [visible, electionId]
+            values: [ouvert, electionId]
           })
         }
+        else{
+          if(visible !== election.visible){
+            sql = "UPDATE election SET visible = $1 WHERE id_election = $2"
+            await client.query({
+              text: sql,
+              values: [visible, electionId]
+            })
+          }
+        }
       }
+      res.json({message: "Modifications appliquées."})
+    }
+    else{
+      res.status(400).json({message: "L'admin n'a pas les droits sur cette élection."})
     }
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
