@@ -1,14 +1,24 @@
 <template>
-  <div>
-    <div class="site-container">
-      <h2>Veuillez sélectionner une élection.</h2>
+  <div class="site-container">
+    <div class="limiter">
+      <h2>Veuillez sélectionner une élection</h2>
       <hr>
-    </div>
-    <div class="site-container">
-      <div v-for="election in elections" :key="election.id_election" class="election">
-        <router-link :to="chemin(election)">
-          <h3>{{election.nom}}</h3>
-        </router-link>
+      <div class="container">
+        <div>
+          <ul>
+            <li :key="election.id_election" v-for="election in elections" class="election">
+              <router-link :to="chemin(election)">
+                <div>
+                  <h3>{{ election.nom }}</h3>
+                  <br>
+                  <div> <strong>Type d'élection : </strong> {{ election.type_election }}</div>
+                  <div> <strong>Date du vote : </strong> {{ election.date }}</div>
+                  <div> <strong>Tour : </strong> {{ election.tour }}</div>
+                </div>
+              </router-link>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -23,8 +33,8 @@ module.exports = {
   },
 
   created: async function () {
-    const result = await axios.get('/api/admin/elections')
-    this.elections = result.data
+    const result = await axios.get('/api/user/voirelections')
+    this.elections = result.data.elections
     console.log(this.elections)
     let test = [5, 6, 7, 8]
     let data = test.join()
@@ -40,6 +50,7 @@ module.exports = {
 </script>
 
 <style scoped>
+
 h2 {
   font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
   font-size: 28px;
@@ -57,13 +68,68 @@ h2 {
 }
 
 hr {
-  display: block;
-  border: 0;
-  border-radius: 3em;
-  border-top: 2px solid #D60920;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  width: 10%;
-  margin: auto;
+  height:2px;
+  border-width:0;
+  color:#D60920;
+  background-color:#D60920;
+  margin-top: 40px;
+  margin-bottom: 30px;
+  margin-left: 40%;
+  width: 20%;
 }
+
+.election {
+  background: #FFF;
+  max-width: 550px;
+  height: 200px;
+  margin: 40px;
+  padding: 20px;
+  border-radius: 2%;
+  transition: 0.4s;
+  border-radius: 10px;
+  -moz-box-shadow: 0px 1px 5px 0px #656565;
+  -webkit-box-shadow: 0px 1px 5px 0px #656565;
+  -o-box-shadow: 0px 1px 5px 0px #656565;
+  box-shadow: 0px 1px 5px 0px #656565;
+  color:#001D6E;
+  text-decoration: none;
+}
+
+ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    list-style-type: none;
+}
+
+.election:hover {
+    transform: scale(1.1);
+    transition: 0.7s;
+}
+
+.election div {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+h3 {
+  font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #001D6E;
+}
+
+a:link { text-decoration: none; color: #001D6E;}
+
+
+a:visited { text-decoration: none; color: #001D6E;}
+
+
+a:hover { text-decoration: none; color: #001D6E;}
+
+
+a:active { text-decoration: none; color: #001D6E; }
+
+
 </style>

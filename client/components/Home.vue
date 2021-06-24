@@ -51,7 +51,7 @@
 
             <div class="column">
               <h2>Centralise avec sécurité les résultats des élections.</h2>
-              <p>Les résultats sont récupérés et vérifiés directement via Vite Mon Vote. Ainsi, les résultats sont comptés bien plus rapidement.</p>
+              <p>Les résultats sont récupérés et vérifiés directement via Vite Mon Vote. Ainsi, les résultats sont comptés bien plus rapidement et accessibles facilement via la même plateforme que sur laquelle vous avez voté !</p>
             </div>
 
           </div>

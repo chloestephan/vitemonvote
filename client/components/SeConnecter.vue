@@ -34,9 +34,7 @@
             <div v-else>
                 <nav class="navbar">
                     <ul class="nav-links">
-                        <li class="nav-item"><a><router-link to='/user/voirelections'>Voir les élections</router-link></a></li>
-                        <li class="nav-item"><a><router-link to='/user/voter'>Aller voter !</router-link></a></li>
-                        <li class="nav-item"><a><router-link to='/user/resultats'>Résultats</router-link></a></li>
+                        <li class="nav-item"><a><router-link to='/user/voirelections'>Les élections</router-link></a></li>
                     </ul>
                     <a class="deconnexionBouton" @click="LogOut()">Se déconnecter</a>
                 </nav>
@@ -177,7 +175,7 @@ module.exports = {
     border-radius: 5px;
     width: 35%;
     position: relative;
-    transition: all .4s ease-in-out;
+    transition: all 0s ease-in-out;
 }
 
 .cross {

@@ -96,8 +96,8 @@ module.exports = {
 nav {
   width: 100%;
   background-color: #001D6E;
-  padding-left: 30px;
-  padding-right: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -135,12 +135,12 @@ nav {
 }
 
 .deconnexionBouton {
-     border-style:solid 2px #D60920;
+    border-style:solid 2px #D60920;
     background-color: #fff;
     color: #D60920;
     border-radius: 4px;
     padding: 10px;
-      transition: 0.4s;
+    transition: 0.4s;
 }
 
 .deconnexionBouton:hover {

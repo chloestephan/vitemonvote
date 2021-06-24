@@ -1,7 +1,11 @@
 <template>
   <div class="site-container">
-      <h2>Veillez sélectionner une élection afin d'afficher ses résultats</h2>
+    <div class="limiter">
+      <h2>Veuillez sélectionner une élection afin d'afficher ses résultats</h2>
       <hr>
+      <div class="container">
+      </div>
+    </div>
   </div>
 </template>
 
