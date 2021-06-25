@@ -9,7 +9,7 @@
                 <img class="loop" src="img/retour_arriere.png" @click="noSort()">
                 <a class="button" @click="sortByVote()">Trier par vote</a>
                 <a class="button" @click="sortByResult()">Trier par résultats</a>
-                <a class="input" href="#" class="last"><input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required></a>
+                <a class="input" class="last"><input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required></a>
                 <img class="loop" src="img/loupe.png" @click="sortBySearch()">
                 <div class="clear"></div>
             </div>
