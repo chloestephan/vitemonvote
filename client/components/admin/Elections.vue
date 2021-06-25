@@ -4,9 +4,10 @@
         <!--  AFFICHAGE SELON SI UNE ELECTION EST SELECTIONNEE OU NON  -->
         <div v-if="!electionInDetail">
             <h2>Choisissez une élection pour la modifier</h2>
+            <br>
+            <img class="loop" src="img/retour_arriere.png" @click="noSort()">
             <input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required>
             <img src="img/loupe.png" @click="sortBySearch()" class="loupeLogo">
-            <button  @click="noSort()">ANNULER LA RECHERCHE</button>
         </div>
         
         <button v-else @click="showAll" class="return">Annuler la recherche</button>
@@ -47,7 +48,10 @@
                     </ul>
                 </li>
             </ul>
-
+            <button>Ouvrir les votes</button>
+            <button>Fermer les votes</button>
+            <button>Afficher les résultats</button>
+            <button>Cacher les résultats</button>
         </div>
         
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->

@@ -550,28 +550,28 @@ router.post('/user/voirelections', async (req, res) => {
     const searchName = req.body.searchName + "%"
   
     if (typeSort === "noSort") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE ouvert = true ORDER BY id_election"
       const result = await client.query({
         text: sql,
       })
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortByVote") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = false ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = false AND ouvert = true ORDER BY id_election"
       const result = await client.query({
         text: sql,
       })
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortByResult") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true AND ouvert = true ORDER BY id_election"
       const result = await client.query({
         text: sql,
       })
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND ouvert = true ORDER BY id_election"
       const result = await client.query({
         text: sql,
         values: [searchName]
@@ -677,16 +677,50 @@ router.post('/admin/elections', async (req, res) => {
   if (req.session.admin) {
     const typeSort = req.body.typeSort
     const searchName = req.body.searchName + "%"
+    const id_admin = req.session.adminId
   
     if (typeSort === "noSort") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = false ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = false AND id_admin = $1 ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+        values: [id_admin]
+      })
+      res.json({elections: result.rows})
+    }
+    else if (typeSort === "sortBySearch") {
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND resultats_visibles = false AND id_admin = $2 ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+        values: [searchName, id_admin]
+      })
+      res.json({elections: result.rows})
+    }
+    else {
+      res.status(401).json({message: "Le type de tri n'est pas accepté ! "})
+    }
+  }
+  else {
+    res.status(401).json({message: "L'utilisateur n'est pas connecté ! "})
+  }
+
+
+})
+
+router.post('/admin/resultats', async (req, res) => {  
+
+  if (req.session.admin) {
+    const typeSort = req.body.typeSort
+    const searchName = req.body.searchName + "%"
+  
+    if (typeSort === "noSort") {
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true ORDER BY id_election"
       const result = await client.query({
         text: sql,
       })
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND resultats_visibles = false ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND resultats_visibles = true ORDER BY id_election"
       const result = await client.query({
         text: sql,
         values: [searchName]
@@ -700,6 +734,4 @@ router.post('/admin/elections', async (req, res) => {
   else {
     res.status(401).json({message: "L'utilisateur n'est pas connecté ! "})
   }
-
-
 })
