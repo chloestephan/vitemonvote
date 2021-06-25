@@ -658,3 +658,37 @@ router.post('/user/voirelections/vote', async (req, res) => {
     res.status(401).json({message: "L'utilisateur n'est pas connecté ! "})
   }
 })
+
+// POUR ADMIN ZEBI
+
+router.post('/admin/elections', async (req, res) => {  
+
+  if (req.session.admin) {
+    const typeSort = req.body.typeSort
+    const searchName = req.body.searchName + "%"
+  
+    if (typeSort === "noSort") {
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = false ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+      })
+      res.json({elections: result.rows})
+    }
+    else if (typeSort === "sortBySearch") {
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND resultats_visibles = false ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+        values: [searchName]
+      })
+      res.json({elections: result.rows})
+    }
+    else {
+      res.status(401).json({message: "Le type de tri n'est pas accepté ! "})
+    }
+  }
+  else {
+    res.status(401).json({message: "L'utilisateur n'est pas connecté ! "})
+  }
+
+
+})
