@@ -232,9 +232,9 @@ router.get('/admin/elections', async(req, res) =>{
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.get('/admin/election', async (req, res) => {
+router.get('/admin/election/:id', async (req, res) => {
   if(req.session.admin === true){
-    const id_election = req.body.id
+    const id_election = req.params.id
     console.log({id: id_election})
     const sql = "SELECT * FROM elections WHERE id_election = $1"
     const result = await client.query({
@@ -251,34 +251,51 @@ router.put('/admin/election', async (req, res) => {
   if(req.session.admin === true){
     const electionId = req.body.electionId
     console.log(id_election)
-    const ouvert = req.body.ouvert
-    const visible = req.body.visible
-    if(ouvert === true && visible === true){
-      res.json({message: "Vous ne pouvez pas afficher les résulats d'une élection en cours."})
+    const sql = "SELECT id_election FROM acces WHERE id_admin = $1"
+    const result = await client.query({
+      text: sql,
+      values: [req.session.adminId]
+    })
+    let allowed = false
+    for (let i = 0; i < result.rows.length; i++){
+      if (result.rows.id_election === electionId){
+        allowed = true
+      }
     }
-    else{
-      let sql = "SELECT * FROM elections WHERE id_election = $1"
-      const result = await client.query({
-        text: sql,
-        values: [electionId]
-      })
-      let election = result.rows[0]
-      if(ouvert !== election.ouvert){
-        sql = "UPDATE elections SET ouvert = $1 WHERE id_election = $2"
-        await client.query({
-          text: sql,
-          values: [ouvert, electionId]
-        })
+    if (allowed){
+      const ouvert = req.body.ouvert
+      const visible = req.body.visible
+      if(ouvert === true && visible === true){
+        res.json({message: "Vous ne pouvez pas afficher les résulats d'une élection en cours."})
       }
       else{
-        if(visible !== election.visible){
-          sql = "UPDATE election SET visible = $1 WHERE id_election = $2"
+        let sql = "SELECT * FROM elections WHERE id_election = $1"
+        const result = await client.query({
+          text: sql,
+          values: [electionId]
+        })
+        let election = result.rows[0]
+        if(ouvert !== election.ouvert){
+          sql = "UPDATE elections SET ouvert = $1 WHERE id_election = $2"
           await client.query({
             text: sql,
-            values: [visible, electionId]
+            values: [ouvert, electionId]
           })
         }
+        else{
+          if(visible !== election.visible){
+            sql = "UPDATE election SET visible = $1 WHERE id_election = $2"
+            await client.query({
+              text: sql,
+              values: [visible, electionId]
+            })
+          }
+        }
       }
+      res.json({message: "Modifications appliquées."})
+    }
+    else{
+      res.status(400).json({message: "L'admin n'a pas les droits sur cette élection."})
     }
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
@@ -373,7 +390,6 @@ router.post('/user/logout', async (req, res) => {
   req.password = ''
   req.session.userId = null
   req.session.user = false
-  //add req.session.adminId = null
   res.json({connected: false, message: 'You just logged out.'})
 })
 
@@ -513,106 +529,131 @@ router.post('/user/login', async (req, res) => {
   res.json({connected: true, message: 'You are now logged in as an user.'})
 })
 
-router.post('/user/voirelections', async (req, res) => {
+// TRI DES ELECTIONS
 
-  const typeSort = req.body.typeSort
+router.post('/user/voirelections', async (req, res) => {  
 
-  if (typeSort === "noSort") {
-    const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat ORDER BY id_election"
-    const result = await client.query({
-      text: sql,
-    })
-    res.json({elections: result.rows})
-  }
-  else if (typeSort === "sortByVote") {
-    const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = false ORDER BY id_election"
-    const result = await client.query({
-      text: sql,
-    })
-    res.json({elections: result.rows})
-  }
-  else if (typeSort === "sortByResult") {
-    const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true ORDER BY id_election"
-    const result = await client.query({
-      text: sql,
-    })
-    res.json({elections: result.rows})
+  if (req.session.user) {
+    const typeSort = req.body.typeSort
+    const searchName = req.body.searchName + "%"
+  
+    if (typeSort === "noSort") {
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+      })
+      res.json({elections: result.rows})
+    }
+    else if (typeSort === "sortByVote") {
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = false ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+      })
+      res.json({elections: result.rows})
+    }
+    else if (typeSort === "sortByResult") {
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+      })
+      res.json({elections: result.rows})
+    }
+    else if (typeSort === "sortBySearch") {
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+        values: [searchName]
+      })
+      res.json({elections: result.rows})
+    }
+    else {
+      res.status(401).json({message: "Le type de tri n'est pas accepté ! "})
+    }
   }
   else {
-    res.status(401).json({message: "Le type de tri n'est pas accepté ! "})
+    res.status(401).json({message: "L'utilisateur n'est pas connecté ! "})
   }
+
+
 })
 
-router.post('/user/voirelections/vote', async (req, res) => {
-  
-  // INFO NECESSAIRE
+// VOTE
 
-  const id_election = req.body.id_election
-  const id_liste = req.body.id_liste
-  const num_carte_electeur = req.session.userId
+router.post('/user/voirelections/vote', async (req, res) => {   
 
-  const getCP = "SELECT code_postal FROM public.electeur WHERE num_carte_electeur=$1"
-  const resultGetCP = await client.query({
-    text: getCP,
-    values: [num_carte_electeur]
-  })
+  if (req.session.user) {
 
-  const code_postal = resultGetCP.rows[0].code_postal
+    // INFO NECESSAIRE
 
-  // ON VERIF S'IL A DEJA VOTE OU NON
+    const id_election = req.body.id_election
+    const id_liste = req.body.id_liste
+    const num_carte_electeur = req.session.userId
 
-  const verifAVote = "SELECT * FROM avote WHERE id_election = $1 and num_carte_electeur = $2"
-  const resultVerifAVote = await client.query({
-    text: verifAVote,
-    values: [id_election, num_carte_electeur]
-  })
-
-  if (resultVerifAVote.rowCount === 0) {
-
-
-    // AJOUT DU VOTE DANS BUREAUDEVOTE
-
-    const getNbrVoteBureau = "SELECT nbr_total_votants FROM bureaudevote WHERE code_postal = $1"
-    const resultGetNbrVoteBureau = await client.query({
-      text: getNbrVoteBureau,
-      values: [code_postal]
+    const getCP = "SELECT code_postal FROM public.electeur WHERE num_carte_electeur=$1"
+    const resultGetCP = await client.query({
+      text: getCP,
+      values: [num_carte_electeur]
     })
 
-    const nbr_total_votants = resultGetNbrVoteBureau.rows[0].nbr_total_votants
+    const code_postal = resultGetCP.rows[0].code_postal
 
-    const addVoteToBureau = "UPDATE bureaudevote SET nbr_total_votants = $1 + 1 WHERE code_postal = $2"
-    const resultAddVoteBureau = await client.query({
-      text: addVoteToBureau,
-      values: [nbr_total_votants, code_postal]
-    })
+    // ON VERIF S'IL A DEJA VOTE OU NON
 
-    // CREATION DE LA TABLE AVOTE
-
-    const createAVote = "INSERT INTO AVote VALUES ($1, $2)"
-    const resultCreateAVote = await client.query({
-      text: createAVote,
+    const verifAVote = "SELECT * FROM avote WHERE id_election = $1 and num_carte_electeur = $2"
+    const resultVerifAVote = await client.query({
+      text: verifAVote,
       values: [id_election, num_carte_electeur]
     })
 
-    // AJOUT DU VOTE A LA LISTE
+    if (resultVerifAVote.rowCount === 0) {
 
-    const getNbrVoteListe = "SELECT nbr_votes FROM liste WHERE id_liste = $1 and id_election = $2"
-    const resultGetNbrVoteListe = await client.query({
-      text: getNbrVoteListe,
-      values: [id_liste, id_election]
-    })
 
-    const nbr_votes = resultGetNbrVoteListe.rows[0].nbr_votes
+      // AJOUT DU VOTE DANS BUREAUDEVOTE
 
-    const addVoteToListe = "UPDATE liste SET nbr_votes = $1 + 1 WHERE id_liste = $2 and id_election = $3"
-    const resultAddVoteToListe = await client.query({
-      text: addVoteToListe,
-      values: [nbr_votes, id_liste, id_election]
-    })
+      const getNbrVoteBureau = "SELECT nbr_total_votants FROM bureaudevote WHERE code_postal = $1"
+      const resultGetNbrVoteBureau = await client.query({
+        text: getNbrVoteBureau,
+        values: [code_postal]
+      })
 
-    res.json({popup: "Le vote a été pris en compte ! Merci de votre participation !"})
+      const nbr_total_votants = resultGetNbrVoteBureau.rows[0].nbr_total_votants
+
+      const addVoteToBureau = "UPDATE bureaudevote SET nbr_total_votants = $1 + 1 WHERE code_postal = $2"
+      const resultAddVoteBureau = await client.query({
+        text: addVoteToBureau,
+        values: [nbr_total_votants, code_postal]
+      })
+
+      // CREATION DE LA TABLE AVOTE
+
+      const createAVote = "INSERT INTO AVote VALUES ($1, $2)"
+      const resultCreateAVote = await client.query({
+        text: createAVote,
+        values: [id_election, num_carte_electeur]
+      })
+
+      // AJOUT DU VOTE A LA LISTE
+
+      const getNbrVoteListe = "SELECT nbr_votes FROM liste WHERE id_liste = $1 and id_election = $2"
+      const resultGetNbrVoteListe = await client.query({
+        text: getNbrVoteListe,
+        values: [id_liste, id_election]
+      })
+
+      const nbr_votes = resultGetNbrVoteListe.rows[0].nbr_votes
+
+      const addVoteToListe = "UPDATE liste SET nbr_votes = $1 + 1 WHERE id_liste = $2 and id_election = $3"
+      const resultAddVoteToListe = await client.query({
+        text: addVoteToListe,
+        values: [nbr_votes, id_liste, id_election]
+      })
+      setTimeout(() => res.json({popup: "Le vote a été pris en compte ! Merci de votre participation !"}), 1500)
+    }
+    else {
+      setTimeout(() => res.json({popup: "Vous avez déjà voté, vous ne pouvez pas voter plusieurs fois !"}), 1500)
+    }
   }
   else {
-    res.json({popup: "Vous avez déjà voté, vous ne pouvez pas voter plusieurs fois !"})
+    res.status(401).json({message: "L'utilisateur n'est pas connecté ! "})
   }
 })
