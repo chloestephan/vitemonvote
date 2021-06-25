@@ -31,6 +31,7 @@
         <!--  AFFICHAGE SI UNE ELECTION EST SELECTIONNEE  -->
 
         <div v-else-if="electionInDetail">
+          <button @click="showAll()">ANNULER LA RECHERCHE</button>
             <br><br>
             <h2>{{ elections[idSelected].nom }}</h2>
             <br>
@@ -52,12 +53,25 @@
                     </ul>
                 </li>
             </ul>
+            <button @click="hideResult(elections[idSelected])">Cacher les résultats</button>
         </div>
         
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
 
         <h2 v-else class="noElection">Aucun résultat disponible !</h2>
 
+        <div :class="[{displayPop : isError}, {displayPop : isNoError}]" class="overlay">
+            <div class="popup">
+                <h2 v-if="isError">Erreur</h2>
+                <h2 v-else>Confirmation</h2>
+                <br>
+                <p>{{ popup }}</p>
+                <button @click="closePopup" class="cross">
+                    X
+                </button>
+            </div>
+        </div>
+        
     </div>
 
 </template>
@@ -76,7 +90,7 @@ module.exports = {
             research: '',
             popup: '',
             isError: false,
-            voted: false,
+            isNoError: false,
         }
     },
     mounted: async function() {
@@ -169,10 +183,25 @@ module.exports = {
             }
         },
         closePopup() {
-            this.wantsToVote = false
             this.isError = false
-            this.voted = false
+            this.isNoError = false
         },
+        async hideResult(election) {
+          const information = {
+            id_election: election.id,
+          }
+          const result = await axios.post('/api/admin/resultats/hideResult', information)
+          this.displayPopup(result.data.popup)
+        },
+        displayPopup(popup) {
+            this.popup = popup
+            if (this.popup !== "L'admin n'est pas connecté !") {
+                this.isNoError = true
+            }
+            else {
+                this.isError = true
+            }
+        }
     }
 }
 

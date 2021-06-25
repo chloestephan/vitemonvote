@@ -734,19 +734,21 @@ router.post('/admin/resultats', async (req, res) => {
   if (req.session.admin) {
     const typeSort = req.body.typeSort
     const searchName = req.body.searchName + "%"
+    const id_admin = req.session.adminId
   
     if (typeSort === "noSort") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true AND id_admin = $1 ORDER BY id_election"
       const result = await client.query({
         text: sql,
+        values: [id_admin]
       })
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND resultats_visibles = true ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND resultats_visibles = true AND id_admin = $2 ORDER BY id_election"
       const result = await client.query({
         text: sql,
-        values: [searchName]
+        values: [searchName, id_admin]
       })
       res.json({elections: result.rows})
     }
@@ -756,5 +758,73 @@ router.post('/admin/resultats', async (req, res) => {
   }
   else {
     res.status(401).json({message: "L'utilisateur n'est pas connecté ! "})
+  }
+})
+
+router.post('/admin/elections/openVote', async (req, res) => {   
+
+  if (req.session.admin) {
+
+    const id_election = req.body.id_election
+    const sql = "UPDATE elections SET ouvert = true WHERE id_election = $1"
+    const result = await client.query({
+      text: sql,
+      values: [id_election]
+    })
+    res.json({popup: "Les votes sont ouverts pour cette élection !"})
+  }  
+  else {
+    res.status(401).json({popup: "L'admin n'est pas connecté !"})
+  }
+})
+
+router.post('/admin/elections/closeVote', async (req, res) => {   
+
+  if (req.session.admin) {
+
+    const id_election = req.body.id_election
+    const sql = "UPDATE elections SET ouvert = false WHERE id_election = $1"
+    const result = await client.query({
+      text: sql,
+      values: [id_election]
+    })
+    res.json({popup: "Les votes sont fermés pour cette élection !"})
+  }  
+  else {
+    res.status(401).json({popup: "L'admin n'est pas connecté !"})
+  }
+})
+
+router.post('/admin/elections/showResult', async (req, res) => {   
+
+  if (req.session.admin) {
+
+    const id_election = req.body.id_election
+    const sql = "UPDATE elections SET resultats_visibles = true WHERE id_election = $1"
+    const result = await client.query({
+      text: sql,
+      values: [id_election]
+    })
+    res.json({popup: "Les résultats sont visibles pour cette élection !"})
+  }  
+  else {
+    res.status(401).json({popup: "L'admin n'est pas connecté !"})
+  }
+})
+
+router.post('/admin/resultats/hideResult', async (req, res) => {   
+
+  if (req.session.admin) {
+
+    const id_election = req.body.id_election
+    const sql = "UPDATE elections SET resultats_visibles = false WHERE id_election = $1"
+    const result = await client.query({
+      text: sql,
+      values: [id_election]
+    })
+    res.json({popup: "Les résultats sont cachés pour cette élection !"})
+  }  
+  else {
+    res.status(401).json({popup: "L'admin n'est pas connecté !"})
   }
 })

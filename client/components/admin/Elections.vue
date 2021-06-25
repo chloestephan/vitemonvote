@@ -29,6 +29,7 @@
         <!--  AFFICHAGE SI UNE ELECTION EST SELECTIONNEE  -->
 
         <div v-else-if="electionInDetail">
+            <button @click="showAll()">ANNULER LA RECHERCHE</button>
             <br><br>
             <h2>{{ elections[idSelected].nom }}</h2>
             <br>
@@ -50,15 +51,26 @@
                     </ul>
                 </li>
             </ul>
-            <button>Ouvrir les votes</button>
-            <button>Fermer les votes</button>
-            <button>Afficher les résultats</button>
-            <button>Cacher les résultats</button>
+            <button @click="openVote(elections[idSelected])">Ouvrir les votes</button>
+            <button @click="closeVote(elections[idSelected])">Fermer les votes</button>
+            <button @click="showResult(elections[idSelected])">Afficher les résultats</button>
         </div>
         
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
 
         <h2 v-else class="noElection">Aucun résultat disponible !</h2>
+
+        <div :class="[{displayPop : isError}, {displayPop : isNoError}]" class="overlay">
+            <div class="popup">
+                <h2 v-if="isError">Erreur</h2>
+                <h2 v-else>Confirmation</h2>
+                <br>
+                <p>{{ popup }}</p>
+                <button @click="closePopup" class="cross">
+                    X
+                </button>
+            </div>
+        </div>
 
     </div>
 
@@ -78,7 +90,7 @@ module.exports = {
             research: '',
             popup: '',
             isError: false,
-            voted: false,
+            isNoError: false,
         }
     },
     mounted: async function() {
@@ -171,10 +183,39 @@ module.exports = {
             }
         },
         closePopup() {
-            this.wantsToVote = false
             this.isError = false
-            this.voted = false
+            this.isNoError = false
         },
+        async openVote(election) {
+          const information = {
+            id_election: election.id,
+          }
+          const result = await axios.post('/api/admin/elections/openVote', information)
+          this.displayPopup(result.data.popup)
+        },
+        async closeVote(election) {
+          const information = {
+            id_election: election.id,
+          }
+          const result = await axios.post('/api/admin/elections/closeVote', information)
+          this.displayPopup(result.data.popup)
+        },
+        async showResult(election) {
+          const information = {
+            id_election: election.id,
+          }
+          const result = await axios.post('/api/admin/elections/showResult', information)
+          this.displayPopup(result.data.popup)
+        },
+        displayPopup(popup) {
+            this.popup = popup
+            if (this.popup !== "L'admin n'est pas connecté !") {
+                this.isNoError = true
+            }
+            else {
+                this.isError = true
+            }
+        }
     }
 }
 
