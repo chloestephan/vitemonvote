@@ -31,7 +31,7 @@
                 <!--  AFFICHAGE SELON LA DISPO DES RESULT OU DES VOTES  -->
 
                 <div v-if="election.resultats_visibles"><strong>RESULTATS DISPONIBLES</strong></div>
-                <div v-else><strong>VOTE DISPONIBLES</strong></div>
+                <div v-else class="dernier"><strong>VOTE DISPONIBLES</strong></div>
             </li>
         </ul>
 
@@ -40,40 +40,43 @@
         <div v-else-if="electionInDetail">
             <br><br>
             <h2>{{ elections[idSelected].nom }}</h2>
-            <br>
-            <div> <strong>Type d'élection : </strong> {{ elections[idSelected].type }}</div>
-            <div> <strong>Date du vote : </strong> {{ elections[idSelected].jour }} / {{ elections[idSelected].mois }} / {{ elections[idSelected].année }}</div>
-            <div> <strong>Tour : </strong> {{ elections[idSelected].tour }}</div>
-            <br>
+            <hr>
+            <div class="details">
+                <div class="intro">
+                    <div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[idSelected].type }}</div><p id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[idSelected].jour }} / {{ elections[idSelected].mois }} / {{ elections[idSelected].année }}</div><p id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[idSelected].tour }}</div>
+                    <br>
+                </div>
 
-            <!--  AFFICHAGE QUI CHANGE POUR MONTRER LES RESULT OU POUR VOTER  -->
+                <!--  AFFICHAGE QUI CHANGE POUR MONTRER LES RESULT OU POUR VOTER  -->
 
-            <ul class="liste_container" v-if="elections[idSelected].resultats_visibles">
-                <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
-                    <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
-                    <div> <strong>Nombre de vote : </strong> {{ liste.nbr_votes }}</div>
-                    <div> <strong>Candidat : </strong> </div>
-                    <ul>
-                        <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
-                            <div> {{ candidat.nom_complet }} </div>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                <ul class="liste_container" v-if="elections[idSelected].resultats_visibles">
+                    <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
+                        <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
+                        <div> <strong>Nombre de vote(s) : </strong> {{ liste.nbr_votes }}</div>
+                        <div> <strong>Candidats : </strong> </div>
+                        <ul>
+                            <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
+                                <div> {{ candidat.nom_complet }} </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
 
-            <ul class="liste_container" v-else>
-                <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
-                    <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
-                    <div> <strong>Candidat : </strong> </div>
-                    <ul>
-                        <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
-                            <div> {{ candidat.nom_complet }} </div>
-                        </li>
-                    </ul>
-                    <button @click="popupConfirmation(elections[idSelected], liste)">VOTER</button>
-                </li>
-            </ul>
-
+                <ul class="liste_container" v-else>
+                    <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
+                        <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
+                        <div> <strong>Candidats : </strong> </div>
+                        <ul>
+                            <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
+                                <div> {{ candidat.nom_complet }} </div>
+                            </li>
+                        </ul>
+                        <button class="voter" @click="popupConfirmation(elections[idSelected], liste)">VOTER</button>
+                    </li>
+                </ul>
+            </div>
         </div>
         
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
@@ -86,9 +89,9 @@
             <div class="popup">
                 <h2>ATTENTION</h2>
                 <br>
-                <p>Êtes-vous sur de vouloir voter ? Une fois le vote comptabilisé, il ne vous sera plus possible de le mofidifier !</p>
-                <button @click="confirmation()" id="button">Confirmer le vote</button>
-                <button @click="closePopup()" id="button">Annuer le vote</button>
+                <p>Êtes-vous sur de vouloir voter ? Une fois le vote comptabilisé, il ne vous sera plus possible de le modifier !</p>
+                <button @click="confirmation()" class="buttonPop">Confirmer le vote</button>
+                <button @click="closePopup()" class="buttonPop">Annuler le vote</button>
             </div>
         </div>
 
@@ -314,7 +317,7 @@ hr {
 .election {
     background: #FFF;
     width: 600px;
-    height: 250px;
+    height: 300px;
     margin: 40px;
     padding: 20px;
     border-radius: 2%;
@@ -339,7 +342,7 @@ ul {
 }
 
 .election:hover {
-    scale: 1.05;
+    scale: 1;
     cursor: pointer;
 }
 
@@ -357,6 +360,9 @@ ul {
 
 .liste {
     background: rgb(209, 208, 207);
+    padding:20px;
+    font-size: 20px;
+    background-color: #f8f9fd;
 }
 
 .candidat {
@@ -375,6 +381,8 @@ ul {
     visibility: hidden;
     opacity: 0;
 }
+
+.dernier {margin-bottom:20px;}
 
 .displayPop {
     visibility: visible;
@@ -464,6 +472,10 @@ ul {
     cursor: pointer;
 }
 
+.buttonPop {
+    margin-top:15px;
+}
+
 .input {
     width: 40%;
 }
@@ -478,6 +490,53 @@ ul {
 
 .loop:hover {
     cursor: pointer;
+}
+
+.return {
+    width: 30%;
+    display: flex;
+    margin:0 auto;
+}
+
+.presentation {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+#separation {
+    font-size: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    color:#D60920;
+}
+
+.details {
+    padding : 50px;
+    margin-left: 100px;
+    margin-right: 100px;
+    margin-bottom: 50px;
+    background-color: #fff;
+    -moz-box-shadow: 0px 1px 5px 0px #656565;
+    -webkit-box-shadow: 0px 1px 5px 0px #656565;
+    -o-box-shadow: 0px 1px 5px 0px #656565;
+    box-shadow: 0px 1px 5px 0px #656565;
+}
+
+.titre {
+    text-transform: uppercase;
+    margin-right: 10px;
+}
+
+.intro {
+    display:flex;
+    justify-content: center;
+    align-content:center;
+    margin: 0 auto;
+}
+
+.voter {
+    margin-top:20px;
+    margin-bottom:20px;
 }
 
 </style>
