@@ -39,8 +39,9 @@
           <hr>
           <button type="button" @click="creerEletion">Valider</button>
         </div>
+        
         <div v-if="typeElection==='Municipales'">
-          <input type="text" v-model="codePostal" placeholder="Code postal" required>
+          <input type="text" v-model="codePostaux[0]" placeholder="Code postal" required>
 
           <div v-for="(liste, index1) in candidats" :key="index1" class="">
             <h2>Nouvelle liste</h2>
@@ -62,6 +63,33 @@
           <hr>
           <button type="button" @click="creerEletion">Valider</button>
         </div>
+        
+        <div v-if="typeElection==='Regionales'">
+          <div v-for="(codePostal, index) in codePostaux" :key="index">
+            <input type="text" v-model="codePostaux[index]" placeholder="Code postal de la région" required>
+          </div>
+          <button type="button" @click="ajouterCode">Ajouter un code postal</button>
+
+          <div v-for="(liste, index1) in candidats" :key="index1" class="">
+            <h2>Nouvelle liste</h2>
+            <hr>
+
+            <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
+
+            <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
+              <div class="ligne">
+                <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat ' + index2" required>
+                <p class="delete" @click="deleteCandidat(index1, index2)">✖️</p>
+              </div>
+            </div>
+            <button type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
+          </div>
+
+          <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+
+          <hr>
+          <button type="button" @click="creerEletion">Valider</button>
+        </div>
       </div>
     </div>
   </div>
@@ -76,7 +104,7 @@ module.exports = {
       nom:'',
       date: null,
       typeElection: '',
-      codePostal: '',
+      codePostaux: [''],
       nomListes: [''],
       candidats: []
     }
@@ -91,7 +119,7 @@ module.exports = {
         nomListes: this.nomListes,
         candidats: this.candidats,
         typeElection: this.typeElection,
-        code_postal: this.codePostal,
+        code_postaux: this.codePostaux,
       }
     }
   },
@@ -108,8 +136,12 @@ module.exports = {
       this.candidats[index].push('')
     },
 
-    async ajouterListe(){
+    ajouterListe(){
       this.candidats.push([''])
+    },
+
+    ajouterCode(){
+      this.codePostaux.push('')
     },
 
     isDone(){

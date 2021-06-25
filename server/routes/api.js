@@ -162,8 +162,7 @@ router.post('/admin/election', async(req, res) =>{
     if(typeElection === "Presidentielle"){
       sql = "SELECT code_postal FROM bureaudevote"
       result = await client.query({
-        text: sql,
-        values: []
+        text: sql
       })
 
       for(let i = 0; i < result.rowCount; i++){
@@ -171,7 +170,31 @@ router.post('/admin/election', async(req, res) =>{
       }
     }
     if(typeElection === "Municipales"){
-      code_postaux.push(req.body.code_postal)
+      code_postaux = req.body.code_postaux
+      console.log({code_postal: code_postaux})
+    }
+
+    if(typeElection === "Regionales"){
+      sql = "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE $1"
+      for(let i = 1; i < req.body.code_postaux.length; i++){
+        sql += " OR code_postal LIKE $" + (i+1)
+      }
+      console.log({Requete_SQL: sql})
+      let code_postaux = []
+      for(let i = 0; i < req.body.code_postaux.length; i++){
+        code_postaux.push(req.body.code_postaux[i] + "%")
+      }
+      console.log({code_postaux: code_postaux})
+      result = await client.query({
+        text: sql,
+        values: code_postaux
+      })
+
+      code_postaux = []
+
+      for(let i = 0; i < result.rowCount; i++){
+        code_postaux.push(result.rows[i].code_postal)
+      }
       console.log({code_postal: code_postaux})
     }
 
