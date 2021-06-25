@@ -4,13 +4,16 @@
         <!--  AFFICHAGE SELON SI UNE ELECTION EST SELECTIONNEE OU NON  -->
         <div v-if="!electionInDetail">
             <h2>Cliquez sur une élection pour voter ou pour voir les résultats !</h2>
-            <button @click="sortByVote()">TRIER PAR VOTE DISPONIBLES</button>
-            <button  @click="sortByResult()">TRIER PAR RESULTATS DISPONIBLES</button>
-            <input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required>
-            <img src="img/loupe.png" @click="sortBySearch()">
-            <button  @click="noSort()">ANNULER LE TRI / LA RECHERCHE</button>
+            <div class="tile_div">
+                <a class="button" @click="sortByVote()">Trier par vote</a>
+                <a class="button" @click="sortByResult()">Trier par résultats</a>
+                <a class="input" href="#" class="last"><input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required></a>
+                <img class="loop" src="img/loupe.png" @click="sortBySearch()">
+                <div class="clear"></div>
+            </div>
+            <div class="tile_div"><a class="button"  @click="noSort()">ANNULER LA RECHERCHE</a></div>
         </div>
-        
+
         <button v-else @click="showAll" class="return">Annuler la recherche</button>
 
         <!--  AFFICHAGE SI DES ELECTIONS SONT DISPO  -->
@@ -407,8 +410,67 @@ ul {
     color: #001D6E;
 }
 
-#button {
-    transition: 0s;
+.tile_div {
+    display: flex;
+    justify-content: center;
+}
+
+.tile_div a {
+    display: block;
+    float: left;
+    height: 50px;
+    width: 20%;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    line-height: 50px;
+    text-decoration: none;
+}
+
+.title_div a.last {
+    margin-right: 0;
+}
+
+.clear {
+    clear: both;
+}
+
+.button {
+    font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+    letter-spacing: 3px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #fff;
+    text-transform: uppercase;
+    width: 100%;
+    height: 50px;
+    border-radius: 25px;
+    background: #001D6E;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 25px;
+    transition: all .4s;  
+    border: none;  
+    text-decoration: none;
+}
+
+.button:hover {
+    background: #fff;
+    text-decoration: none;
+    color: #D60920;
+    border: solid;
+    border-width: 2px;
+    border-color: #D60920;
+    cursor: pointer;
+}
+
+.input {
+    width: 40%;
+}
+
+.loop {
+    max-height: 50px;
 }
 
 </style>
