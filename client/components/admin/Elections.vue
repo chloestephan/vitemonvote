@@ -6,7 +6,7 @@
       <div class="container">
         <div>
           <ul>
-            <li :key="election.id_election" v-for="election in elections" class="election">
+            <li v-for="election in elections" :key="election.id_election" class="election">
               <router-link :to="chemin(election)">
                 <div>
                   <h3>{{ election.nom }}</h3>
@@ -33,12 +33,11 @@ module.exports = {
   },
 
   created: async function () {
-    const result = await axios.get('/api/user/voirelections')
-    this.elections = result.data.elections
+    console.log("test1")
+    const result = await axios.get('/api/admin/elections')
+    this.elections = result.data
+    console.log("test2")
     console.log(this.elections)
-    let test = [5, 6, 7, 8]
-    let data = test.join()
-    console.log(data)
   },
 
   methods: {

@@ -36,6 +36,10 @@
   .header-right {
     float: right;
   }
+
+  #header-logo {
+    margin-left: 50px;
+  }
   
   /* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */
   @media screen and (max-width: 500px) {
@@ -50,6 +54,3 @@
   }
 
 
-#header-logo {
-  margin-left: 50px;
-}
