@@ -324,7 +324,7 @@ ul {
     display: block;
     float: left;
     height: 50px;
-    width: 20%;
+    width: 35%;
     margin-right: 10px;
     margin-bottom: 10px;
     text-align: center;
@@ -370,16 +370,13 @@ ul {
     cursor: pointer;
 }
 
-.input {
-    width: 40%;
-}
 
 .loop {
-    max-height: 40px;
+    max-height: 30px;
     margin-left: 0px;
     margin-right: 10px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 
