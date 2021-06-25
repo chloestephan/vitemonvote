@@ -7,7 +7,7 @@
             <button @click="sortByVote()">TRIER PAR VOTE DISPONIBLES</button>
             <button  @click="sortByResult()">TRIER PAR RESULTATS DISPONIBLES</button>
             <input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required>
-            <button  @click="sortBySearch()">RECHERCHER</button>
+            <img src="img/loupe.png" @click="sortBySearch()">
             <button  @click="noSort()">ANNULER LE TRI / LA RECHERCHE</button>
         </div>
         
@@ -116,7 +116,6 @@ module.exports = {
             electionInDetail: false,
             sortedByVote: false,
             sortedByResult: false,
-            sortedBySearch: false,
             noSorted: true,
             idSelected: -1,
             research: '',
@@ -231,7 +230,6 @@ module.exports = {
                 this.sort("sortBySearch")
                 this.sortedByVote = false
                 this.sortedByResult = false
-                this.sortedBySearch = true
                 this.noSorted = false
             }
         },
