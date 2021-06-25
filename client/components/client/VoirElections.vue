@@ -3,15 +3,17 @@
     <div>
         <!--  AFFICHAGE SELON SI UNE ELECTION EST SELECTIONNEE OU NON  -->
         <div v-if="!electionInDetail">
-            <h2>Cliquez sur une élection pour voter ou pour voir les résultats !</h2>
+            <h2>Cliquez sur une élection pour voter ou pour voir les résultats</h2>
+            <br>
             <div class="tile_div">
+                <img class="loop" src="img/retour_arriere.png" @click="noSort()">
                 <a class="button" @click="sortByVote()">Trier par vote</a>
                 <a class="button" @click="sortByResult()">Trier par résultats</a>
                 <a class="input" href="#" class="last"><input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required></a>
                 <img class="loop" src="img/loupe.png" @click="sortBySearch()">
                 <div class="clear"></div>
             </div>
-            <div class="tile_div"><a class="button"  @click="noSort()">ANNULER LA RECHERCHE</a></div>
+            <hr>
         </div>
 
         <button v-else @click="showAll" class="return">Annuler la recherche</button>
@@ -470,7 +472,11 @@ ul {
 }
 
 .loop {
-    max-height: 50px;
+    max-height: 40px;
+    margin-left: 0px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 </style>
