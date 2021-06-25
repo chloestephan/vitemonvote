@@ -76,7 +76,7 @@ module.exports = {
 </script>
 
 <style scoped>
-
+/*
 nav {
   width: 100%;
   background-color: #001D6E;
@@ -89,9 +89,6 @@ nav {
   transition: 0.8s;
 }
 
-.logo {
-  display: inline-block;
-}
 
 .nav-links {
   list-style: none;
@@ -117,20 +114,90 @@ nav {
 .nav-item:hover a {
   color: #001D6E;
 }
-
+*/
 .deconnexionBouton {
-    border-style:solid 2px #D60920;
-    background-color: #fff;
-    color: #D60920;
-    border-radius: 4px;
-    padding: 10px;
-    transition: 0.4s;
+  border-style:solid 2px #D60920;
+  background-color: #fff;
+  color: #D60920;
+  border-radius: 4px;
+  padding: 10px;
+  transition: 0.4s;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .deconnexionBouton:hover {
   cursor: pointer;
   color:#fff;
   background-color: #D60920;
+}
+
+
+nav > div {
+  font-size: 16px;
+  min-height: 50px;
+  padding: 10 15px;
+}
+
+nav {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+
+  width: 100%;
+  background-color: #001D6E;
+  padding-left: 20px;
+  padding-right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
+  transition: 0.8s;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+}
+
+.nav-item {
+  transition: 0.6s;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.nav-item a {
+  text-decoration: none;
+  color: white;
+  transition: 0.6s;
+  text-decoration: none;
+  height: 50px;
+}
+
+.nav-item:hover {
+  background-color: white;
+}
+
+.nav-item:hover a {
+  color: #001D6E;
+}
+
+
+@media (min-width: 30rem) {
+  nav {
+    grid-template-columns: 1fr auto auto;
+    justify-items: start;
+  }
+
+  .nav-item {
+    transition: 0.6s;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
 }
 
 </style>
