@@ -142,6 +142,7 @@ router.post('/admin/election', async(req, res) =>{
     const nom = req.body.nom
     const date = req.body.date
     const tour = req.body.tour
+    const typeElection = req.body.typeElection
     let tour_precedent = null
     if (tour !== 1){
       tour_precedent = req.body.precedent_tour
@@ -149,26 +150,36 @@ router.post('/admin/election', async(req, res) =>{
     const nomListes = req.body.nomListes
     const candidats = req.body.candidats
 
-    let sql = "INSERT INTO elections(nom, date, tour, tour_precedent, type_election, id_admin, ouvert, resultats_visibles) VALUES ($1, $2, $3, $4, $5, $6, $7, false) RETURNING id_election"
+    let sql = "INSERT INTO elections(nom, date, tour, tour_precedent, type_election, id_admin, ouvert, resultats_visibles) VALUES ($1, $2, $3, $4, $5, $6, false, false) RETURNING id_election"
     let result = await client.query({
       text: sql,
-      values: [nom, date, tour, tour_precedent, "Presidentielle", req.session.adminId, false]
+      values: [nom, date, tour, tour_precedent, typeElection, req.session.adminId]
     })
 
     const id_election = result.rows[0].id_election
 
-    sql = "SELECT code_postal FROM bureaudevote"
-    result = await client.query({
-      text: sql,
-      values: []
-    })
+    let code_postaux = []
+    if(typeElection === "Presidentielle"){
+      sql = "SELECT code_postal FROM bureaudevote"
+      result = await client.query({
+        text: sql,
+        values: []
+      })
 
-    const code_postaux = result.rows
+      for(let i = 0; i < result.rowCount; i++){
+        code_postaux.push(result.rows[i].code_postal)
+      }
+    }
+    if(typeElection === "Municipales"){
+      code_postaux.push(req.body.code_postal)
+      console.log({code_postal: code_postaux})
+    }
+
     for(let i = 0; i < code_postaux.length; i++){
       sql = "INSERT INTO organise VALUES ($1, $2)"
       await client.query({
         text: sql,
-        values: [id_election, code_postaux[i].code_postal]
+        values: [id_election, code_postaux[i]]
       })
     }
 

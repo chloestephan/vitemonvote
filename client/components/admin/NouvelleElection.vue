@@ -11,11 +11,10 @@
         <select name="typeElection" id="type-election" class="box" v-model="typeElection">
           <option value="">Choisir une option</option>
           <option value="Municipales">Municipales</option>
-          <option value="Cantonales">Département</option>
           <option value="Regionales">Regionales</option>
           <option value="Legislatives">Legislatives</option>
           <option value="Presidentielle">Presidentielle</option>
-          <option value="Europeenes">Européennes</option>
+          <option value="Europeennes">Européennes</option>
           <option value="Referundum">Referundum</option>
         </select>
 
@@ -31,16 +30,37 @@
 
             <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
               <div class="ligne">
+                <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat'" required>
+              </div>
+            </div>
+
+            <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+          </div>
+          <hr>
+          <button type="button" @click="creerEletion">Valider</button>
+        </div>
+        <div v-if="typeElection==='Municipales'">
+          <input type="text" v-model="codePostal" placeholder="Code postal" required>
+
+          <div v-for="(liste, index1) in candidats" :key="index1" class="">
+            <h2>Nouvelle liste</h2>
+            <hr>
+
+            <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
+
+            <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
+              <div class="ligne">
                 <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat ' + index2" required>
                 <p class="delete" @click="deleteCandidat(index1, index2)">✖️</p>
               </div>
             </div>
             <button type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
-
-            <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
           </div>
+          
+          <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+
           <hr>
-          <button type="button" @click="creerEletionPresidentielle">Valider</button>
+          <button type="button" @click="creerEletion">Valider</button>
         </div>
       </div>
     </div>
@@ -56,13 +76,24 @@ module.exports = {
       nom:'',
       date: null,
       typeElection: '',
+      codePostal: '',
       nomListes: [''],
       candidats: []
     }
   },
 
   computed: {
-
+    election: function() {
+      return {
+        nom: this.nom,
+        date: this.date,
+        tour: 1,
+        nomListes: this.nomListes,
+        candidats: this.candidats,
+        typeElection: this.typeElection,
+        code_postal: this.codePostal,
+      }
+    }
   },
 
   created: function(){
@@ -104,17 +135,9 @@ module.exports = {
       return false
     },
 
-    async creerEletionPresidentielle(){
-      if (this.isDone() === true){
-        const election = {
-          nom: this.nom,
-          date: this.date,
-          tour: 1,
-          nomListes: this.nomListes,
-          candidats: this.candidats,
-        }
-
-        const result = await axios.post('/api/admin/election', election)
+    async creerEletion(){
+      if (this.isDone()){
+        const result = await axios.post('/api/admin/election', this.election)
         alert(result.data.message)
       }
     },
