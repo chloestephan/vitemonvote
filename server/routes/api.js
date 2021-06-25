@@ -211,17 +211,18 @@ router.get('/admin/elections', async(req, res) =>{
     })
     console.log(result.rows)
 
-    sql = "SELECT * FROM elections WHERE id_election IN ($1)"
+    sql = "SELECT * FROM elections WHERE id_election IN $1"
 
     let tmp = []
     for (let i = 0; i < result.rows.length; i++){
       tmp.push(result.rows[i].id_election)
     }
+    console.log(tmp)
     const data = tmp.join()
-    console.log({data: '{' + data + '}'})
+    console.log({data: '(' + data + ')'})
     result = await client.query({
       text: sql,
-      values: [data]
+      values: [tmp]
     })
 
     console.log(result.rows)
