@@ -87,8 +87,8 @@
                 <h2>ATTENTION</h2>
                 <br>
                 <p>Êtes-vous sur de vouloir voter ? Une fois le vote comptabilisé, il ne vous sera plus possible de le mofidifier !</p>
-                <button @click="confirmation" id="button">Confirmer le vote</button>
-                <button @click="closePopup" id="button">Annuer le vote</button>
+                <button @click="confirmation()" id="button">Confirmer le vote</button>
+                <button @click="closePopup()" id="button">Annuer le vote</button>
             </div>
         </div>
 
@@ -231,19 +231,16 @@ module.exports = {
             }
         },
         async sortBySearch() {
-            if (!this.sortedBySearch) {
-                this.sort("sortBySearch")
-                this.sortedByVote = false
-                this.sortedByResult = false
-                this.noSorted = false
-            }
+            this.sort("sortBySearch")
+            this.sortedByVote = false
+            this.sortedByResult = false
+            this.noSorted = false
         },
         async noSort() {
             if (!this.noSorted) {
                 this.sort("noSort")
                 this.sortedByVote = false
                 this.sortedByResult = false
-                this.sortedBySearch = false
                 this.noSorted = true
             }
         },
