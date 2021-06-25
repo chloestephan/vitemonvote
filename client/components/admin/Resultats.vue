@@ -153,6 +153,8 @@ module.exports = {
         showAll() {
             this.idSelected = -1
             this.electionInDetail = false
+            this.noSorted = false
+            this.noSort()
         },
         async sort (typeOfSort) {
             this.elections = [{}]

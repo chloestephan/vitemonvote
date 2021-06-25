@@ -1,15 +1,22 @@
 <template>
   <div class="site-container">
     <div class="limiter">
+
         <div v-if="!isUserConnected" class="container">
           <form @submit.prevent="loginUser">
             <h3>Connexion</h3>
-            <input type="text" v-model="email" placeholder="Email" required>
-            <input type="password" v-model="password" placeholder="Mot de passe" required>
 
-            <button type="submit">Connexion</button>
+              <input type="text" v-model="email" placeholder="Email" required>
+              <div class="ligne">
+                <input v-bind:type="typeMdp" v-model="password" placeholder="Mot de passe" required>
+                <img src="img/hide_password.png" class="showMDP" @click="showMDP" v-if="hidden">
+                <img src="img/show_password.png" class="showMDP" @click="showMDP" v-else>
+              </div>
+
+              <button type="submit" @click="loginUser">Connexion</button>
           </form>
         </div>
+
         <div v-else>
             <nav class="navbar">
                 <ul class="nav-links">
@@ -23,6 +30,18 @@
             </nav>
           <router-view></router-view>
         </div>
+
+            <div :class="[{displayPop : isError}]" class="overlay">
+                <div class="popup">
+                    <h2 v-if="isError">Erreur</h2>
+                    <br>
+                    <p>{{ popup }}</p>
+                    <button v-on:click="closePopup" class="cross">
+                        X
+                    </button>
+                </div>
+            </div>
+
       </div>
     </div>
   </div>
@@ -36,6 +55,10 @@ module.exports = {
             email: '',
             password: '',
             isUserConnected: false,
+            popup: '',
+            isError: false,
+            typeMdp: 'password',
+            hidden: true,
         }
     },
 
@@ -54,8 +77,12 @@ module.exports = {
                 }
 
                 const result = await axios.post('/api/admin/login', user)
-
+                this.popup = result.data.popup
                 this.isUserConnected = result.data.connected
+
+                if (!(this.popup === undefined)) {
+                  this.isError = true
+                }
             }
         },
         async LogOut(){
@@ -69,8 +96,14 @@ module.exports = {
             this.password = result.data.password
 
             this.isUserConnected = result.data.connected
-
-        }
+        },
+        showMDP() {
+            this.typeMdp = this.hidden ? "text" : "password"
+            this.hidden = !this.hidden
+        },
+        closePopup() {
+            this.isError = false
+        },
     }
 }
 </script>
@@ -115,6 +148,83 @@ nav {
   color: #001D6E;
 }
 */
+
+/* CSS POPUP */
+
+.overlay {
+    text-align: center;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7);
+    transition: opacity .4s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.displayPop {
+    visibility: visible;
+    opacity: 1;
+}
+
+.popup {
+    margin: 6rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 5px;
+    width: 35%;
+    position: relative;
+    transition: all 0s ease-in-out;
+}
+
+.cross {
+    color: black;
+    position: absolute;
+    top: 2px;
+    bottom: 0;
+    right: 2px;
+    width: 10px;
+    background: #fff;
+    border: 0px;
+    font-weight: bold;
+    font-size: 120%;
+}
+
+.cross:hover {
+    color: #001D6E;
+}
+
+h2 {
+    color: #001D6E;
+    font-family: Poppins-Bold;
+    font-size: 30px;
+}
+
+/* CSS FORM */
+
+.ligne {
+    width:100%;
+    display: flex;
+}
+
+.showMDP {
+    height: 30px;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all .4s;
+    border: none;
+    text-decoration: none;
+    margin: 10px;
+}
+
+.showMDP:hover {
+    cursor: pointer;
+}
+
 .deconnexionBouton {
   border-style:solid 2px #D60920;
   background-color: #fff;

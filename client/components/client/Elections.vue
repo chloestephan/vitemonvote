@@ -457,7 +457,7 @@ ul {
     justify-content: center;
     align-items: center;
     padding: 0 25px;
-    transition: all .4s;  
+    transition: all 0s;  
     border: none;  
     text-decoration: none;
 }

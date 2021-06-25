@@ -36,12 +36,12 @@ router.post('/admin/login', async (req, res) => {
   })
 
   if(result.rowCount === 0){
-    res.status(401).json({ message: 'User does not already exist, please register first.'})
+    res.json({ popup: "L'email utilisé et/ou le mot de passe sont incorretes !"})
     return
   }
 
   if (! await bcrypt.compare(password, result.rows[0].password)){
-    res.status(401).json({message: 'Wrong password'})
+    res.json({connected: false, popup: "L'email et/ou le mot de passe sont incorrectes !"})
     return
   }
 
@@ -74,7 +74,7 @@ router.post('/admin/register', async (req, res) =>{
     })
 
     if(result1.rowCount !== 0){
-      res.status(401).json({ message: 'Admin already exist'})
+      res.json({ popup: "Cet admin existe déjà !"})
       return
     }
 
@@ -87,7 +87,7 @@ router.post('/admin/register', async (req, res) =>{
     })
 
     const result2 = await client.query({text: "SELECT id, email FROM admins"})
-    res.json(result2.rows)
+    res.json({admin: result2.rows, popup: "L'admin a bien été créée !"})
     return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
@@ -107,7 +107,7 @@ router.delete('/admin/:id', async (req, res) => {
     })
 
     const result = await client.query({text: "SELECT id, email FROM admins"})
-    res.json(result.rows)
+    res.json({admin: result.rows, popup: "L'admin a bien été supprimé !"})
     return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
@@ -576,7 +576,7 @@ router.post('/user/voirelections', async (req, res) => {
     const searchName = req.body.searchName + "%"
   
     if (typeSort === "noSort") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE ouvert = true ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE (ouvert = true OR resultats_visibles = true) ORDER BY id_election"
       const result = await client.query({
         text: sql,
       })
@@ -590,14 +590,14 @@ router.post('/user/voirelections', async (req, res) => {
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortByResult") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true AND ouvert = true ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true ORDER BY id_election"
       const result = await client.query({
         text: sql,
       })
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND ouvert = true ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND (ouvert = true OR resultats_visibles = true) ORDER BY id_election"
       const result = await client.query({
         text: sql,
         values: [searchName]
@@ -620,7 +620,7 @@ router.post('/user/voirelections', async (req, res) => {
 router.post('/user/voirelections/vote', async (req, res) => {   
 
   if (req.session.user) {
-
+  
     // INFO NECESSAIRE
 
     const id_election = req.body.id_election
@@ -634,61 +634,75 @@ router.post('/user/voirelections/vote', async (req, res) => {
     })
 
     const code_postal = resultGetCP.rows[0].code_postal
+    
+    // ON VERIF SI LE VOTE EST BIEN OUVERT SINON C'EST UN HACKER T'AS VU
 
-    // ON VERIF S'IL A DEJA VOTE OU NON
-
-    const verifAVote = "SELECT * FROM avote WHERE id_election = $1 and num_carte_electeur = $2"
-    const resultVerifAVote = await client.query({
-      text: verifAVote,
-      values: [id_election, num_carte_electeur]
+    const verifIsOpen = "SELECT * FROM elections WHERE id_election = $1 AND ouvert = true AND resultats_visibles = false"
+    const resultVerifIsOpen = await client.query({
+      text: verifIsOpen,
+      values: [id_election]
     })
+    
+    if (resultVerifIsOpen.rowCount !== 0) {
 
-    if (resultVerifAVote.rowCount === 0) {
+      // ON VERIF S'IL A DEJA VOTE OU NON
 
-
-      // AJOUT DU VOTE DANS BUREAUDEVOTE
-
-      const getNbrVoteBureau = "SELECT nbr_total_votants FROM bureaudevote WHERE code_postal = $1"
-      const resultGetNbrVoteBureau = await client.query({
-        text: getNbrVoteBureau,
-        values: [code_postal]
-      })
-
-      const nbr_total_votants = resultGetNbrVoteBureau.rows[0].nbr_total_votants
-
-      const addVoteToBureau = "UPDATE bureaudevote SET nbr_total_votants = $1 + 1 WHERE code_postal = $2"
-      const resultAddVoteBureau = await client.query({
-        text: addVoteToBureau,
-        values: [nbr_total_votants, code_postal]
-      })
-
-      // CREATION DE LA TABLE AVOTE
-
-      const createAVote = "INSERT INTO AVote VALUES ($1, $2)"
-      const resultCreateAVote = await client.query({
-        text: createAVote,
+      const verifAVote = "SELECT * FROM avote WHERE id_election = $1 AND num_carte_electeur = $2"
+      const resultVerifAVote = await client.query({
+        text: verifAVote,
         values: [id_election, num_carte_electeur]
       })
 
-      // AJOUT DU VOTE A LA LISTE
+      if (resultVerifAVote.rowCount === 0) {
 
-      const getNbrVoteListe = "SELECT nbr_votes FROM liste WHERE id_liste = $1 and id_election = $2"
-      const resultGetNbrVoteListe = await client.query({
-        text: getNbrVoteListe,
-        values: [id_liste, id_election]
-      })
 
-      const nbr_votes = resultGetNbrVoteListe.rows[0].nbr_votes
+        // AJOUT DU VOTE DANS BUREAUDEVOTE
 
-      const addVoteToListe = "UPDATE liste SET nbr_votes = $1 + 1 WHERE id_liste = $2 and id_election = $3"
-      const resultAddVoteToListe = await client.query({
-        text: addVoteToListe,
-        values: [nbr_votes, id_liste, id_election]
-      })
-      setTimeout(() => res.json({popup: "Le vote a été pris en compte ! Merci de votre participation !"}), 1500)
+        const getNbrVoteBureau = "SELECT nbr_total_votants FROM bureaudevote WHERE code_postal = $1"
+        const resultGetNbrVoteBureau = await client.query({
+          text: getNbrVoteBureau,
+          values: [code_postal]
+        })
+
+        const nbr_total_votants = resultGetNbrVoteBureau.rows[0].nbr_total_votants
+
+        const addVoteToBureau = "UPDATE bureaudevote SET nbr_total_votants = $1 + 1 WHERE code_postal = $2"
+        const resultAddVoteBureau = await client.query({
+          text: addVoteToBureau,
+          values: [nbr_total_votants, code_postal]
+        })
+
+        // CREATION DE LA TABLE AVOTE
+
+        const createAVote = "INSERT INTO AVote VALUES ($1, $2)"
+        const resultCreateAVote = await client.query({
+          text: createAVote,
+          values: [id_election, num_carte_electeur]
+        })
+
+        // AJOUT DU VOTE A LA LISTE
+
+        const getNbrVoteListe = "SELECT nbr_votes FROM liste WHERE id_liste = $1 and id_election = $2"
+        const resultGetNbrVoteListe = await client.query({
+          text: getNbrVoteListe,
+          values: [id_liste, id_election]
+        })
+
+        const nbr_votes = resultGetNbrVoteListe.rows[0].nbr_votes
+
+        const addVoteToListe = "UPDATE liste SET nbr_votes = $1 + 1 WHERE id_liste = $2 and id_election = $3"
+        const resultAddVoteToListe = await client.query({
+          text: addVoteToListe,
+          values: [nbr_votes, id_liste, id_election]
+        })
+        setTimeout(() => res.json({popup: "Le vote a été pris en compte ! Merci de votre participation !"}), 500)
+      }
+      else {
+        setTimeout(() => res.json({popup: "Vous avez déjà voté, vous ne pouvez pas voter plusieurs fois !"}), 500)
+      }
     }
     else {
-      setTimeout(() => res.json({popup: "Vous avez déjà voté, vous ne pouvez pas voter plusieurs fois !"}), 1500)
+      setTimeout(() => res.json({popup: "Les votes ne sont pas ouvert !"}), 500)
     }
   }
   else {
@@ -769,7 +783,7 @@ router.post('/admin/elections/openVote', async (req, res) => {
   if (req.session.admin) {
 
     const id_election = req.body.id_election
-    const sql = "UPDATE elections SET ouvert = true WHERE id_election = $1"
+    const sql = "UPDATE elections SET ouvert = true, resultats_visibles = false WHERE id_election = $1"
     const result = await client.query({
       text: sql,
       values: [id_election]
@@ -786,7 +800,7 @@ router.post('/admin/elections/closeVote', async (req, res) => {
   if (req.session.admin) {
 
     const id_election = req.body.id_election
-    const sql = "UPDATE elections SET ouvert = false WHERE id_election = $1"
+    const sql = "UPDATE elections SET ouvert = false, resultats_visibles = false WHERE id_election = $1"
     const result = await client.query({
       text: sql,
       values: [id_election]
@@ -803,7 +817,7 @@ router.post('/admin/elections/showResult', async (req, res) => {
   if (req.session.admin) {
 
     const id_election = req.body.id_election
-    const sql = "UPDATE elections SET resultats_visibles = true WHERE id_election = $1"
+    const sql = "UPDATE elections SET ouvert = false, resultats_visibles = true WHERE id_election = $1"
     const result = await client.query({
       text: sql,
       values: [id_election]
@@ -820,7 +834,7 @@ router.post('/admin/resultats/hideResult', async (req, res) => {
   if (req.session.admin) {
 
     const id_election = req.body.id_election
-    const sql = "UPDATE elections SET resultats_visibles = false WHERE id_election = $1"
+    const sql = "UPDATE elections SET ouvert = false, resultats_visibles = false WHERE id_election = $1"
     const result = await client.query({
       text: sql,
       values: [id_election]
