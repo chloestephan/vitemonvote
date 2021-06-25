@@ -180,7 +180,7 @@ router.post('/admin/election', async(req, res) =>{
         sql += " OR code_postal LIKE $" + (i+1)
       }
       console.log({Requete_SQL: sql})
-      let code_postaux = []
+
       for(let i = 0; i < req.body.code_postaux.length; i++){
         code_postaux.push(req.body.code_postaux[i] + "%")
       }
@@ -195,15 +195,18 @@ router.post('/admin/election', async(req, res) =>{
       for(let i = 0; i < result.rowCount; i++){
         code_postaux.push(result.rows[i].code_postal)
       }
-      console.log({code_postal: code_postaux})
     }
 
+    console.log({election: id_election})
+    console.log({code_postal: code_postaux})
     for(let i = 0; i < code_postaux.length; i++){
       sql = "INSERT INTO organise VALUES ($1, $2)"
       await client.query({
         text: sql,
         values: [id_election, code_postaux[i]]
       })
+      console.log("organise" + i)
+      console.log({code_postal: code_postaux[i]})
     }
 
     for(let i = 0; i < nomListes.length; i++){
