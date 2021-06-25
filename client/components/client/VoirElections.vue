@@ -476,6 +476,10 @@ ul {
     margin-bottom: 5px;
 }
 
+.loop:hover {
+    cursor: pointer;
+}
+
 </style>
 
 

@@ -2,15 +2,19 @@
 
     <div>
         <!--  AFFICHAGE SELON SI UNE ELECTION EST SELECTIONNEE OU NON  -->
-        <div v-if="!electionInDetail">
-            <h2>Choisissez une élection pour voir les résultats</h2>
-            <br>
-            <img class="loop" src="img/retour_arriere.png" @click="noSort()">
-            <input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required>
-            <img src="img/loupe.png" @click="sortBySearch()" class="loupeLogo">
-        </div>
         
-        <button v-else @click="showAll" class="return">Annuler la recherche</button>
+        <div v-if="!electionInDetail">
+
+            <h2>Cliquez sur une élection pour voter ou pour voir les résultats</h2>
+            <br>
+            <div class="tile_div">
+                <img class="loop" src="img/retour_arriere.png" @click="noSort()">
+                <a class="input" class="last"><input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required></a>
+                <img class="loop" src="img/loupe.png" @click="sortBySearch()">
+                <div class="clear"></div>
+            </div>
+            <hr>
+        </div>
 
         <!--  AFFICHAGE SI DES ELECTIONS SONT DISPO  -->
 
@@ -305,21 +309,79 @@ ul {
     transition: 0s;
 }
 
-.loupeLogo {
-    height: 30px;
-    width: auto;
+
+.loop:hover {
+    cursor: pointer;
+}
+
+
+.tile_div {
+    display: flex;
+    justify-content: center;
+}
+
+.tile_div a {
+    display: block;
+    float: left;
+    height: 50px;
+    width: 20%;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    line-height: 50px;
+    text-decoration: none;
+}
+
+.title_div a.last {
+    margin-right: 0;
+}
+
+.clear {
+    clear: both;
+}
+
+.button {
+    font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+    letter-spacing: 3px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #fff;
+    text-transform: uppercase;
+    width: 100%;
+    height: 50px;
+    border-radius: 25px;
+    background: #001D6E;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all .4s;
-    border: none;
+    padding: 0 25px;
+    transition: all .4s;  
+    border: none;  
     text-decoration: none;
-    margin: 10px;
 }
 
-.loupeLogo:hover {
+.button:hover {
+    background: #fff;
+    text-decoration: none;
+    color: #D60920;
+    border: solid;
+    border-width: 2px;
+    border-color: #D60920;
     cursor: pointer;
 }
+
+.input {
+    width: 40%;
+}
+
+.loop {
+    max-height: 40px;
+    margin-left: 0px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 
 </style>
 
