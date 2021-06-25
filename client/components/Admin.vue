@@ -135,7 +135,7 @@ nav {
 
 nav > div {
   font-size: 16px;
-  min-height: 50px;
+  max-height: 50px;
   padding: 10 15px;
 }
 

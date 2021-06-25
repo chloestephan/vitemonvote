@@ -34,9 +34,9 @@
             <div v-else>
                 <nav class="navbar">
                     <ul class="nav-links">
-                        <li class="nav-item"><a><router-link to='/user/voirelections'>Les élections</router-link></a></li>
+                        <a class="nav-item deconnexionBouton" @click="LogOut()">Se déconnecter</a>
                     </ul>
-                    <a class="deconnexionBouton" @click="LogOut()">Se déconnecter</a>
+
                 </nav>
             <router-view></router-view>
             </div>
@@ -258,12 +258,14 @@ nav {
 }
 
 .deconnexionBouton {
-     border-style:solid 2px #D60920;
+    border-style:solid 2px #D60920;
     background-color: #fff;
     color: #D60920;
     border-radius: 4px;
     padding: 10px;
-      transition: 0.4s;
+    transition: 0.4s;
+    margin-top:10px;
+    margin-bottom:10px;
 }
 
 .deconnexionBouton:hover {
