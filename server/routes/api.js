@@ -100,15 +100,52 @@ router.delete('/admin/:id', async (req, res) => {
       res.status(401).json({message: "You can't delete the current admin"})
       return
     }
-    const sql = "DELETE FROM admins WHERE id=$1"
-    await client.query({
-      text: sql,
+    else if (deleteAdmin === '1') {
+      const result = await client.query({text: "SELECT id, email FROM admins"})
+      res.json({admin: result.rows, popup: "Vous ne pouvez pas supprimer le super admin !"})
+      return      
+    }
+    const haveElection = "SELECT * FROM acces WHERE id_election = $1"
+    const resultHaveElection = await client.query({
+      text: haveElection,
       values: [deleteAdmin]
     })
+    
+    if (resultHaveElection.rowCount === 0) {
+      const sql = "DELETE FROM admins WHERE id=$1"
+      await client.query({
+        text: sql,
+        values: [deleteAdmin]
+      })
+  
+      const result = await client.query({text: "SELECT id, email FROM admins"})
+      res.json({admin: result.rows, popup: "L'admin a bien été supprimé !"})
+      return
+    }
+    else {
 
-    const result = await client.query({text: "SELECT id, email FROM admins"})
-    res.json({admin: result.rows, popup: "L'admin a bien été supprimé !"})
-    return
+      // ON DONNE TOUT AU SUPER ADMIN
+
+      await client.query({
+        text: "UPDATE acces SET id_admin = 1 WHERE id_admin = $1",
+        values: [deleteAdmin]
+      })
+
+      await client.query({
+        text: "UPDATE elections SET id_admin = 1 WHERE id_admin = $1",
+        values: [deleteAdmin]
+      })
+
+      const sql = "DELETE FROM admins WHERE id=$1"
+      await client.query({
+        text: sql,
+        values: [deleteAdmin]
+      })
+
+      const result = await client.query({text: "SELECT id, email FROM admins"})
+      res.json({admin: result.rows, popup: "L'admin a bien été supprimé !"})
+      return
+    }
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
@@ -117,21 +154,6 @@ router.get('/admin/admins', async (req, res) =>{
   if (req.session.admin === true){
     const result = await client.query({text: "SELECT id, email FROM admins"})
     res.json({currentId: req.session.adminId, administrateurs: result.rows})
-    return
-  }
-  res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
-})
-
-router.delete('/admin/doleance/:id', async (req, res) =>{
-  if (req.session.admin === true){
-    const doleance = req.params.id
-    const sql = "DELETE FROM doleances WHERE id=$1"
-    await client.query({
-      text: sql,
-      values: [doleance]
-    })
-    
-    res.json({message: "Doleance supprimée."})
     return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
@@ -238,107 +260,6 @@ router.post('/admin/election', async(req, res) =>{
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.get('/admin/elections', async(req, res) =>{
-  if (req.session.admin === true){
-    const adminId = req.session.adminId
-    let sql = "SELECT id_election FROM acces WHERE id_admin=$1"
-    let result = await client.query({
-      text: sql,
-      values: [adminId]
-    })
-    console.log(result.rows)
-
-    sql = "SELECT * FROM elections WHERE id_election IN $1"
-
-    let tmp = []
-    for (let i = 0; i < result.rows.length; i++){
-      tmp.push(result.rows[i].id_election)
-    }
-    console.log(tmp)
-    const data = tmp.join()
-    console.log({data: '(' + data + ')'})
-    result = await client.query({
-      text: sql,
-      values: [tmp]
-    })
-
-    console.log(result.rows)
-
-    res.json(result.rows)
-    return
-  }
-  res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
-})
-
-router.get('/admin/election/:id', async (req, res) => {
-  if(req.session.admin === true){
-    const id_election = req.params.id
-    console.log({id: id_election})
-    const sql = "SELECT * FROM elections WHERE id_election = $1"
-    const result = await client.query({
-      text: sql,
-      values: [id_election]
-    })
-    res.json(result.rows[0])
-    return
-  }
-  res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
-})
-
-router.put('/admin/election', async (req, res) => {
-  if(req.session.admin === true){
-    const electionId = req.body.electionId
-    console.log(id_election)
-    const sql = "SELECT id_election FROM acces WHERE id_admin = $1"
-    const result = await client.query({
-      text: sql,
-      values: [req.session.adminId]
-    })
-    let allowed = false
-    for (let i = 0; i < result.rows.length; i++){
-      if (result.rows.id_election === electionId){
-        allowed = true
-      }
-    }
-    if (allowed){
-      const ouvert = req.body.ouvert
-      const visible = req.body.visible
-      if(ouvert === true && visible === true){
-        res.json({message: "Vous ne pouvez pas afficher les résulats d'une élection en cours."})
-      }
-      else{
-        let sql = "SELECT * FROM elections WHERE id_election = $1"
-        const result = await client.query({
-          text: sql,
-          values: [electionId]
-        })
-        let election = result.rows[0]
-        if(ouvert !== election.ouvert){
-          sql = "UPDATE elections SET ouvert = $1 WHERE id_election = $2"
-          await client.query({
-            text: sql,
-            values: [ouvert, electionId]
-          })
-        }
-        else{
-          if(visible !== election.visible){
-            sql = "UPDATE election SET visible = $1 WHERE id_election = $2"
-            await client.query({
-              text: sql,
-              values: [visible, electionId]
-            })
-          }
-        }
-      }
-      res.json({message: "Modifications appliquées."})
-    }
-    else{
-      res.status(400).json({message: "L'admin n'a pas les droits sur cette élection."})
-    }
-  }
-  res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
-})
-
 router.post('/admin/electeurs', async(req, res) => {
   if (req.session.admin === true){
     const electeurs = req.body.electeurs
@@ -365,12 +286,12 @@ router.get('/admin/electeur', async(req, res) => {
     const email = req.body.email
     const code_postal = req.body.code_postal
 
-    const sql = "SELECT * FROM electeur HAVING lower(num_carte_electeur) LIKE lower($1) AND lower(email) LIKE lower($2) AND code_postal LIKE $3"
+    const sql = "SELECT * FROM electeur WHERE lower(num_carte_electeur) LIKE lower($1) AND lower(email) LIKE lower($2) AND code_postal LIKE $3"
     const result = await client.query({
       text: sql,
       values: [num_carte_electeur + "%", email + "%", code_postal + "%"]
     })
-
+    console.log("EHO")
     res.json(result.rows)
     return
   }
@@ -401,7 +322,7 @@ router.post('/admin/bureaux', async (req, res) => {
         values: [bureaux[i], 0]
       })
     }
-    res.json({message: "Bureaux ajoutés"})
+    res.json({popup: "Les bureaux ont bien été ajoutés !"})
     return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
@@ -526,7 +447,7 @@ router.post('/user/register', async (req, res) => {
       } 
     })
 
-    const sqlVerif = "UPDATE public.electeur SET password=$1 WHERE num_carte_electeur=$2"
+    const sqlVerif = "UPDATE public.Electeur SET password=$1 WHERE num_carte_electeur=$2"
     const result = await client.query({
       text: sqlVerif,
       values: [hash, numCarteElec]
@@ -569,11 +490,13 @@ router.post('/user/login', async (req, res) => {
 
 // TRI DES ELECTIONS
 
-router.post('/user/voirelections', async (req, res) => {  
+router.post('/user/elections', async (req, res) => {  
 
   if (req.session.user) {
     const typeSort = req.body.typeSort
     const searchName = req.body.searchName + "%"
+
+
   
     if (typeSort === "noSort") {
       const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE (ouvert = true OR resultats_visibles = true) ORDER BY id_election"
@@ -615,9 +538,26 @@ router.post('/user/voirelections', async (req, res) => {
 
 })
 
+// NBR TOTAL VOTANT
+
+router.post('/user/elections/nbrVotant', async (req, res) => {  
+
+  if (req.session.user) {
+
+    const id_election = req.body.id
+    const getTotalVote = "SELECT count(*) FROM avote WHERE id_election = $1"
+    const resultGetTotalVote = await client.query({
+      text: getTotalVote,
+      values: [id_election]
+    })
+
+    res.json({totalVote: resultGetTotalVote.rows[0].count})
+  }
+})
+
 // VOTE
 
-router.post('/user/voirelections/vote', async (req, res) => {   
+router.post('/user/elections/vote', async (req, res) => {   
 
   if (req.session.user) {
   
@@ -627,7 +567,7 @@ router.post('/user/voirelections/vote', async (req, res) => {
     const id_liste = req.body.id_liste
     const num_carte_electeur = req.session.userId
 
-    const getCP = "SELECT code_postal FROM public.electeur WHERE num_carte_electeur=$1"
+    const getCP = "SELECT code_postal FROM public.Electeur WHERE num_carte_electeur=$1"
     const resultGetCP = await client.query({
       text: getCP,
       values: [num_carte_electeur]
@@ -667,17 +607,17 @@ router.post('/user/voirelections/vote', async (req, res) => {
         const nbr_total_votants = resultGetNbrVoteBureau.rows[0].nbr_total_votants
 
         const addVoteToBureau = "UPDATE bureaudevote SET nbr_total_votants = $1 + 1 WHERE code_postal = $2"
-        const resultAddVoteBureau = await client.query({
+        await client.query({
           text: addVoteToBureau,
           values: [nbr_total_votants, code_postal]
         })
 
         // CREATION DE LA TABLE AVOTE
 
-        const createAVote = "INSERT INTO AVote VALUES ($1, $2)"
-        const resultCreateAVote = await client.query({
+        const createAVote = "INSERT INTO AVote VALUES ($1, $2, $3)"
+        await client.query({
           text: createAVote,
-          values: [id_election, num_carte_electeur]
+          values: [id_election, num_carte_electeur, code_postal]
         })
 
         // AJOUT DU VOTE A LA LISTE
@@ -691,7 +631,7 @@ router.post('/user/voirelections/vote', async (req, res) => {
         const nbr_votes = resultGetNbrVoteListe.rows[0].nbr_votes
 
         const addVoteToListe = "UPDATE liste SET nbr_votes = $1 + 1 WHERE id_liste = $2 and id_election = $3"
-        const resultAddVoteToListe = await client.query({
+        await client.query({
           text: addVoteToListe,
           values: [nbr_votes, id_liste, id_election]
         })
