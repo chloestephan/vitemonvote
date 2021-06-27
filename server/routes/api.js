@@ -614,10 +614,10 @@ router.post('/user/elections/vote', async (req, res) => {
 
         // CREATION DE LA TABLE AVOTE
 
-        const createAVote = "INSERT INTO AVote VALUES ($1, $2, $3)"
+        const createAVote = "INSERT INTO AVote VALUES ($1, $2)"
         await client.query({
           text: createAVote,
-          values: [id_election, num_carte_electeur, code_postal]
+          values: [id_election, num_carte_electeur]
         })
 
         // AJOUT DU VOTE A LA LISTE
@@ -796,6 +796,81 @@ router.post('/admin/resultats/hideResult', async (req, res) => {
     })
     res.json({popup: "Les résultats sont cachés pour cette élection !"})
   }  
+  else {
+    res.status(401).json({popup: "L'admin n'est pas connecté !"})
+  }
+})
+
+router.post('/admin/resultats/generate', async (req, res) => {   
+
+  if (req.session.admin) {
+
+    // CREATION DE LA NOUVELLE ELECTION
+
+    const oldElection = req.body.oldElection
+    const newName = req.body.newName
+    const newDate = req.body.newDate
+    const newTour = oldElection.tour + 1
+    const previousTour = oldElection.tour
+    const type = oldElection.type
+    const id_admin = req.session.adminId
+
+    const createElection = "INSERT INTO elections (nom, date, tour, tour_precedent, type_election, id_admin, ouvert, resultats_visibles) VALUES ($1, $2, $3, $4, $5, $6, false, false)"
+    await client.query({
+      text: createElection,
+      values: [newName, newDate, newTour, previousTour, type, id_admin]
+    })
+
+    // CREATION DES LISTES QUI ONT GAGNE LE PREMIER TOUR
+
+    const getIdElection = "SELECT id_election FROM elections WHERE nom = $1 AND date = $2 AND tour = $3"
+    const result = await client.query({
+      text: getIdElection,
+      values: [newName, newDate, newTour]
+    })
+
+    const id_election = result.rows[0].id_election
+
+    for(let j = 0; j < 2; j++) {
+      let maxVote = -1
+      for (let i = 0; i < oldElection.listes.length; i++) {
+        if (maxVote < oldElection.listes[i].nbr_votes) {
+          maxVote = oldElection.listes[i].nbr_votes  // On récupère les 2 qui ont eu le plus de vote
+        }
+      }
+  
+      let index = (element) => element.nbr_votes === maxVote
+      let position = oldElection.listes.findIndex(index)
+      
+      // Création de la liste
+
+      let createListe = "INSERT INTO liste (nom_liste, id_election, nbr_votes) VALUES ($1, $2, 0)"
+      await client.query({
+        text: createListe,
+        values: [oldElection.listes[position].nom_liste, id_election]
+      })
+
+      let getIdListe = "SELECT id_liste FROM liste WHERE nom_liste = $1 AND id_election = $2 AND nbr_votes = 0"
+      let resultGetIdListe = await client.query({
+        text: getIdListe,
+        values: [oldElection.listes[position].nom_liste, id_election]
+      })
+
+      let id_liste = resultGetIdListe.rows[0].id_liste
+
+      let createCandidat = "INSERT INTO candidat (id_liste, nom_complet) VALUES ($1, $2)"
+      await client.query({
+        text: createCandidat,
+        values: [id_liste, oldElection.listes[position].candidats[0].nom_complet]
+      })
+
+      oldElection.listes.splice(position, 1)
+    }
+
+    // CREATION DES CANDIDATS
+
+    res.json({message: "Election créée !"})
+  }
   else {
     res.status(401).json({popup: "L'admin n'est pas connecté !"})
   }

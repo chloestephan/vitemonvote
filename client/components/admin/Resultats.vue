@@ -63,6 +63,15 @@
                 </div>
                 <hr>
                 <button @click="hideResult(elections[idSelected])">Cacher les résultats</button>
+                <button v-if="elections[idSelected].type === 'Presidentielle' && elections[idSelected].tour !== 2" @click=" generation = !generation">Génération du prochain tour</button>
+                <div v-if="generation">
+                    <form @submit.prevent="generatePresidentielle(elections[idSelected])">
+                        <input type="text" placeholder="Nom de l'éléction" required v-model="newElectionName">
+                        <label for="start"><h3>Date du prochain tour :</h3></label>
+                        <input type="date" id="start" name="premierTourDate" required v-model="newElectionDate">
+                        <button type="submit">Générer</button>
+                    </form>
+                </div>
             </div>
         </div>
         
@@ -102,6 +111,9 @@ module.exports = {
             popup: '',
             isError: false,
             isNoError: false,
+            generation: false,
+            newElectionName: '',
+            newElectionDate: '',
         }
     },
     mounted: async function() {
@@ -150,6 +162,7 @@ module.exports = {
                         id_liste: result.data.elections[i].id_liste,
                         nom_liste: result.data.elections[i].nom_liste,
                         nbr_votes: result.data.elections[i].nbr_votes,
+                        pourcentage: 0,
                         candidats: this.candidats
                     })
                     this.candidats = [{}]
@@ -177,6 +190,9 @@ module.exports = {
             this.idSelected = -1
             this.electionInDetail = false
             this.noSorted = false
+            this.generation = false
+            this.newElectionName = ''
+            this.newElectionDate = ''
             this.noSort()
         },
         async sort (typeOfSort) {
@@ -226,6 +242,15 @@ module.exports = {
             else {
                 this.isError = true
             }
+        },
+        async generatePresidentielle(election) {
+
+            const informationElection = {
+                oldElection: election,
+                newName: this.newElectionName,
+                newDate: this.newElectionDate,
+            }
+            const result = await axios.post('api/admin/resultats/generate', informationElection)  
         }
     }
 }

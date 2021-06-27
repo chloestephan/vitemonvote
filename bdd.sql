@@ -95,7 +95,6 @@ CREATE TABLE public.BureauDeVote(
 CREATE TABLE public.AVote(
 	id_election   INT NOT NULL ,
 	num_carte_electeur   Varchar (50) NOT NULL ,
-	code_postal       Varchar (50) NOT NULL ,
 	CONSTRAINT Votants_PK PRIMARY KEY (id_election,num_carte_electeur)
 
 	,CONSTRAINT Votants_Elections_FK FOREIGN KEY (id_election) REFERENCES public.Elections(id_election)

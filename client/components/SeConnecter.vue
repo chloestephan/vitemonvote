@@ -15,7 +15,7 @@
                 </div>
 
                 <div class="login">
-                    <form>
+                    <form @submit.prevent="loginUser">
                         <h3>Se connecter</h3>
 
                         <input type="text" v-model="emailLogin" placeholder="Email" required>
@@ -25,7 +25,7 @@
                             <img src="img/show_password.png" class="showMDP" @click="showMDP" v-else>
                         </div>
 
-                        <button type="submit" @click="loginUser">Connexion</button>
+                        <button type="submit">Connexion</button>
                     </form>
                 </div>
 
