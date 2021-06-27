@@ -251,6 +251,7 @@ module.exports = {
                 newDate: this.newElectionDate,
             }
             const result = await axios.post('api/admin/resultats/generate', informationElection)  
+             this.displayPopup(result.data.popup)
         }
     }
 }

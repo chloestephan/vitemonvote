@@ -869,7 +869,7 @@ router.post('/admin/resultats/generate', async (req, res) => {
 
     // CREATION DES CANDIDATS
 
-    res.json({message: "Election créée !"})
+    res.json({popup: "Le 2nd tour de l'éléction présidentielle a été créée !"})
   }
   else {
     res.status(401).json({popup: "L'admin n'est pas connecté !"})
