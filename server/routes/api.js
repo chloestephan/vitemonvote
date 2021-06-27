@@ -494,7 +494,7 @@ router.post('/user/elections', async (req, res) => {
 
   if (req.session.user) {
     const typeSort = req.body.typeSort
-    const searchName = req.body.searchName + "%"
+    const searchName = "%" + req.body.searchName + "%"
 
 
   
@@ -520,7 +520,7 @@ router.post('/user/elections', async (req, res) => {
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND (ouvert = true OR resultats_visibles = true) ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE lower(nom) like lower($1) AND (ouvert = true OR resultats_visibles = true) ORDER BY id_election"
       const result = await client.query({
         text: sql,
         values: [searchName]
@@ -656,7 +656,7 @@ router.post('/admin/elections', async (req, res) => {
 
   if (req.session.admin) {
     const typeSort = req.body.typeSort
-    const searchName = req.body.searchName + "%"
+    const searchName = "%" + req.body.searchName + "%"
     const id_admin = req.session.adminId
   
     if (typeSort === "noSort") {
@@ -668,7 +668,7 @@ router.post('/admin/elections', async (req, res) => {
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND resultats_visibles = false AND id_admin = $2 ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE lower(nom) like lower($1) AND resultats_visibles = false AND id_admin = $2 ORDER BY id_election"
       const result = await client.query({
         text: sql,
         values: [searchName, id_admin]
@@ -690,7 +690,7 @@ router.post('/admin/resultats', async (req, res) => {
 
   if (req.session.admin) {
     const typeSort = req.body.typeSort
-    const searchName = req.body.searchName + "%"
+    const searchName = "%" + req.body.searchName + "%"
     const id_admin = req.session.adminId
   
     if (typeSort === "noSort") {
@@ -702,7 +702,7 @@ router.post('/admin/resultats', async (req, res) => {
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE nom like $1 AND resultats_visibles = true AND id_admin = $2 ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE lower(nom) like lower($1) AND resultats_visibles = true AND id_admin = $2 ORDER BY id_election"
       const result = await client.query({
         text: sql,
         values: [searchName, id_admin]
@@ -766,6 +766,21 @@ router.post('/admin/elections/showResult', async (req, res) => {
   }  
   else {
     res.status(401).json({popup: "L'admin n'est pas connecté !"})
+  }
+})
+
+router.post('/admin/elections/nbrVotant', async (req, res) => {  
+
+  if (req.session.admin) {
+
+    const id_election = req.body.id
+    const getTotalVote = "SELECT count(*) FROM avote WHERE id_election = $1"
+    const resultGetTotalVote = await client.query({
+      text: getTotalVote,
+      values: [id_election]
+    })
+
+    res.json({totalVote: resultGetTotalVote.rows[0].count})
   }
 })
 

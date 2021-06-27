@@ -7,12 +7,14 @@
             <br>
             <div class="tile_div">
                 <img class="loop" src="img/retour_arriere.png" @click="noSort()">
-                <a class="input" class="last"><input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required></a>
+                <a class="input" id="last"><input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required></a>
                 <img class="loop" src="img/loupe.png" @click="sortBySearch()">
                 <div class="clear"></div>
             </div>
             <hr>
         </div>
+
+        <button v-else @click="showAll" class="return">Annuler la recherche</button>
 
         <!--  AFFICHAGE SI DES ELECTIONS SONT DISPO  -->
 
@@ -29,36 +31,44 @@
         <!--  AFFICHAGE SI UNE ELECTION EST SELECTIONNEE  -->
 
         <div v-else-if="electionInDetail">
-            <button @click="showAll()">ANNULER LA RECHERCHE</button>
             <br><br>
             <h2>{{ elections[idSelected].nom }}</h2>
-            <br>
-            <div> <strong>Type d'élection : </strong> {{ elections[idSelected].type }}</div>
-            <div> <strong>Date du vote : </strong> {{ elections[idSelected].jour }} / {{ elections[idSelected].mois }} / {{ elections[idSelected].année }}</div>
-            <div> <strong>Tour : </strong> {{ elections[idSelected].tour }}</div>
-            <br>
+            <hr>
+            <div class="details">
+                <div class="intro">
+                    <div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[idSelected].type }} </div><p id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[idSelected].jour }} / {{ elections[idSelected].mois }} / {{ elections[idSelected].année }} </div><p id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[idSelected].tour }} </div><p v-if="elections[idSelected].resultats_visibles" id="separation">|</p>
+                    <br>
+                </div>
 
-            <!--  AFFICHAGE QUI CHANGE POUR MONTRER LES RESULT OU POUR VOTER  -->
+                <!--  AFFICHAGE QUI CHANGE POUR MONTRER LES RESULT OU POUR VOTER  -->
 
-            <ul class="liste_container">
-                <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
-                    <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
-                    <div> <strong>Candidat : </strong> </div>
-                    <ul>
-                        <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
-                            <div> {{ candidat.nom_complet }} </div>
+                <div>
+                    <ul class="liste_container">
+                        <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
+                            <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
+                            <div> <strong>Candidats : </strong> </div>
+                            <ul>
+                                <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
+                                    <div> {{ candidat.nom_complet }} </div>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
-                </li>
-            </ul>
-            <button @click="openVote(elections[idSelected])">Ouvrir les votes</button>
-            <button @click="closeVote(elections[idSelected])">Fermer les votes</button>
-            <button @click="showResult(elections[idSelected])">Afficher les résultats</button>
+                </div>
+                <hr>
+                <button @click="openVote(elections[idSelected])">Ouvrir les votes</button>
+                <button @click="closeVote(elections[idSelected])">Fermer les votes</button>
+                <button @click="showResult(elections[idSelected])">Afficher les résultats</button>
+            </div>
         </div>
         
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
 
         <h2 v-else class="noElection">Aucun résultat disponible !</h2>
+
+        <!-- POPUP -->
 
         <div :class="[{displayPop : isError}, {displayPop : isNoError}]" class="overlay">
             <div class="popup">
@@ -148,7 +158,15 @@ module.exports = {
                     this.listes = [{}]
                     this.listes.pop()
                 }
+                for (let x = 0; x < this.elections.length; x++) {  // Cache les votes sur la console pour les élections où on n'a pas afficher les résultats
+                    if (this.elections[x].resultats_visibles === false) {
+                        for (let j = 0; j < this.elections[x].listes.length; j++) {
+                            this.elections[x].listes[j].nbr_votes = 0
+                        }
+                    }
+                }
             }
+
         },
         showAll() {
             this.idSelected = -1
@@ -255,7 +273,7 @@ hr {
 .election {
     background: #FFF;
     width: 600px;
-    height: 250px;
+    height: 300px;
     margin: 40px;
     padding: 20px;
     border-radius: 2%;
@@ -280,7 +298,7 @@ ul {
 }
 
 .election:hover {
-    scale: 1.05;
+    scale: 1;
     cursor: pointer;
 }
 
@@ -298,6 +316,9 @@ ul {
 
 .liste {
     background: rgb(209, 208, 207);
+    padding:20px;
+    font-size: 20px;
+    background-color: #f8f9fd;
 }
 
 .candidat {
@@ -316,6 +337,8 @@ ul {
     visibility: hidden;
     opacity: 0;
 }
+
+.dernier {margin-bottom:20px;}
 
 .displayPop {
     visibility: visible;
@@ -350,11 +373,6 @@ ul {
     color: #001D6E;
 }
 
-#button {
-    transition: 0s;
-}
-
-
 .tile_div {
     display: flex;
     justify-content: center;
@@ -364,7 +382,7 @@ ul {
     display: block;
     float: left;
     height: 50px;
-    width: 35%;
+    width: 20%;
     margin-right: 10px;
     margin-bottom: 10px;
     text-align: center;
@@ -372,7 +390,7 @@ ul {
     text-decoration: none;
 }
 
-.title_div a.last {
+.title_div a#last {
     margin-right: 0;
 }
 
@@ -395,7 +413,7 @@ ul {
     justify-content: center;
     align-items: center;
     padding: 0 25px;
-    transition: all .4s;  
+    transition: all 0s;  
     border: none;  
     text-decoration: none;
 }
@@ -410,17 +428,71 @@ ul {
     cursor: pointer;
 }
 
-.loop {
-    max-height: 30px;
-    margin-left: 0px;
-    margin-right: 10px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+.buttonPop {
+    margin-top:15px;
 }
 
+.input {
+    width: 40%;
+}
+
+.loop {
+    max-height: 40px;
+    margin-left: 0px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
 
 .loop:hover {
     cursor: pointer;
+}
+
+.return {
+    width: 30%;
+    display: flex;
+    margin:0 auto;
+}
+
+.presentation {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+#separation {
+    font-size: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    color:#D60920;
+}
+
+.details {
+    padding : 50px;
+    margin-left: 100px;
+    margin-right: 100px;
+    margin-bottom: 50px;
+    background-color: #fff;
+    -moz-box-shadow: 0px 1px 5px 0px #656565;
+    -webkit-box-shadow: 0px 1px 5px 0px #656565;
+    -o-box-shadow: 0px 1px 5px 0px #656565;
+    box-shadow: 0px 1px 5px 0px #656565;
+}
+
+.titre {
+    text-transform: uppercase;
+    margin-right: 10px;
+}
+
+.intro {
+    display:flex;
+    justify-content: center;
+    align-content:center;
+    margin: 0 auto;
+}
+
+.voter {
+    margin-top:20px;
+    margin-bottom:20px;
 }
 
 </style>
