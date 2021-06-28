@@ -5,11 +5,9 @@
       <hr>
 
       <div>
-        <input type="text" v-model="nom" placeholder="Nom de l'élection" required>
-
         <label for="type-election"><h3>Choisir le type d'élection :</h3></label>
         <select name="typeElection" id="type-election" class="box" v-model="typeElection">
-          <option value="">Choisir une option</option>
+          <option value="''">Choisir une option</option>
           <option value="Municipales">Municipales</option>
           <option value="Regionales">Regionales</option>
           <option value="Legislatives">Legislatives</option>
@@ -18,77 +16,45 @@
           <option value="Referundum">Referundum</option>
         </select>
 
-        <label for="start"><h3>Date du premier tour :</h3></label>
-        <input type="date" id="start" name="premierTourDate" v-model="date">
+        <div v-if="typeElection!==''">
+          <div v-if="typeElection!=='Referundum'">
+            <input type="text" v-model="nom" placeholder="Nom de l'élection" required>
 
-        <div v-if="typeElection==='Presidentielle' || typeElection==='Europeennes'">
-          <div v-for="(liste, index1) in candidats" :key="index1" class="">
-            <h2>Nouvelle liste</h2>
-            <hr>
+            <label for="start"><h3>Date du premier tour :</h3></label>
+          </div>
+          <div v-else>
+            <input type="text" v-model="nom" placeholder="Question du referundum" required>
 
-            <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
+            <label for="start"><h3>Date du referundum :</h3></label>
+          </div>
+          <input type="date" id="start" name="premierTourDate" v-model="date">
 
-            <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
-              <div class="ligne">
-                <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat'" required>
-              </div>
+          <input v-if="typeElection==='Municipales'" type="text" v-model="codePostaux[0]" placeholder="Code postal" required>
+          <div v-if="typeElection==='Regionales'">
+            <div v-for="(codePostal, index) in codePostaux" :key="index">
+              <input type="text" v-model="codePostaux[index]" placeholder="Code postal de la région" required>
             </div>
-
-            <button v-if="typeElection==='Europeennes'" type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
-            <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+            <button type="button" @click="ajouterCode">Ajouter un code postal</button>
           </div>
-          <hr>
-          <button type="button" @click="creerEletion">Valider</button>
-        </div>
-        
-        <div v-if="typeElection==='Municipales'">
-          <input type="text" v-model="codePostaux[0]" placeholder="Code postal" required>
 
-          <div v-for="(liste, index1) in candidats" :key="index1" class="">
-            <h2>Nouvelle liste</h2>
-            <hr>
+          <div v-if="typeElection!=='Referundum'">
+            <div v-for="(liste, index1) in candidats" :key="index1" class="">
+              <h2>Nouvelle liste</h2>
+              <hr>
 
-            <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
+              <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
 
-            <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
-              <div class="ligne">
-                <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat ' + index2" required>
-                <p class="delete" @click="deleteCandidat(index1, index2)">✖️</p>
+              <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
+                <div class="ligne">
+                  <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat'" required>
+                </div>
               </div>
+
+              <button v-if="typeElection!=='Presidentielle'" type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
+              <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
             </div>
-            <button type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
-          </div>
-          
-          <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
-
-          <hr>
-          <button type="button" @click="creerEletion">Valider</button>
-        </div>
-        
-        <div v-if="typeElection==='Regionales'">
-          <div v-for="(codePostal, index) in codePostaux" :key="index">
-            <input type="text" v-model="codePostaux[index]" placeholder="Code postal de la région" required>
-          </div>
-          <button type="button" @click="ajouterCode">Ajouter un code postal</button>
-
-          <div v-for="(liste, index1) in candidats" :key="index1" class="">
-            <h2>Nouvelle liste</h2>
             <hr>
-
-            <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
-
-            <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
-              <div class="ligne">
-                <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat ' + index2" required>
-                <p class="delete" @click="deleteCandidat(index1, index2)">✖️</p>
-              </div>
-            </div>
-            <button type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
           </div>
-
-          <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
-
-          <hr>
           <button type="button" @click="creerEletion">Valider</button>
         </div>
       </div>

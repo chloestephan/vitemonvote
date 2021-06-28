@@ -169,8 +169,15 @@ router.post('/admin/election', async(req, res) =>{
     if (tour !== 1){
       tour_precedent = req.body.precedent_tour
     }
-    const nomListes = req.body.nomListes
-    const candidats = req.body.candidats
+    let nomListes
+    let candidats
+    if(typeElection!=='Referundum'){
+      nomListes = req.body.nomListes
+      candidats = req.body.candidats
+    }
+    else{
+      nomListes = ['oui', 'non']
+    }
 
     let sql = "INSERT INTO elections(nom, date, tour, tour_precedent, type_election, id_admin, ouvert, resultats_visibles) VALUES ($1, $2, $3, $4, $5, $6, false, false) RETURNING id_election"
     let result = await client.query({
@@ -237,14 +244,15 @@ router.post('/admin/election', async(req, res) =>{
         text: sql,
         values: [nomListes[i], id_election, 0]
       })
-      const id_liste = result.rows[0].id_liste
-      console.log({id_liste: id_liste, listes: candidats, candidats: candidats[i] })
-      for(let j = 0; j < candidats[i].length; j++){
-        sql = "INSERT INTO candidat VALUES ($1, $2)"
-        await client.query({
-          text: sql,
-          values: [id_liste, candidats[i][j]]
-        })
+      if(typeElection!=='Referundum'){
+        const id_liste = result.rows[0].id_liste
+        for(let j = 0; j < candidats[i].length; j++){
+          sql = "INSERT INTO candidat VALUES ($1, $2)"
+          await client.query({
+            text: sql,
+            values: [id_liste, candidats[i][j]]
+          })
+        }
       }
     }
 
