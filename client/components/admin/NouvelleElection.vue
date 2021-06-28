@@ -10,6 +10,7 @@
           <option value="''">Choisir une option</option>
           <option value="Municipales">Municipales</option>
           <option value="Regionales">Regionales</option>
+          <option value="Departementales">Départementales</option>
           <option value="Legislatives">Legislatives</option>
           <option value="Presidentielle">Presidentielle</option>
           <option value="Europeennes">Européennes</option>
