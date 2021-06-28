@@ -10,7 +10,7 @@ const AdminElections = window.httpVueLoader('./components/admin/Elections.vue')
 const AdminElection = window.httpVueLoader('./components/admin/Election.vue')
 const AdminElecteurs = window.httpVueLoader('./components/admin/Electeurs.vue')
 
-const LoginElection = window.httpVueLoader('./components/client/VoirElections.vue')
+const LoginElection = window.httpVueLoader('./components/client/Elections.vue')
 
 const routes = [
   { path: '/', component: Home},

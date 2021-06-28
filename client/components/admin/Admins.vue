@@ -19,9 +19,22 @@
                 <hr>
                 <div v-for="administrateur in administrateurs" :key="administrateur.id" class="admin">
                     <p id="email">{{administrateur.email}}</p>
-                    <p v-if="administrateur.id !== currentAdmin" class="cross" @click="deleteAdmin(administrateur)">✖️</p>
+                    <p v-if="administrateur.id !== currentAdmin" class="crossDelADmin" @click="deleteAdmin(administrateur)">✖️</p>
                 </div>
             </div>
+
+            <div :class="[{displayPop : isError}, {displayPop : isNoError}]" class="overlay">
+                <div class="popup">
+                    <h2 v-if="isError">Erreur</h2>
+                    <h2 v-else>Confirmation</h2>
+                    <br>
+                    <p>{{ popup }}</p>
+                    <button v-on:click="closePopup" class="crossPopup">
+                        X
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
   </div>
@@ -34,6 +47,9 @@ module.exports = {
         return {
             administrateurs: null,
             currentAdmin: null,
+            isError: false,
+            isNoError: false,
+            popup: '',
             email: '',
             password: '',
         }
@@ -48,7 +64,15 @@ module.exports = {
     methods: {
         async deleteAdmin(administrateur){
             const result = await axios.delete('/api/admin/' + administrateur.id)
-            this.administrateurs = result.data
+            this.administrateurs = result.data.admin
+            this.popup = result.data.popup
+
+            if (this.popup === "L'admin a bien été supprimé !") {
+                this.isNoError = true
+            }
+            else if (!(this.popup === undefined)) {
+                this.isError = true
+            }
         },
         async ajouterAdmin(){
             if(this.email !== '' && this.password !== ''){
@@ -58,9 +82,21 @@ module.exports = {
                 }
 
                 const result = await axios.post('/api/admin/register', admin)
-                this.administrateurs = result.data
+                this.administrateurs = result.data.admin
+                this.popup = result.data.popup
+
+                if (this.popup === "L'admin a bien été créée !") {
+                    this.isNoError = true
+                }
+                else if (!(this.popup === undefined)) {
+                    this.isError = true
+                }
             }
-        }
+        },
+        closePopup() {
+            this.isError = false
+            this.isNoError = false
+        },
     }
 }
 </script>
@@ -126,7 +162,7 @@ module.exports = {
         text-decoration: bold;
     }
 
-    .cross:hover{
+    .crossDelADmin:hover{
         cursor: pointer;
     }
 
@@ -136,5 +172,56 @@ module.exports = {
 
 /* ------ MEDIA QUERIES ------ */
 
+
+.overlay {
+    text-align: center;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7);
+    transition: opacity .4s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.displayPop {
+    visibility: visible;
+    opacity: 1;
+}
+
+.popup {
+    margin: 6rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 5px;
+    width: 35%;
+    position: relative;
+    transition: all 0s ease-in-out;
+}
+
+.crossPopup {
+    color: black;
+    position: absolute;
+    top: 2px;
+    bottom: 0;
+    right: 2px;
+    width: 10px;
+    background: #fff;
+    border: 0px;
+    font-weight: bold;
+    font-size: 120%;
+}
+
+.crossPopup:hover {
+    color: #001D6E;
+}
+
+h2 {
+    color: #001D6E;
+    font-family: Poppins-Bold;
+    font-size: 30px;
+}
 
 </style>

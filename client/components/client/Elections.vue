@@ -3,14 +3,19 @@
     <div>
         <!--  AFFICHAGE SELON SI UNE ELECTION EST SELECTIONNEE OU NON  -->
         <div v-if="!electionInDetail">
-            <h2>Cliquez sur une élection pour voter ou pour voir les résultats !</h2>
-            <button @click="sortByVote()">TRIER PAR VOTE DISPONIBLES</button>
-            <button  @click="sortByResult()">TRIER PAR RESULTATS DISPONIBLES</button>
-            <input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required>
-            <img src="img/loupe.png" @click="sortBySearch()">
-            <button  @click="noSort()">ANNULER LE TRI / LA RECHERCHE</button>
+            <h2>Cliquez sur une élection pour voter ou pour voir les résultats</h2>
+            <br>
+            <div class="tile_div">
+                <img class="loop" src="img/retour_arriere.png" @click="noSort()">
+                <a class="button" @click="sortByVote()">Trier par vote</a>
+                <a class="button" @click="sortByResult()">Trier par résultats</a>
+                <a class="input" id="last"><input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required></a>
+                <img class="loop" src="img/loupe.png" @click="sortBySearch()">
+                <div class="clear"></div>
+            </div>
+            <hr>
         </div>
-        
+
         <button v-else @click="showAll" class="return">Annuler la recherche</button>
 
         <!--  AFFICHAGE SI DES ELECTIONS SONT DISPO  -->
@@ -26,7 +31,7 @@
                 <!--  AFFICHAGE SELON LA DISPO DES RESULT OU DES VOTES  -->
 
                 <div v-if="election.resultats_visibles"><strong>RESULTATS DISPONIBLES</strong></div>
-                <div v-else><strong>VOTE DISPONIBLES</strong></div>
+                <div v-else class="dernier"><strong>VOTE DISPONIBLES</strong></div>
             </li>
         </ul>
 
@@ -35,40 +40,49 @@
         <div v-else-if="electionInDetail">
             <br><br>
             <h2>{{ elections[idSelected].nom }}</h2>
-            <br>
-            <div> <strong>Type d'élection : </strong> {{ elections[idSelected].type }}</div>
-            <div> <strong>Date du vote : </strong> {{ elections[idSelected].jour }} / {{ elections[idSelected].mois }} / {{ elections[idSelected].année }}</div>
-            <div> <strong>Tour : </strong> {{ elections[idSelected].tour }}</div>
-            <br>
+            <hr>
+            <div class="details">
+                <div class="intro">
+                    <div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[idSelected].type }} </div><p id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[idSelected].jour }} / {{ elections[idSelected].mois }} / {{ elections[idSelected].année }} </div><p id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[idSelected].tour }} </div><p v-if="elections[idSelected].resultats_visibles" id="separation">|</p>
+                    <div v-if="elections[idSelected].resultats_visibles" class="presentation"> <strong class="titre">Nombre de votants : </strong> {{ totalVote }} </div>
+                    <br>
+                </div>
 
-            <!--  AFFICHAGE QUI CHANGE POUR MONTRER LES RESULT OU POUR VOTER  -->
+                <!--  AFFICHAGE QUI CHANGE POUR MONTRER LES RESULT OU POUR VOTER  -->
 
-            <ul class="liste_container" v-if="elections[idSelected].resultats_visibles">
-                <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
-                    <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
-                    <div> <strong>Nombre de vote : </strong> {{ liste.nbr_votes }}</div>
-                    <div> <strong>Candidat : </strong> </div>
-                    <ul>
-                        <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
-                            <div> {{ candidat.nom_complet }} </div>
+                <div v-if="elections[idSelected].resultats_visibles">
+                    <ul class="liste_container">
+                        <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
+                            <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
+                            <div> <strong>Taux de vote : </strong> {{ liste.pourcentage }} %</div>
+                            <div> <strong>Candidats : </strong> </div>
+                            <ul>
+                                <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
+                                    <div> {{ candidat.nom_complet }} </div>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
-                </li>
-            </ul>
+                </div>
 
-            <ul class="liste_container" v-else>
-                <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
-                    <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
-                    <div> <strong>Candidat : </strong> </div>
-                    <ul>
-                        <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
-                            <div> {{ candidat.nom_complet }} </div>
+                <div v-else>
+                    <ul class="liste_container">
+                        <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
+                            <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
+                            <div> <strong>Candidats : </strong> </div>
+                            <ul>
+                                <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
+                                    <div> {{ candidat.nom_complet }} </div>
+                                </li>
+                            </ul>
+                            <button class="voter" @click="popupConfirmation(elections[idSelected], liste)">VOTER</button>
                         </li>
                     </ul>
-                    <button @click="popupConfirmation(elections[idSelected], liste)">VOTER</button>
-                </li>
-            </ul>
-
+                </div>
+                
+            </div>
         </div>
         
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
@@ -81,9 +95,9 @@
             <div class="popup">
                 <h2>ATTENTION</h2>
                 <br>
-                <p>Êtes-vous sur de vouloir voter ? Une fois le vote comptabilisé, il ne vous sera plus possible de le mofidifier !</p>
-                <button @click="confirmation" id="button">Confirmer le vote</button>
-                <button @click="closePopup" id="button">Annuer le vote</button>
+                <p>Êtes-vous sur de vouloir voter ? Une fois le vote comptabilisé, il ne vous sera plus possible de le modifier !</p>
+                <button @click="confirmation()" class="buttonPop">Confirmer le vote</button>
+                <button @click="closePopup()" class="buttonPop">Annuler le vote</button>
             </div>
         </div>
 
@@ -113,6 +127,7 @@ module.exports = {
             elections: [{}],
             listes: [{}],
             candidats: [{}],
+            totalVote: -1,
             electionInDetail: false,
             sortedByVote: false,
             sortedByResult: false,
@@ -134,7 +149,7 @@ module.exports = {
             typeSort: "noSort"
         }
 
-        const result = await axios.post('/api/user/voirelections', sort)
+        const result = await axios.post('/api/user/elections', sort)
 
         this.elections.pop()
         this.listes.pop()
@@ -147,6 +162,18 @@ module.exports = {
             const findId = (element) => element.id === idElection
             this.idSelected = this.elections.findIndex(findId)
             this.electionInDetail = true
+
+            const info = {
+                id: this.elections[this.idSelected].id
+            }
+
+            const result = await axios.post('/api/user/elections/nbrVotant', info)
+            this.totalVote = result.data.totalVote
+
+            for (let i = 0; i < this.elections[this.idSelected].listes.length; i++) {  // On calcule le pourcentage de chaques listes et on fixe le nombre de décimal à 2
+                let pourcentage = this.elections[this.idSelected].listes[i].nbr_votes / this.totalVote * 100
+                this.elections[this.idSelected].listes[i].pourcentage = pourcentage.toFixed(2)
+            }
         },
         fillElection(result) {
             for (var i = 0; i < result.data.elections.length; i++) {
@@ -162,6 +189,7 @@ module.exports = {
                         id_liste: result.data.elections[i].id_liste,
                         nom_liste: result.data.elections[i].nom_liste,
                         nbr_votes: result.data.elections[i].nbr_votes,
+                        pourcentage: 0,
                         candidats: this.candidats
                     })
                     this.candidats = [{}]
@@ -183,6 +211,14 @@ module.exports = {
                     this.listes = [{}]
                     this.listes.pop()
                 }
+
+                for (let x = 0; x < this.elections.length; x++) {  // Cache les votes sur la console pour les élections où on n'a pas afficher les résultats
+                    if (this.elections[x].resultats_visibles === false) {
+                        for (let j = 0; j < this.elections[x].listes.length; j++) {
+                            this.elections[x].listes[j].nbr_votes = 0
+                        }
+                    }
+                }
             }
         },
         showAll() {
@@ -199,7 +235,7 @@ module.exports = {
                 searchName: this.research
             }
 
-            const result = await axios.post('/api/user/voirelections', sort)
+            const result = await axios.post('/api/user/elections', sort)
 
             this.elections.pop()
             this.listes.pop()
@@ -207,7 +243,7 @@ module.exports = {
 
             this.fillElection(result)
         },
-        async sortByVote() {
+        sortByVote() {
             if (!this.sortedByVote) {
                 this.sort("sortByVote")
                 this.sortedByVote = true
@@ -216,7 +252,7 @@ module.exports = {
                 this.noSorted = false
             }
         },
-        async sortByResult() {
+        sortByResult() {
             if (!this.sortedByResult) {
                 this.sort("sortByResult")
                 this.sortedByVote = false
@@ -225,20 +261,17 @@ module.exports = {
                 this.noSorted = false
             }
         },
-        async sortBySearch() {
-            if (!this.sortedBySearch) {
-                this.sort("sortBySearch")
-                this.sortedByVote = false
-                this.sortedByResult = false
-                this.noSorted = false
-            }
+        sortBySearch() {
+            this.sort("sortBySearch")
+            this.sortedByVote = false
+            this.sortedByResult = false
+            this.noSorted = false
         },
-        async noSort() {
+        noSort() {
             if (!this.noSorted) {
                 this.sort("noSort")
                 this.sortedByVote = false
                 this.sortedByResult = false
-                this.sortedBySearch = false
                 this.noSorted = true
             }
         },
@@ -248,7 +281,7 @@ module.exports = {
                     id_election: this.idElectionVote,
                     id_liste: this.idListeVote,
                 }
-                const result = await axios.post('/api/user/voirelections/vote', information)
+                const result = await axios.post('/api/user/elections/vote', information)
 
                 this.popup = result.data.popup
 
@@ -274,7 +307,7 @@ module.exports = {
            this.confirmVote = true
            this.wantsToVote = false
            this.vote()
-        }
+        },
     }
 }
 
@@ -312,7 +345,7 @@ hr {
 .election {
     background: #FFF;
     width: 600px;
-    height: 250px;
+    height: 300px;
     margin: 40px;
     padding: 20px;
     border-radius: 2%;
@@ -337,7 +370,7 @@ ul {
 }
 
 .election:hover {
-    scale: 1.05;
+    scale: 1;
     cursor: pointer;
 }
 
@@ -355,6 +388,9 @@ ul {
 
 .liste {
     background: rgb(209, 208, 207);
+    padding:20px;
+    font-size: 20px;
+    background-color: #f8f9fd;
 }
 
 .candidat {
@@ -373,6 +409,8 @@ ul {
     visibility: hidden;
     opacity: 0;
 }
+
+.dernier {margin-bottom:20px;}
 
 .displayPop {
     visibility: visible;
@@ -407,8 +445,126 @@ ul {
     color: #001D6E;
 }
 
-#button {
-    transition: 0s;
+.tile_div {
+    display: flex;
+    justify-content: center;
+}
+
+.tile_div a {
+    display: block;
+    float: left;
+    height: 50px;
+    width: 20%;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    line-height: 50px;
+    text-decoration: none;
+}
+
+.title_div a#last {
+    margin-right: 0;
+}
+
+.clear {
+    clear: both;
+}
+
+.button {
+    font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+    letter-spacing: 3px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #fff;
+    text-transform: uppercase;
+    width: 100%;
+    height: 50px;
+    border-radius: 25px;
+    background: #001D6E;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 25px;
+    transition: all 0s;  
+    border: none;  
+    text-decoration: none;
+}
+
+.button:hover {
+    background: #fff;
+    text-decoration: none;
+    color: #D60920;
+    border: solid;
+    border-width: 2px;
+    border-color: #D60920;
+    cursor: pointer;
+}
+
+.buttonPop {
+    margin-top:15px;
+}
+
+.input {
+    width: 40%;
+}
+
+.loop {
+    max-height: 40px;
+    margin-left: 0px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.loop:hover {
+    cursor: pointer;
+}
+
+.return {
+    width: 30%;
+    display: flex;
+    margin:0 auto;
+}
+
+.presentation {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+#separation {
+    font-size: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    color:#D60920;
+}
+
+.details {
+    padding : 50px;
+    margin-left: 100px;
+    margin-right: 100px;
+    margin-bottom: 50px;
+    background-color: #fff;
+    -moz-box-shadow: 0px 1px 5px 0px #656565;
+    -webkit-box-shadow: 0px 1px 5px 0px #656565;
+    -o-box-shadow: 0px 1px 5px 0px #656565;
+    box-shadow: 0px 1px 5px 0px #656565;
+}
+
+.titre {
+    text-transform: uppercase;
+    margin-right: 10px;
+}
+
+.intro {
+    display:flex;
+    justify-content: center;
+    align-content:center;
+    margin: 0 auto;
+}
+
+.voter {
+    margin-top:20px;
+    margin-bottom:20px;
 }
 
 </style>

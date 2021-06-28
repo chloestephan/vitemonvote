@@ -15,7 +15,7 @@
                 </div>
 
                 <div class="login">
-                    <form>
+                    <form @submit.prevent="loginUser">
                         <h3>Se connecter</h3>
 
                         <input type="text" v-model="emailLogin" placeholder="Email" required>
@@ -25,7 +25,7 @@
                             <img src="img/show_password.png" class="showMDP" @click="showMDP" v-else>
                         </div>
 
-                        <button type="submit" @click="loginUser">Connexion</button>
+                        <button type="submit">Connexion</button>
                     </form>
                 </div>
 
@@ -34,9 +34,9 @@
             <div v-else>
                 <nav class="navbar">
                     <ul class="nav-links">
-                        <li class="nav-item"><a><router-link to='/user/voirelections'>Les élections</router-link></a></li>
+                        <a class="nav-item deconnexionBouton" @click="LogOut()">Se déconnecter</a>
                     </ul>
-                    <a class="deconnexionBouton" @click="LogOut()">Se déconnecter</a>
+
                 </nav>
             <router-view></router-view>
             </div>
@@ -205,6 +205,7 @@ h2 {
     width:100%;
     display: flex;
 }
+
 .showMDP {
     height: 30px;
     width: auto;
@@ -262,12 +263,14 @@ nav {
 }
 
 .deconnexionBouton {
-     border-style:solid 2px #D60920;
+    border-style:solid 2px #D60920;
     background-color: #fff;
     color: #D60920;
     border-radius: 4px;
     padding: 10px;
-      transition: 0.4s;
+    transition: 0.4s;
+    margin-top:10px;
+    margin-bottom:10px;
 }
 
 .deconnexionBouton:hover {
