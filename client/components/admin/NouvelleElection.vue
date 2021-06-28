@@ -21,7 +21,7 @@
         <label for="start"><h3>Date du premier tour :</h3></label>
         <input type="date" id="start" name="premierTourDate" v-model="date">
 
-        <div v-if="typeElection==='Presidentielle'">
+        <div v-if="typeElection==='Presidentielle' || typeElection==='Europeennes'">
           <div v-for="(liste, index1) in candidats" :key="index1" class="">
             <h2>Nouvelle liste</h2>
             <hr>
@@ -34,6 +34,7 @@
               </div>
             </div>
 
+            <button v-if="typeElection==='Europeennes'" type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
             <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
           </div>
           <hr>

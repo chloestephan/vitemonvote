@@ -181,7 +181,7 @@ router.post('/admin/election', async(req, res) =>{
     const id_election = result.rows[0].id_election
 
     let code_postaux = []
-    if(typeElection === "Presidentielle"){
+    if(typeElection === "Presidentielle" || typeElection === "Europeennes"){
       sql = "SELECT code_postal FROM bureaudevote"
       result = await client.query({
         text: sql

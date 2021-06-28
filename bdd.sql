@@ -2,7 +2,7 @@
 --        Script Postgre 
 ------------------------------------------------------------
 
-CREATE TYPE TypeElection AS ENUM ('Municipales','Cantonales','Regionales','Legislatives','Presidentielle','Europeenes','Referundum');
+CREATE TYPE TypeElection AS ENUM ('Municipales','Cantonales','Regionales','Legislatives','Presidentielle','Europeennes','Referundum');
 
 
 ------------------------------------------------------------
