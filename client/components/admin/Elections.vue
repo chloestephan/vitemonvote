@@ -58,9 +58,9 @@
                     </ul>
                 </div>
                 <hr>
-                <button @click="openVote(elections[idSelected])">Ouvrir les votes</button>
-                <button @click="closeVote(elections[idSelected])">Fermer les votes</button>
-                <button @click="showResult(elections[idSelected])">Afficher les résultats</button>
+                <button class="btnAction" @click="openVote(elections[idSelected])">Ouvrir les votes</button>
+                <button class="btnAction" @click="closeVote(elections[idSelected])">Fermer les votes</button>
+                <button class="btnAction" @click="showResult(elections[idSelected])">Afficher les résultats</button>
             </div>
         </div>
         
@@ -430,6 +430,13 @@ ul {
 
 .buttonPop {
     margin-top:15px;
+}
+
+.btnAction {
+    width: 40%;
+    margin-left: 30%;
+    margin-right: 30%;
+    margin-top: 20px;
 }
 
 .input {
