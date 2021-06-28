@@ -49,7 +49,7 @@
                         <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
                             <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
                             <div> <strong>Candidats : </strong> </div>
-                            <ul>
+                            <ul class="liste_candidats">
                                 <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
                                     <div> {{ candidat.nom_complet }} </div>
                                 </li>
@@ -319,6 +319,10 @@ ul {
     padding:20px;
     font-size: 20px;
     background-color: #f8f9fd;
+}
+
+.liste_candidats {
+    display: block;
 }
 
 .candidat {

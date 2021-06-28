@@ -53,9 +53,9 @@
                             <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
                             <div> <strong>Taux de vote : </strong> {{ liste.pourcentage }} %</div>
                             <div> <strong>Candidats : </strong> </div>
-                            <ul>
+                            <ul class="liste_candidats">
                                 <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
-                                    <div> {{ candidat.nom_complet }} </div>
+                                    {{ candidat.nom_complet }}
                                 </li>
                             </ul>
                         </li>
@@ -63,7 +63,7 @@
                 </div>
                 <hr>
                 <button @click="hideResult(elections[idSelected])">Cacher les résultats</button>
-                <button v-if="elections[idSelected].type === 'Presidentielle' && elections[idSelected].tour !== 2" @click=" generation = !generation">Génération du prochain tour</button>
+                <button v-if="elections[idSelected].type !== 'Referundum' && elections[idSelected].tour !== 2" @click=" generation = !generation">Génération du prochain tour</button>
                 <div v-if="generation">
                     <form @submit.prevent="generatePresidentielle(elections[idSelected])">
                         <input type="text" placeholder="Nom de l'éléction" required v-model="newElectionName">
@@ -236,7 +236,7 @@ module.exports = {
         },
         displayPopup(popup) {
             this.popup = popup
-            if (this.popup !== "L'admin n'est pas connecté !") {
+            if (this.popup !== "L'admin n'est pas connecté !" && this.popup !== "Nous ne pouvons pas créer un 2nd tour, il y a déjà un gagnant dans cette élection !") {
                 this.isNoError = true
             }
             else {
@@ -338,8 +338,8 @@ ul {
     background-color: #f8f9fd;
 }
 
-.candidat {
-    list-style-type: none;
+.liste_candidats {
+    display: block;
 }
 
 .overlay {

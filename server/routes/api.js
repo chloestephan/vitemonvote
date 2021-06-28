@@ -593,6 +593,19 @@ router.post('/user/elections/vote', async (req, res) => {
     
     if (resultVerifIsOpen.rowCount !== 0) {
 
+      // IL FAUT VOIR S'IL PEUT VOTER SELON SON CP
+
+      const verifCodePostal = "SELECT * FROM organise WHERE id_election = $1 AND code_postal_bureau = $2"
+      const resultVerifCodePostal = await client.query({
+        text: verifCodePostal,
+        values: [id_election, code_postal]
+      })
+
+      if (resultVerifCodePostal.rowCount === 0) {
+        setTimeout(() => res.json({popup: "Vous ne pouvez pas voter pour cette élection, vous n'habitez pas dans la bonne région, le bon département !"}), 500)
+        return
+      }
+
       // ON VERIF S'IL A DEJA VOTE OU NON
 
       const verifAVote = "SELECT * FROM avote WHERE id_election = $1 AND num_carte_electeur = $2"
@@ -823,61 +836,116 @@ router.post('/admin/resultats/generate', async (req, res) => {
     const type = oldElection.type
     const id_admin = req.session.adminId
 
-    const createElection = "INSERT INTO elections (nom, date, tour, tour_precedent, type_election, id_admin, ouvert, resultats_visibles) VALUES ($1, $2, $3, $4, $5, $6, false, false)"
-    await client.query({
-      text: createElection,
-      values: [newName, newDate, newTour, previousTour, type, id_admin]
+    const getTotalVote = "SELECT count(*) FROM avote WHERE id_election = $1"
+    const resultGetTotalVote = await client.query({
+      text: getTotalVote,
+      values: [oldElection.id]
     })
 
-    // CREATION DES LISTES QUI ONT GAGNE LE PREMIER TOUR
+    const totalVote = resultGetTotalVote.rows[0].count
 
-    const getIdElection = "SELECT id_election FROM elections WHERE nom = $1 AND date = $2 AND tour = $3"
-    const result = await client.query({
-      text: getIdElection,
-      values: [newName, newDate, newTour]
-    })
-
-    const id_election = result.rows[0].id_election
-
-    for(let j = 0; j < 2; j++) {
-      let maxVote = -1
+    if (oldElection.type === "Presidentielle" || oldElection.type === "Regionales") {
+      
       for (let i = 0; i < oldElection.listes.length; i++) {
-        if (maxVote < oldElection.listes[i].nbr_votes) {
-          maxVote = oldElection.listes[i].nbr_votes  // On récupère les 2 qui ont eu le plus de vote
+        if (totalVote <= oldElection.listes[i].nbr_votes * 2) {
+          res.json({popup: "Nous ne pouvons pas créer un 2nd tour, il y a déjà un gagnant dans cette élection !"})
+          return
         }
       }
-  
-      let index = (element) => element.nbr_votes === maxVote
-      let position = oldElection.listes.findIndex(index)
       
-      // Création de la liste
-
-      let createListe = "INSERT INTO liste (nom_liste, id_election, nbr_votes) VALUES ($1, $2, 0)"
+      const createElection = "INSERT INTO elections (nom, date, tour, tour_precedent, type_election, id_admin, ouvert, resultats_visibles) VALUES ($1, $2, $3, $4, $5, $6, false, false)"
       await client.query({
-        text: createListe,
-        values: [oldElection.listes[position].nom_liste, id_election]
+        text: createElection,
+        values: [newName, newDate, newTour, previousTour, type, id_admin]
       })
-
-      let getIdListe = "SELECT id_liste FROM liste WHERE nom_liste = $1 AND id_election = $2 AND nbr_votes = 0"
-      let resultGetIdListe = await client.query({
-        text: getIdListe,
-        values: [oldElection.listes[position].nom_liste, id_election]
+  
+      // CREATION DES LISTES QUI ONT GAGNE LE PREMIER TOUR
+  
+      const getIdElection = "SELECT id_election FROM elections WHERE nom = $1 AND date = $2 AND tour = $3"
+      const result = await client.query({
+        text: getIdElection,
+        values: [newName, newDate, newTour]
       })
+  
+      const id_election = result.rows[0].id_election
+  
+      if (oldElection.type === "Presidentielle") {
+        for(let j = 0; j < 2; j++) {
+          let maxVote = -1
+          for (let i = 0; i < oldElection.listes.length; i++) {
+            if (maxVote < oldElection.listes[i].nbr_votes) {
+              maxVote = oldElection.listes[i].nbr_votes  // On récupère les 2 qui ont eu le plus de vote
+            }
+          }
+      
+          let index = (element) => element.nbr_votes === maxVote
+          let position = oldElection.listes.findIndex(index)
+          
+          // Création de la liste
+    
+          let createListe = "INSERT INTO liste (nom_liste, id_election, nbr_votes) VALUES ($1, $2, 0)"
+          await client.query({
+            text: createListe,
+            values: [oldElection.listes[position].nom_liste, id_election]
+          })
+    
+          let getIdListe = "SELECT id_liste FROM liste WHERE nom_liste = $1 AND id_election = $2 AND nbr_votes = 0"
+          let resultGetIdListe = await client.query({
+            text: getIdListe,
+            values: [oldElection.listes[position].nom_liste, id_election]
+          })
+    
+          let id_liste = resultGetIdListe.rows[0].id_liste
+    
+          let createCandidat = "INSERT INTO candidat (id_liste, nom_complet) VALUES ($1, $2)"
+          await client.query({
+            text: createCandidat,
+            values: [id_liste, oldElection.listes[position].candidats[0].nom_complet]
+          })
+    
+          oldElection.listes.splice(position, 1)
+        }
 
-      let id_liste = resultGetIdListe.rows[0].id_liste
+      
+      }
+      else if (oldElection.type === "Regionales") {
+        
+        for(let i = 0; i < oldElection.listes.length; i++) {
 
-      let createCandidat = "INSERT INTO candidat (id_liste, nom_complet) VALUES ($1, $2)"
-      await client.query({
-        text: createCandidat,
-        values: [id_liste, oldElection.listes[position].candidats[0].nom_complet]
-      })
+          if (totalVote / 10 <= oldElection.listes[i].nbr_votes) {
+           
+            // Création de la liste
+      
+            let createListe = "INSERT INTO liste (nom_liste, id_election, nbr_votes) VALUES ($1, $2, 0)"
+            await client.query({
+              text: createListe,
+              values: [oldElection.listes[i].nom_liste, id_election]
+            })
+      
+            let getIdListe = "SELECT id_liste FROM liste WHERE nom_liste = $1 AND id_election = $2 AND nbr_votes = 0"
+            let resultGetIdListe = await client.query({
+              text: getIdListe,
+              values: [oldElection.listes[i].nom_liste, id_election]
+            })
+      
+            let id_liste = resultGetIdListe.rows[0].id_liste
+      
+            for (let j = 0; j < oldElection.listes[i].candidats.length; j++) {
+              let createCandidat = "INSERT INTO candidat (id_liste, nom_complet) VALUES ($1, $2)"
+              await client.query({
+                text: createCandidat,
+                values: [id_liste, oldElection.listes[i].candidats[j].nom_complet]
+              })
+            }
+          }
+        }
+      }
 
-      oldElection.listes.splice(position, 1)
+      res.json({popup: "Le 2nd tour de l'éléction présidentielle a été créée !"})
     }
-
-    // CREATION DES CANDIDATS
-
-    res.json({popup: "Le 2nd tour de l'éléction présidentielle a été créée !"})
+    else {
+      res.json({popup: "En sah j'ai pas fait cette élection pour le moment, respire un coup ça sera fait soon"})
+    }
   }
   else {
     res.status(401).json({popup: "L'admin n'est pas connecté !"})
