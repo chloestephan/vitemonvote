@@ -15,7 +15,7 @@
                 </div>
 
                 <div class="login">
-                    <form>
+                    <form @submit.prevent="loginUser">
                         <h3>Se connecter</h3>
 
                         <input type="text" v-model="emailLogin" placeholder="Email" required>
@@ -25,7 +25,7 @@
                             <img src="img/show_password.png" class="showMDP" @click="showMDP" v-else>
                         </div>
 
-                        <button type="submit" @click="loginUser">Connexion</button>
+                        <button type="submit">Connexion</button>
                     </form>
                 </div>
 
@@ -78,6 +78,17 @@ module.exports = {
         const result = await axios.get('/api/user/me')
         this.isUserConnected = result.data.user
     },
+
+    mounted() {
+      window.addEventListener('beforeunload', e => this.beforeunloadHandler(e))
+      window.addEventListener('unload', e => this.unloadHandler(e))
+    }, 
+    
+    destroyed() {
+      window.removeEventListener('beforeunload', e => this.beforeunloadHandler(e))
+      window.removeEventListener('unload', e => this.unloadHandler(e))
+    },
+
     methods: {
         async getPassword() {
             this.popup = ''
@@ -137,6 +148,16 @@ module.exports = {
             this.typeMdp = this.hidden ? "text" : "password"
             this.hidden = !this.hidden
         },
+
+        /*
+        beforeunloadHandler(){
+          this.LogOut();
+        },
+        */
+        unloadHandler(e){
+          this.LogOut();
+        }
+
     }
 }
 

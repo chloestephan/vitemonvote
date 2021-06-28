@@ -49,6 +49,7 @@ module.exports = {
             currentAdmin: null,
             isError: false,
             isNoError: false,
+            popup: '',
             email: '',
             password: '',
         }
