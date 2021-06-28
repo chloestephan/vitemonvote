@@ -45,37 +45,6 @@ h2 {
     text-align: center;
 }
 
-.column p {
-    font-size: 18px;
-    line-height: 1.55;
-    font-weight: 300;
-    text-align: justify;
-    display: flex;
-    height: 150px;
-    align-items: center;
-}
-
-.rang-centre {
-    margin: 0 auto;
-    width: 50%;
-    height: 340px;
-}
-
-.column {
-    float: left;
-    width: 50%;
-    padding-top: 20px;
-    margin-top: 20px;
-    flex:1;
-    display: inline-block;
-}
-
-.row:after {
-    content: "";
-    display: table;
-    clear: both;
-}
-
 
 /* --- les différents formulaires de Vite mon vote --- */
 
@@ -97,6 +66,10 @@ form {
     -webkit-box-shadow: 0px 1px 5px 0px #656565;
     -o-box-shadow: 0px 1px 5px 0px #656565;
     box-shadow: 0px 1px 5px 0px #656565;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
 }
 
 form h3 {
@@ -178,78 +151,29 @@ button:hover {
 
 /* Extra small devices (portrait phones, less than 576px) */
 @media (max-width: 575px) {
-    img {
-        max-width: 275px;
+    h2 {
+        font-size:26px;
     }
-    .column {
-        width:100%;
-        display: block;
-    }
-
-    .column img {
-        max-width: 150px;
-        height: auto;
-    }
-
-    .column h2 {
-        margin-top: 30px;
-        margin-bottom: 40px;
-    }
-
-    .column p {
-        margin-top: 20px;
-        margin-bottom: 40px;
-    }
-
-    .container {
-        width: 95%;
-        margin: auto;
-    }
-
-    #id-election {
-        width: 80%;
-    }
- }
+}
 
 /* Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) and (max-width: 767px) { 
-    .column {
-        width:80%;
-        margin-left: 10%;
-        margin-right: 10%;
+    h2 {
+        font-size: 26px;
     }
-
-    .column h2 {
-        margin-top: 30px;
-        margin-bottom: 40px;
-    }
-
-    .column p {
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-
-    .container {
-        width: 100%;
-        margin: auto;
-    }
-
-    #id-election {
-        width: 80%;
-    }
-
-    img {
-        max-width: 150px;
-    }
- }
+}
 
 /* Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991px) { 
-    
- }
+    h2 {
+        font-size: 30px;
+    }
+}
 
 /* Large devices (desktops, 992px and up) */
-@media (min-width: 992px) and (max-width: 1199px) {  }
+@media (min-width: 992px) and (max-width: 1199px) { 
+
+ }
 
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {  }
