@@ -34,14 +34,14 @@
 
         <div v-else-if="electionInDetail">
             <br><br>
-            <h2>{{ elections[idSelected].nom }}</h2>
+            <h2>{{ elections[0].nom }}</h2>
             <hr>
             <div class="details">
                 <div class="intro">
-                    <div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[idSelected].type }} </div><p id="separation">|</p>
-                    <div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[idSelected].jour }} / {{ elections[idSelected].mois }} / {{ elections[idSelected].année }} </div><p id="separation">|</p>
-                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[idSelected].tour }} </div><p v-if="elections[idSelected].resultats_visibles" id="separation">|</p>
-                    <div v-if="elections[idSelected].resultats_visibles" class="presentation"> <strong class="titre">Nombre de votants : </strong> {{ totalVote }} </div>
+                    <div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[0].type }} </div><p id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[0].jour }} / {{ elections[0].mois }} / {{ elections[0].année }} </div><p id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[0].tour }} </div><p v-if="elections[0].resultats_visibles" id="separation">|</p>
+                    <div v-if="elections[0].resultats_visibles" class="presentation"> <strong class="titre">Nombre de votants : </strong> {{ totalVote }} </div>
                     <br>
                 </div>
 
@@ -49,7 +49,7 @@
 
                 <div>
                     <ul class="liste_container">
-                        <li :key="liste.id_liste" v-for="liste in elections[idSelected].listes" class="liste">
+                        <li :key="liste.id_liste" v-for="liste in elections[0].listes" class="liste">
                             <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
                             <div> <strong>Taux de vote : </strong> {{ liste.pourcentage }} %</div>
                             <div> <strong>Candidats : </strong> </div>
@@ -62,10 +62,10 @@
                     </ul>
                 </div>
                 <hr>
-                <button @click="hideResult(elections[idSelected])">Cacher les résultats</button>
-                <button v-if="elections[idSelected].type !== 'Referundum' && elections[idSelected].tour !== 2" @click=" generation = !generation">Génération du prochain tour</button>
+                <button @click="hideResult(elections[0])">Cacher les résultats</button>
+                <button v-if="elections[0].type !== 'Referundum' && elections[0].tour !== 2" @click=" generation = !generation">Génération du prochain tour</button>
                 <div v-if="generation">
-                    <form @submit.prevent="generatePresidentielle(elections[idSelected])">
+                    <form @submit.prevent="generatePresidentielle(elections[0])">
                         <input type="text" placeholder="Nom de l'éléction" required v-model="newElectionName">
                         <label for="start"><h3>Date du prochain tour :</h3></label>
                         <input type="date" id="start" name="premierTourDate" required v-model="newElectionDate">
@@ -128,40 +128,63 @@ module.exports = {
         this.listes.pop()
         this.candidats.pop()
 
-        this.fillElection(result)
+        this.fillElection(result.data.elections)
     },
     methods: {
         async detailElection(idElection) {
             const findId = (element) => element.id === idElection
             this.idSelected = this.elections.findIndex(findId)
             this.electionInDetail = true
-            
-            const info = {
-                id: this.elections[this.idSelected].id
+
+            const information = {
+                election: this.elections[this.idSelected]
             }
 
-            const result = await axios.post('/api/admin/elections/nbrVotant', info)
-            this.totalVote = result.data.totalVote
+            const result = await axios.post('/api/admin/resultats/detailElection', information)
 
-            for (let i = 0; i < this.elections[this.idSelected].listes.length; i++) {  // On calcule le pourcentage de chaques listes et on fixe le nombre de décimal à 2
-                let pourcentage = this.elections[this.idSelected].listes[i].nbr_votes / this.totalVote * 100
-                this.elections[this.idSelected].listes[i].pourcentage = pourcentage.toFixed(2)
-            }
+            this.elections = [{}]
+            this.listes = [{}]
+            this.candidats = [{}]
+
+            this.elections.pop()
+            this.listes.pop()
+            this.candidats.pop()
+
+            this.fillDetailedElection(result.data.elections)
         },
-        fillElection(result) {
-            for (var i = 0; i < result.data.elections.length; i++) {
-                var date = result.data.elections[i].date.substring(0,10).split('-')
-                
-                this.candidats.push({
-                    nom_complet: result.data.elections[i].nom_complet
+        fillElection(elections) {
+            for (var i = 0; i < elections.length; i++) {
+                var date = elections[i].date.substring(0,10).split('-')
+            
+                this.elections.push({
+                    id: elections[i].id_election,
+                    nom: elections[i].nom,
+                    année: date[0],
+                    mois: date[1],
+                    jour: date[2],
+                    tour: elections[i].tour,
+                    type: elections[i].type_election,
+                    resultats_visibles: elections[i].resultats_visibles,
                 })
+            }
 
-                if ( (i === result.data.elections.length - 1) || ( result.data.elections[i].id_liste !== result.data.elections[i + 1].id_liste ) ) {
+        },
+        async fillDetailedElection(election) {
+            for (var i = 0; i < election.length; i++) {
+                var date = election[i].date.substring(0,10).split('-')
+                
+                if (election.type !== "Referundum") {
+                    this.candidats.push({
+                        nom_complet: election[i].nom_complet
+                    })
+                }
+
+                if ( (i === election.length - 1) || ( election[i].id_liste !== election[i + 1].id_liste ) ) {
                     this.listes.push({
-                        id_election: result.data.elections[i].id_election,
-                        id_liste: result.data.elections[i].id_liste,
-                        nom_liste: result.data.elections[i].nom_liste,
-                        nbr_votes: result.data.elections[i].nbr_votes,
+                        id_election: election[i].id_election,
+                        id_liste: election[i].id_liste,
+                        nom_liste: election[i].nom_liste,
+                        nbr_votes: election[i].nbr_votes,
                         pourcentage: 0,
                         candidats: this.candidats
                     })
@@ -169,21 +192,39 @@ module.exports = {
                     this.candidats.pop()
                 }
 
-                if ( (i === result.data.elections.length - 1) || (result.data.elections[i].id_election !== result.data.elections[i + 1].id_election) ) {
+                if ( (i === election.length - 1) || (election[i].id_election !== election[i + 1].id_election) ) {
                     this.elections.push({
-                        id: result.data.elections[i].id_election,
-                        nom: result.data.elections[i].nom,
+                        id: election[i].id_election,
+                        nom: election[i].nom,
                         année: date[0],
                         mois: date[1],
                         jour: date[2],
-                        tour: result.data.elections[i].tour,
-                        type: result.data.elections[i].type_election,
-                        resultats_visibles: result.data.elections[i].resultats_visibles,
+                        tour: election[i].tour,
+                        type: election[i].type_election,
+                        resultats_visibles: election[i].resultats_visibles,
                         listes: this.listes
                     })
                     this.listes = [{}]
                     this.listes.pop()
                 }
+                for (let x = 0; x < this.elections.length; x++) {  // Cache les votes sur la console pour les élections où on n'a pas afficher les résultats
+                    if (this.elections[x].resultats_visibles === false) {
+                        for (let j = 0; j < this.elections[x].listes.length; j++) {
+                            this.elections[x].listes[j].nbr_votes = 0
+                        }
+                    }
+                }
+            }
+            const info = {
+                id: this.elections[0].id
+            }
+
+            const result = await axios.post('/api/admin/resultats/nbrVotant', info)
+            this.totalVote = result.data.totalVote
+
+            for (let i = 0; i < this.elections[0].listes.length; i++) {  // On calcule le pourcentage de chaques listes et on fixe le nombre de décimal à 2
+                let pourcentage = this.elections[0].listes[i].nbr_votes / this.totalVote * 100
+                this.elections[0].listes[i].pourcentage = pourcentage.toFixed(2)
             }
         },
         showAll() {
@@ -211,7 +252,7 @@ module.exports = {
             this.listes.pop()
             this.candidats.pop()
 
-            this.fillElection(result)
+            this.fillElection(result.data.elections)
         },
         async sortBySearch() {
               this.sort("sortBySearch")
