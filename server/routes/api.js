@@ -550,7 +550,7 @@ router.post('/user/elections/detailElection', async (req, res) => {
     const election = req.body.election
 
     if (election.type === "Referundum") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE AND id_election = $1"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE id_election = $1"
       const result = await client.query({
         text: sql,
         values: [election.id]

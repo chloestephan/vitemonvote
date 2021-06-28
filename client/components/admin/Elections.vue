@@ -47,13 +47,22 @@
                 <div>
                     <ul class="liste_container">
                         <li :key="liste.id_liste" v-for="liste in elections[0].listes" class="liste">
-                            <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
-                            <div> <strong>Candidats : </strong> </div>
-                            <ul class="liste_candidats">
-                                <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
-                                    <div> {{ candidat.nom_complet }} </div>
-                                </li>
-                            </ul>
+
+                            <div v-if="elections[0].type === 'Referundum'">
+                                <div> <strong>Réponse : </strong> {{ liste.nom_liste }}</div>
+                            </div>
+
+                          <div v-else>
+                                <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
+                                <div v-if="elections[0].type === 'Presidentielle'"> <strong>Candidat : </strong> </div>
+                                <div v-else> <strong>Candidats : </strong> </div>
+                                <ul class="liste_candidats">
+                                    <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
+                                        <div> {{ candidat.nom_complet }} </div>
+                                    </li>
+                                </ul>
+                            </div>
+
                         </li>
                     </ul>
                 </div>
