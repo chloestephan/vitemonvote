@@ -4,6 +4,9 @@ déjà faite
 -Référendum :
 déjà faite
 
+-Municipales
+
+
 - Régionales : 
 Passage au 2ème tour si + de 10%
 Victoire au premier tour (si 50%)
@@ -12,10 +15,17 @@ Victoire au premier tour (si 50%)
 1 homme et 1 femme se présentent (donc 2 candidats)
 Pour gagner au 1er tour : majorité absolue ET nombre de votes favorables pour une liste > 0,25 * nbtotal d'electeurs
 Pour passer au 2ème tour : nbVotesFavorables > nbTotalElecteurs * 0,125
-SI 2 listes ou plus passent : 2ème tour avec ces listes, celle qui a le + de voix au 2nd tour gagne l'éléction.
-SI 0 liste ou 1 seule passe : 2ème tour avec les 2 listes ayant eu le + de voix.
+SI 2 listes ou plus passent : 2ème tour avec ces listes, puis scrutin majoritaire.
+SI 0 liste ou 1 seule passe : 2ème tour avec les 2 listes ayant eu le + de voix, puis scrutin majoritaire.
 
+-Municipales :
+Potentielle victoire au premier tour si suffrage universel 
+Pour passer au 2ème tour : au moins 10% des suffrages exprimés
+Scrutin majoritaire.
 
+-législatives :
+Ptn je capte rien du tout
 
-
+-Européennes : 
+heu haha oe ^^
 
