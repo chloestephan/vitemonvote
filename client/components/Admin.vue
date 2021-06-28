@@ -68,10 +68,17 @@ module.exports = {
         console.log(result.data.admin)
     },
     
-    beforeMount() {
-      window.addEventListener("beforeunload", this.preventNav())
+    
+    mounted() {
+      window.addEventListener('beforeunload', e => this.beforeunloadHandler(e))
+      window.addEventListener('unload', e => this.unloadHandler(e))
+    }, 
+    
+    destroyed() {
+      window.removeEventListener('beforeunload', e => this.beforeunloadHandler(e))
+      window.removeEventListener('unload', e => this.unloadHandler(e))
     },
-      
+    
     
 
     methods: {
@@ -110,6 +117,15 @@ module.exports = {
         closePopup() {
             this.isError = false
         },
+        /*
+        beforeunloadHandler(){
+          this.LogOut();
+        },
+        */
+        unloadHandler(e){
+          this.LogOut();
+        }
+
     }
 }
 </script>
