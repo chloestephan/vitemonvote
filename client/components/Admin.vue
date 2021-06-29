@@ -131,45 +131,6 @@ module.exports = {
 </script>
 
 <style scoped>
-/*
-nav {
-  width: 100%;
-  background-color: #001D6E;
-  padding-left: 20px;
-  padding-right: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 50px;
-  transition: 0.8s;
-}
-
-
-.nav-links {
-  list-style: none;
-  display: flex;
-}
-
-.nav-item {
-  transition: 0.6s;
-}
-
-.nav-item a {
-  display: inline-block;
-  padding: 10px 15px;
-  text-decoration: none;
-  color: white;
-  transition: 0.6s;
-}
-
-.nav-item:hover {
-  background-color: white;
-}
-
-.nav-item:hover a {
-  color: #001D6E;
-}
-*/
 
 /* CSS POPUP */
 
@@ -272,7 +233,6 @@ nav > div {
 }
 
 nav {
-  display: grid;
   justify-items: center;
   text-align: center;
 
@@ -316,20 +276,29 @@ nav {
   color: #001D6E;
 }
 
+/* ------ MEDIA QUERIES ------ */
 
-@media (min-width: 30rem) {
-  nav {
-    grid-template-columns: 1fr auto auto;
-    justify-items: start;
-  }
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575px) {
 
-  .nav-item {
-    transition: 0.6s;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    padding-left: 0px;
-    padding-right: 0px;
-  }
 }
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767px) { 
+
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991px) { 
+
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199px) { 
+
+ }
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {  }
 
 </style>

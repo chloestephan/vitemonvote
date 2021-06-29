@@ -36,9 +36,9 @@
             <hr>
             <div class="details">
                 <div class="intro">
-                    <div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[0].type }} </div><p id="separation">|</p>
-                    <div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[0].jour }} / {{ elections[0].mois }} / {{ elections[0].année }} </div><p id="separation">|</p>
-                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[0].tour }} </div><p v-if="elections[0].resultats_visibles" id="separation">|</p>
+                    <p><div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[0].type }} </div></p>
+                    <p><div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[0].jour }} / {{ elections[0].mois }} / {{ elections[0].année }} </div></p>
+                    <p><div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[0].tour }} </div></p>
                     <br>
                 </div>
 
@@ -363,6 +363,8 @@ ul {
     padding:20px;
     font-size: 20px;
     background-color: #f8f9fd;
+    border-radius: 25px;
+    margin-bottom: 10px;
 }
 
 .liste_candidats {
@@ -461,8 +463,8 @@ ul {
     justify-content: center;
     align-items: center;
     padding: 0 25px;
-    transition: all 0s;  
-    border: none;  
+    transition: all 0s;
+    border: none;
     text-decoration: none;
 }
 
@@ -538,18 +540,15 @@ ul {
     margin-right: 10px;
 }
 
-.intro {
-    display:flex;
-    justify-content: center;
-    align-content:center;
-    margin: 0 auto;
-}
 
 .voter {
     margin-top:20px;
     margin-bottom:20px;
 }
 
+.intro {
+    text-align:center;
+}
 </style>
 
 

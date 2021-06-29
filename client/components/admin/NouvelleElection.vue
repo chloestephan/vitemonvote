@@ -21,7 +21,7 @@
           <div v-if="typeElection!=='Referundum'">
             <input type="text" v-model="nom" placeholder="Nom de l'élection" required>
 
-            <label for="start"><h3>Date du premier tour :</h3></label>
+            <label for="start"><h3>Date et lieu du premier tour :</h3></label>
           </div>
           <div v-else>
             <input type="text" v-model="nom" placeholder="Question du referundum" required>
@@ -35,7 +35,7 @@
             <div v-for="(codePostal, index) in codePostaux" :key="index">
               <input type="text" v-model="codePostaux[index]" placeholder="Code postal de la région" required>
             </div>
-            <button type="button" @click="ajouterCode">Ajouter un code postal</button>
+            <button type="button" @click="ajouterCode">Ajouter un autre code postal</button>
           </div>
 
           <div v-if="typeElection!=='Referundum'">
@@ -248,6 +248,7 @@ input {
   color: #001D6E;
   background-color: #e6e6e6;
   border-radius: 8px;
+  margin-bottom: 20px;
 }
 
 button {
