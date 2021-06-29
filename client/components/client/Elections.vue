@@ -214,7 +214,6 @@ module.exports = {
                     resultats_visibles: elections[i].resultats_visibles,
                 })
             }
-
         },
         async fillDetailedElection(election) {
             for (var i = 0; i < election.length; i++) {

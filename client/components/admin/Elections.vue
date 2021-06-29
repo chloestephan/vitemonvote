@@ -3,10 +3,12 @@
     <div>
         <!--  AFFICHAGE SELON SI UNE ELECTION EST SELECTIONNEE OU NON  -->
         <div v-if="!electionInDetail">
-            <h2>Cliquez sur une élection pour voter ou pour voir les résultats</h2>
+            <h2>Cliquez sur une élection pour voir les détails de celle-ci</h2>
             <br>
             <div class="tile_div">
                 <img class="loop" src="img/retour_arriere.png" @click="noSort()">
+                <a class="button" @click="sortByVote()">Trier par vote</a>
+                <a class="button" @click="sortByResult()">Trier par résultats</a>
                 <a class="input" id="last"><input type="text" v-model="research" placeholder="Par exemple : Paris, Marseille..." required></a>
                 <img class="loop" src="img/loupe.png" @click="sortBySearch()">
                 <div class="clear"></div>
@@ -25,6 +27,8 @@
                 <div> <strong>Type d'élection : </strong> {{ election.type }}</div>
                 <div> <strong>Date du vote : </strong> {{ election.jour }} / {{ election.mois }} / {{ election.année }}</div>
                 <div> <strong>Tour : </strong> {{ election.tour }}</div>
+                <div v-if="election.resultats_visibles"><strong>RESULTATS DISPONIBLES</strong></div>
+                <div v-else class="dernier"><strong>VOTE DISPONIBLES</strong></div>
             </li>
         </ul>
 
@@ -36,9 +40,10 @@
             <hr>
             <div class="details">
                 <div class="intro">
-                    <p><div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[0].type }} </div></p>
-                    <p><div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[0].jour }} / {{ elections[0].mois }} / {{ elections[0].année }} </div></p>
-                    <p><div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[0].tour }} </div></p>
+                    <div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[0].type }} </div>
+                    <div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[0].jour }} / {{ elections[0].mois }} / {{ elections[0].année }} </div>
+                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[0].tour }} </div>
+                    <div v-if="elections[0].resultats_visibles" class="presentation"> <strong class="titre">Nombre de votants : </strong> {{ totalVote }} </div>
                     <br>
                 </div>
 
@@ -54,6 +59,7 @@
 
                           <div v-else>
                                 <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
+                                <div v-if="elections[0].resultats_visibles"> <strong>Taux de vote : </strong> {{ liste.pourcentage }} %</div>
                                 <div v-if="elections[0].type === 'Presidentielle'"> <strong>Candidat : </strong> </div>
                                 <div v-else> <strong>Candidats : </strong> </div>
                                 <ul class="liste_candidats">
@@ -70,6 +76,18 @@
                 <button class="btnAction" @click="openVote(elections[0])">Ouvrir les votes</button>
                 <button class="btnAction" @click="closeVote(elections[0])">Fermer les votes</button>
                 <button class="btnAction" @click="showResult(elections[0])">Afficher les résultats</button>
+                <button class="btnAction" @click="hideResult(elections[0])">Cacher les résultats</button>
+                <button class="btnAction" @click="popupConfirmation(elections[0])">Supprimer l'élection</button>
+                
+                <button class="btnAction" v-if="elections[0].type !== 'Referundum' && elections[0].tour !== 2 && elections[0].resultats_visibles" @click="generation = !generation">Génération du prochain tour</button>
+                <div v-if="generation && elections[0].resultats_visibles">
+                    <form @submit.prevent="generateNewElection(elections[0])">
+                        <input type="text" placeholder="Nom de l'éléction" required v-model="newElectionName">
+                        <label for="start"><h3>Date du prochain tour :</h3></label>
+                        <input type="date" id="start" name="premierTourDate" required v-model="newElectionDate">
+                        <button type="submit">Générer</button>
+                    </form>
+                </div>
             </div>
         </div>
         
@@ -78,6 +96,16 @@
         <h2 v-else class="noElection">Aucun résultat disponible !</h2>
 
         <!-- POPUP -->
+
+        <div :class="[{displayPop : wantsToDelete}]" class="overlay">
+            <div class="popup">
+                <h2>ATTENTION</h2>
+                <br>
+                <p>Êtes-vous sur de vouloir supprimer cette élection ?</p>
+                <button @click="confirmation()" class="buttonPop">Confirmer</button>
+                <button @click="closePopup()" class="buttonPop">Annuler</button>
+            </div>
+        </div>
 
         <div :class="[{displayPop : isError}, {displayPop : isNoError}]" class="overlay">
             <div class="popup">
@@ -103,13 +131,22 @@ module.exports = {
             elections: [{}],
             listes: [{}],
             candidats: [{}],
+            totalVote: -1,
             electionInDetail: false,
+            sortedByVote: false,
+            sortedByResult: false,
             noSorted: true,
             idSelected: -1,
             research: '',
             popup: '',
             isError: false,
             isNoError: false,
+            generation: false,
+            newElectionName: '',
+            newElectionDate: '',
+            wantsToDelete: false,
+            confirmDelete: false,
+            electionToDelete: -1
         }
     },
     mounted: async function() {
@@ -165,7 +202,7 @@ module.exports = {
             }
 
         },
-        fillDetailedElection(election) {
+        async fillDetailedElection(election) {
             for (var i = 0; i < election.length; i++) {
                 var date = election[i].date.substring(0,10).split('-')
                 
@@ -181,6 +218,7 @@ module.exports = {
                         id_liste: election[i].id_liste,
                         nom_liste: election[i].nom_liste,
                         nbr_votes: election[i].nbr_votes,
+                        pourcentage: 0,
                         candidats: this.candidats
                     })
                     this.candidats = [{}]
@@ -210,12 +248,32 @@ module.exports = {
                     }
                 }
             }
+            if (this.elections[0].resultats_visibles) {
+                const info = {
+                    id: this.elections[0].id
+                }
 
+                const result = await axios.post('/api/admin/elections/nbrVotant', info)
+                this.totalVote = result.data.totalVote
+
+                for (let i = 0; i < this.elections[0].listes.length; i++) {  // On calcule le pourcentage de chaques listes et on fixe le nombre de décimal à 2
+                    let pourcentage = this.elections[0].listes[i].nbr_votes / this.totalVote * 100
+                    if (isNaN(pourcentage)) {
+                        this.elections[0].listes[i].pourcentage = 0
+                    }
+                    else {
+                        this.elections[0].listes[i].pourcentage = pourcentage.toFixed(2)
+                    }
+                }
+            }
         },
         showAll() {
             this.idSelected = -1
             this.electionInDetail = false
             this.noSorted = false
+            this.generation = false
+            this.newElectionName = ''
+            this.newElectionDate = ''
             this.noSort()
         },
         async sort (typeOfSort) {
@@ -236,17 +294,40 @@ module.exports = {
 
             this.fillElection(result.data.elections)
         },
-        async sortBySearch() {
-              this.sort("sortBySearch")
-              this.noSorted = false
+        sortByVote() {
+            if (!this.sortedByVote) {
+                this.sort("sortByVote")
+                this.sortedByVote = true
+                this.sortedByResult = false
+                this.sortedBySearch = false
+                this.noSorted = false
+            }
         },
-        async noSort() {
+        sortByResult() {
+            if (!this.sortedByResult) {
+                this.sort("sortByResult")
+                this.sortedByVote = false
+                this.sortedByResult = true
+                this.sortedBySearch = false
+                this.noSorted = false
+            }
+        },
+        sortBySearch() {
+            this.sort("sortBySearch")
+            this.sortedByVote = false
+            this.sortedByResult = false
+            this.noSorted = false
+        },
+        noSort() {
             if (!this.noSorted) {
                 this.sort("noSort")
+                this.sortedByVote = false
+                this.sortedByResult = false
                 this.noSorted = true
             }
         },
         closePopup() {
+            this.wantsToDelete = false
             this.isError = false
             this.isNoError = false
         },
@@ -271,6 +352,13 @@ module.exports = {
           const result = await axios.post('/api/admin/elections/showResult', information)
           this.displayPopup(result.data.popup)
         },
+        async hideResult(election) {
+          const information = {
+            id_election: election.id,
+          }
+          const result = await axios.post('/api/admin/elections/hideResult', information)
+          this.displayPopup(result.data.popup)
+        },
         displayPopup(popup) {
             this.popup = popup
             if (this.popup !== "L'admin n'est pas connecté !") {
@@ -278,6 +366,35 @@ module.exports = {
             }
             else {
                 this.isError = true
+            }
+        },
+        async generateNewElection(election) {
+
+            const informationElection = {
+                oldElection: election,
+                newName: this.newElectionName,
+                newDate: this.newElectionDate,
+            }
+            const result = await axios.post('api/admin/elections/generate', informationElection)  
+             this.displayPopup(result.data.popup)
+        },
+        popupConfirmation(election) {
+            this.wantsToDelete = true
+        },
+        confirmation() {
+            this.confirmDelete = true
+            this.wantsToDelete = false
+            this.deleteElection()
+        },
+        async deleteElection() {
+            if (this.confirmDelete) {
+                const information = {
+                    electionToDelete: this.elections[0]
+                }
+                
+                const result = await axios.post('api/admin/elections/delete', information)
+                this.displayPopup(result.data.popup)
+                this.confirmDelete = false
             }
         }
     }

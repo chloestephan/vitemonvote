@@ -709,7 +709,7 @@ router.post('/admin/elections', async (req, res) => {
     const id_admin = req.session.adminId
   
     if (typeSort === "noSort") {
-      const sql = "SELECT * FROM public.elections WHERE resultats_visibles = false AND id_admin = $1 ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections WHERE id_admin = $1 ORDER BY id_election"
       const result = await client.query({
         text: sql,
         values: [id_admin]
@@ -717,10 +717,26 @@ router.post('/admin/elections', async (req, res) => {
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections WHERE lower(nom) like lower($1) AND resultats_visibles = false AND id_admin = $2 ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections WHERE lower(nom) like lower($1) AND id_admin = $2 ORDER BY id_election"
       const result = await client.query({
         text: sql,
         values: [searchName, id_admin]
+      })
+      res.json({elections: result.rows})
+    }
+    else if (typeSort === "sortByVote") {
+      const sql = "SELECT * FROM public.elections WHERE resultats_visibles = false AND id_admin = $1 ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+        values: [id_admin]
+      })
+      res.json({elections: result.rows})
+    }
+    else if (typeSort === "sortByResult") {
+      const sql = "SELECT * FROM public.elections WHERE resultats_visibles = true AND id_admin = $1 ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+        values: [id_admin]
       })
       res.json({elections: result.rows})
     }
@@ -740,7 +756,7 @@ router.post('/admin/elections/detailElection', async (req, res) => {
     const id_admin = req.session.adminId
 
     if (election.type === "Referundum") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE resultats_visibles = false AND id_admin = $1 AND id_election = $2"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE id_admin = $1 AND id_election = $2"
       const result = await client.query({
         text: sql,
         values: [id_admin, election.id]
@@ -748,70 +764,7 @@ router.post('/admin/elections/detailElection', async (req, res) => {
       res.json({elections: result.rows})
     }
     else if (election.type !== undefined) {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = false AND id_admin = $1 AND id_election = $2"
-      const result = await client.query({
-        text: sql,
-        values: [id_admin, election.id]
-      })
-      res.json({elections: result.rows}) 
-    }
-    else {
-      res.status(401).json({message: "Le type de tri n'est pas accepté ! "})
-    }
-  }
-  else {
-    res.status(401).json({message: "L'utilisateur n'est pas connecté ! "})
-  }
-})
-
-router.post('/admin/resultats', async (req, res) => {  
-
-  if (req.session.admin) {
-    const typeSort = req.body.typeSort
-    const searchName = "%" + req.body.searchName + "%"
-    const id_admin = req.session.adminId
-  
-    if (typeSort === "noSort") {
-      const sql = "SELECT * FROM public.elections WHERE resultats_visibles = true AND id_admin = $1 ORDER BY id_election"
-      const result = await client.query({
-        text: sql,
-        values: [id_admin]
-      })
-      res.json({elections: result.rows})
-    }
-    else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections WHERE lower(nom) like lower($1) AND resultats_visibles = true AND id_admin = $2 ORDER BY id_election"
-      const result = await client.query({
-        text: sql,
-        values: [searchName, id_admin]
-      })
-      res.json({elections: result.rows})
-    }
-    else {
-      res.status(401).json({message: "Le type de tri n'est pas accepté ! "})
-    }
-  }
-  else {
-    res.status(401).json({message: "L'utilisateur n'est pas connecté ! "})
-  }
-})
-
-router.post('/admin/resultats/detailElection', async (req, res) => {  
-
-  if (req.session.admin) {
-    const election = req.body.election
-    const id_admin = req.session.adminId
-
-    if (election.type === "Referundum") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE resultats_visibles = true AND id_admin = $1 AND id_election = $2"
-      const result = await client.query({
-        text: sql,
-        values: [id_admin, election.id]
-      })
-      res.json({elections: result.rows})
-    }
-    else if (election.type !== undefined) {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE resultats_visibles = true AND id_admin = $1 AND id_election = $2"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE id_admin = $1 AND id_election = $2"
       const result = await client.query({
         text: sql,
         values: [id_admin, election.id]
@@ -878,7 +831,7 @@ router.post('/admin/elections/showResult', async (req, res) => {
   }
 })
 
-router.post('/admin/resultats/nbrVotant', async (req, res) => {  
+router.post('/admin/elections/nbrVotant', async (req, res) => {  
 
   if (req.session.admin) {
 
@@ -893,7 +846,7 @@ router.post('/admin/resultats/nbrVotant', async (req, res) => {
   }
 })
 
-router.post('/admin/resultats/hideResult', async (req, res) => {   
+router.post('/admin/elections/hideResult', async (req, res) => {   
 
   if (req.session.admin) {
 
@@ -910,7 +863,7 @@ router.post('/admin/resultats/hideResult', async (req, res) => {
   }
 })
 
-router.post('/admin/resultats/delete', async (req, res) => {   
+router.post('/admin/elections/delete', async (req, res) => {   
 
   if (req.session.admin) {
 
@@ -977,7 +930,7 @@ router.post('/admin/resultats/delete', async (req, res) => {
   }
 })
 
-router.post('/admin/resultats/generate', async (req, res) => {   
+router.post('/admin/elections/generate', async (req, res) => {   
 
   if (req.session.admin) {
 
