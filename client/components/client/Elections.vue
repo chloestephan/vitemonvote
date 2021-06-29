@@ -347,6 +347,7 @@ module.exports = {
                 else if (this.popup !== undefined) {
                     this.isError = true
                 }
+                this.confirmVote = false
             }
         },
         closePopup() {

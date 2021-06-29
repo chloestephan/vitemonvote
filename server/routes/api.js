@@ -176,7 +176,7 @@ router.post('/admin/election', async(req, res) =>{
       candidats = req.body.candidats
     }
     else{
-      nomListes = ['oui', 'non']
+      nomListes = ['Oui', 'Non']
     }
 
     let sql = "INSERT INTO elections(nom, date, tour, tour_precedent, type_election, id_admin, ouvert, resultats_visibles) VALUES ($1, $2, $3, $4, $5, $6, false, false) RETURNING id_election"
@@ -905,6 +905,73 @@ router.post('/admin/resultats/hideResult', async (req, res) => {
     })
     res.json({popup: "Les résultats sont cachés pour cette élection !"})
   }  
+  else {
+    res.status(401).json({popup: "L'admin n'est pas connecté !"})
+  }
+})
+
+router.post('/admin/resultats/delete', async (req, res) => {   
+
+  if (req.session.admin) {
+
+    const electionToDelete = req.body.electionToDelete
+      
+    // ON SUPPRIME LES CANDIDATS
+
+    if (electionToDelete.type !== 'Referundum') {
+      for (let i = 0; i < electionToDelete.listes.length; i++) {
+         
+        let deleteCandidat = "DELETE FROM candidat where id_liste = $1"
+        await client.query({
+          text: deleteCandidat,
+          values: [electionToDelete.listes[i].id_liste]
+        })
+  
+      }
+    }
+
+    // ON SUPRRIME LES LISTES 
+
+    let deleteListe = "DELETE FROM liste where id_election = $1"
+    await client.query({
+      text: deleteListe,
+      values: [electionToDelete.id]
+    })
+
+    // ON SUPPRIME LES AVOTE
+
+    let deleteVote = "DELETE FROM avote where id_election = $1"
+    await client.query({
+      text: deleteVote,
+      values: [electionToDelete.id]
+    })
+
+    // ON SUPPRIME LES ORGANISE
+
+    let deleteOrganise = "DELETE FROM organise where id_election = $1"
+    await client.query({
+      text: deleteOrganise,
+      values: [electionToDelete.id]
+    })
+
+    // ON SUPPRIME LES ACCES
+
+    let deleteAcces = "DELETE FROM acces where id_election = $1"
+    await client.query({
+      text: deleteAcces,
+      values: [electionToDelete.id]
+    })
+
+    // ON SUPPRIME L'ELECTION
+
+    let deleteElection = "DELETE FROM elections where id_election = $1"
+    await client.query({
+      text: deleteElection,
+      values: [electionToDelete.id]
+    })
+
+    res.json({popup: "L'élection a bien été supprimée !"})
+  }
   else {
     res.status(401).json({popup: "L'admin n'est pas connecté !"})
   }

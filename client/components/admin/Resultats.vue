@@ -73,9 +73,10 @@
                 </div>
                 <hr>
                 <button @click="hideResult(elections[0])">Cacher les résultats</button>
+                <button @click="popupConfirmation(elections[0])">Supprimer l'élection</button>
                 <button v-if="elections[0].type !== 'Referundum' && elections[0].tour !== 2" @click=" generation = !generation">Génération du prochain tour</button>
                 <div v-if="generation">
-                    <form @submit.prevent="generatePresidentielle(elections[0])">
+                    <form @submit.prevent="generateNewElection(elections[0])">
                         <input type="text" placeholder="Nom de l'éléction" required v-model="newElectionName">
                         <label for="start"><h3>Date du prochain tour :</h3></label>
                         <input type="date" id="start" name="premierTourDate" required v-model="newElectionDate">
@@ -88,6 +89,16 @@
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
 
         <h2 v-else class="noElection">Aucun résultat disponible !</h2>
+
+        <div :class="[{displayPop : wantsToDelete}]" class="overlay">
+            <div class="popup">
+                <h2>ATTENTION</h2>
+                <br>
+                <p>Êtes-vous sur de vouloir supprimer cette élection ?</p>
+                <button @click="confirmation()" class="buttonPop">Confirmer</button>
+                <button @click="closePopup()" class="buttonPop">Annuler</button>
+            </div>
+        </div>
 
         <div :class="[{displayPop : isError}, {displayPop : isNoError}]" class="overlay">
             <div class="popup">
@@ -124,6 +135,9 @@ module.exports = {
             generation: false,
             newElectionName: '',
             newElectionDate: '',
+            wantsToDelete: false,
+            confirmDelete: false,
+            electionToDelete: -1
         }
     },
     mounted: async function() {
@@ -275,6 +289,7 @@ module.exports = {
             }
         },
         closePopup() {
+            this.wantsToDelete = false
             this.isError = false
             this.isNoError = false
         },
@@ -287,14 +302,14 @@ module.exports = {
         },
         displayPopup(popup) {
             this.popup = popup
-            if (this.popup !== "L'admin n'est pas connecté !" && this.popup !== "Nous ne pouvons pas créer un 2nd tour, il y a déjà un gagnant dans cette élection !") {
+            if (this.popup !== "L'admin n'est pas connecté !" && this.popup !== "Nous ne pouvons pas créer un 2nd tour, il y a déjà un gagnant dans cette élection !" && this.popup !== "Vous n'avez pas les droits pour faire cela. Seul le super admin peut supprimer une élection !") {
                 this.isNoError = true
             }
             else {
                 this.isError = true
             }
         },
-        async generatePresidentielle(election) {
+        async generateNewElection(election) {
 
             const informationElection = {
                 oldElection: election,
@@ -303,6 +318,25 @@ module.exports = {
             }
             const result = await axios.post('api/admin/resultats/generate', informationElection)  
              this.displayPopup(result.data.popup)
+        },
+        popupConfirmation(election) {
+            this.wantsToDelete = true
+        },
+        confirmation() {
+            this.confirmDelete = true
+            this.wantsToDelete = false
+            this.deleteElection()
+        },
+        async deleteElection() {
+            if (this.confirmDelete) {
+                const information = {
+                    electionToDelete: this.elections[0]
+                }
+                
+                const result = await axios.post('api/admin/resultats/delete', information)
+                this.displayPopup(result.data.popup)
+                this.confirmDelete = false
+            }
         }
     }
 }
