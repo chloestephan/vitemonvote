@@ -7,7 +7,7 @@
       <div>
         <label for="type-election"><h3>Choisir le type d'élection :</h3></label>
         <select name="typeElection" id="type-election" class="box" v-model="typeElection">
-          <option value="''">Choisir une option</option>
+          <option value="">Choisir une option</option>
           <option value="Municipales">Municipales</option>
           <option value="Regionales">Regionales</option>
           <option value="Departementales">Départementales</option>

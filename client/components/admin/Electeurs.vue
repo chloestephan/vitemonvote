@@ -55,7 +55,7 @@ module.exports = {
         code_postal: this.code_postal,
       }
 
-      const result = await axios.get('/api/admin/electeur', recherche)
+      const result = await axios.post('/api/admin/electeur', recherche)
       this.electeurs = result.data
     },
 

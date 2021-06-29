@@ -288,11 +288,13 @@ router.post('/admin/electeurs', async(req, res) => {
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.get('/admin/electeur', async(req, res) => {
+router.post('/admin/electeur', async(req, res) => {
   if (req.session.admin === true){
     const num_carte_electeur = req.body.num_carte_electeur
     const email = req.body.email
     const code_postal = req.body.code_postal
+
+    console.log({carte: num_carte_electeur, email: email, poste: code_postal})
 
     const sql = "SELECT * FROM electeur WHERE lower(num_carte_electeur) LIKE lower($1) AND lower(email) LIKE lower($2) AND code_postal LIKE $3"
     const result = await client.query({
@@ -300,6 +302,7 @@ router.get('/admin/electeur', async(req, res) => {
       values: [num_carte_electeur + "%", email + "%", code_postal + "%"]
     })
     console.log("EHO")
+    console.log({result: result.rows})
     res.json(result.rows)
     return
   }
