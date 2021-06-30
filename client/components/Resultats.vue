@@ -3,7 +3,7 @@
     <div>
         <!--  AFFICHAGE SELON SI UNE ELECTION EST SELECTIONNEE OU NON  -->
         <div v-if="!electionInDetail">
-            <h2>Cliquez sur une élection pour voter</h2>
+            <h2>Cliquez sur une élection pour voir les résultats</h2>
             <br>
             <div class="tile_div">
                 <img class="loop" src="img/retour_arriere.png" @click="noSort()">
@@ -28,7 +28,7 @@
 
                 <!--  AFFICHAGE SELON LA DISPO DES RESULT OU DES VOTES  -->
 
-                <div><strong>VOTE DISPONIBLES</strong></div>
+                <div><strong>RESULTATS DISPONIBLES</strong></div>
             </li>
         </ul>
 
@@ -43,6 +43,7 @@
                     <div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[0].type }} </div><p id="separation">|</p>
                     <div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[0].jour }} / {{ elections[0].mois }} / {{ elections[0].année }} </div><p id="separation">|</p>
                     <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[0].tour }} </div><p v-if="elections[0].resultats_visibles" id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Nombre de votants : </strong> {{ totalVote }} </div>
                     <br>
                 </div>
 
@@ -54,57 +55,30 @@
 
                             <div v-if="elections[0].type === 'Referundum'">
                                 <div> <strong>Réponse : </strong> {{ liste.nom_liste }}</div>
-                                <button class="voter" @click="popupConfirmation(elections[0], liste)">VOTER</button>
+                                <div> <strong>Taux de vote : </strong> {{ liste.pourcentage }} %</div>
                             </div>
 
-                          <div v-else>
+                            <div v-else>
                                 <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
+                                <div> <strong>Taux de vote : </strong> {{ liste.pourcentage }} %</div>
                                 <div v-if="elections[0].type === 'Presidentielle'"> <strong>Candidat : </strong> </div>
                                 <div v-else> <strong>Candidats : </strong> </div>
+
                                 <ul class="liste_candidats">
                                     <li :key="candidat.id" v-for="candidat in liste.candidats" class="candidat">
                                         <div> {{ candidat.nom_complet }} </div>
                                     </li>
                                 </ul>
-                                <button class="voter" @click="popupConfirmation(elections[0], liste)">VOTER</button>
                             </div>
-
                         </li>
                     </ul>
-                </div>
-                
+                </div>                
             </div>
         </div>
         
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
 
         <h2 v-else class="noElection">Aucun résultat disponible !</h2>
-
-        <!--  POPUP AVANT VOTE  -->
-
-        <div :class="[{displayPop : wantsToVote}]" class="overlay">
-            <div class="popup">
-                <h2>ATTENTION</h2>
-                <br>
-                <p>Êtes-vous sur de vouloir voter ? Une fois le vote comptabilisé, il ne vous sera plus possible de le modifier !</p>
-                <button @click="confirmation()" class="buttonPop">Confirmer le vote</button>
-                <button @click="closePopup()" class="buttonPop">Annuler le vote</button>
-            </div>
-        </div>
-
-        <!--  POPUP APRES VOTE  -->
-
-        <div :class="[{displayPop : isError}, {displayPop : voted}]" class="overlay">
-            <div class="popup">
-                <h2 v-if="isError">Erreur</h2>
-                <h2 v-else>Confirmation de vote</h2>
-                <br>
-                <p>{{ popup }}</p>
-                <button @click="closePopup" class="cross">
-                    X
-                </button>
-            </div>
-        </div>
 
     </div>
 
@@ -124,12 +98,6 @@ module.exports = {
             idSelected: -1,
             research: '',
             popup: '',
-            wantsToVote: false,
-            confirmVote: false,
-            idElectionVote: -1,
-            idListeVote: -1,
-            isError: false,
-            voted: false,
         }
     },
     mounted: async function() {
@@ -138,7 +106,7 @@ module.exports = {
             typeSort: "noSort"
         }
 
-        const result = await axios.post('/api/user/elections', sort)
+        const result = await axios.post('/api/resultats', sort)
 
         this.elections.pop()
         this.listes.pop()
@@ -156,7 +124,7 @@ module.exports = {
                 election: this.elections[this.idSelected]
             }
 
-            const result = await axios.post('/api/user/elections/detailElection', information)
+            const result = await axios.post('/api/resultats/detailElection', information)
 
             this.elections = [{}]
             this.listes = [{}]
@@ -235,7 +203,7 @@ module.exports = {
                 id: this.elections[0].id
             }
 
-            const result = await axios.post('/api/user/elections/nbrVotant', info)
+            const result = await axios.post('/api/resultats/nbrVotant', info)
             this.totalVote = result.data.totalVote
 
             for (let i = 0; i < this.elections[0].listes.length; i++) {  // On calcule le pourcentage de chaques listes et on fixe le nombre de décimal à 2
@@ -259,7 +227,7 @@ module.exports = {
                 searchName: this.research
             }
 
-            const result = await axios.post('/api/user/elections', sort)
+            const result = await axios.post('/api/resultats', sort)
 
             this.elections.pop()
             this.listes.pop()
@@ -269,47 +237,17 @@ module.exports = {
         },
         sortBySearch() {
             this.sort("sortBySearch")
+            this.sortedByVote = false
+            this.sortedByResult = false
             this.noSorted = false
         },
         noSort() {
             if (!this.noSorted) {
                 this.sort("noSort")
+                this.sortedByVote = false
+                this.sortedByResult = false
                 this.noSorted = true
             }
-        },
-        async vote() {
-            if (this.confirmVote) {
-                const information = {
-                    id_election: this.idElectionVote,
-                    id_liste: this.idListeVote,
-                }
-                const result = await axios.post('/api/user/elections/vote', information)
-
-                this.popup = result.data.popup
-
-                if (this.popup === "Le vote a été pris en compte ! Merci de votre participation !") {
-                    this.voted = true
-                }
-                else if (this.popup !== undefined) {
-                    this.isError = true
-                }
-                this.confirmVote = false
-            }
-        },
-        closePopup() {
-            this.wantsToVote = false
-            this.isError = false
-            this.voted = false
-        },
-        popupConfirmation(election, liste) {
-            this.wantsToVote = true
-            this.idElectionVote = election.id
-            this.idListeVote = liste.id_liste
-        },
-        confirmation() {
-           this.confirmVote = true
-           this.wantsToVote = false
-           this.vote()
         },
     }
 }

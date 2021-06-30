@@ -508,28 +508,14 @@ router.post('/user/elections', async (req, res) => {
     const searchName = "%" + req.body.searchName + "%"
   
     if (typeSort === "noSort") {
-      const sql = "SELECT * FROM public.elections WHERE (ouvert = true OR resultats_visibles = true) ORDER BY id_election"
-      const result = await client.query({
-        text: sql,
-      })
-      res.json({elections: result.rows})
-    }
-    else if (typeSort === "sortByVote") {
-      const sql = "SELECT * FROM public.elections WHERE resultats_visibles = false AND ouvert = true ORDER BY id_election"
-      const result = await client.query({
-        text: sql,
-      })
-      res.json({elections: result.rows})
-    }
-    else if (typeSort === "sortByResult") {
-      const sql = "SELECT * FROM public.elections WHERE resultats_visibles = true ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections WHERE ouvert = true ORDER BY id_election"
       const result = await client.query({
         text: sql,
       })
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections WHERE lower(nom) like lower($1) AND (ouvert = true OR resultats_visibles = true) ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections WHERE lower(nom) like lower($1) AND ouvert = true ORDER BY id_election"
       const result = await client.query({
         text: sql,
         values: [searchName]
@@ -701,6 +687,76 @@ router.post('/user/elections/vote', async (req, res) => {
     res.status(401).json({message: "L'utilisateur n'est pas connecté ! "})
   }
 })
+
+// TRI DES ELECTIONS
+
+router.post('/resultats', async (req, res) => {  
+
+    const typeSort = req.body.typeSort
+    const searchName = "%" + req.body.searchName + "%"
+  
+    if (typeSort === "noSort") {
+      const sql = "SELECT * FROM public.elections WHERE resultats_visibles = true ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+      })
+      res.json({elections: result.rows})
+    }
+    else if (typeSort === "sortBySearch") {
+      const sql = "SELECT * FROM public.elections WHERE lower(nom) like lower($1) AND resultats_visibles = true ORDER BY id_election"
+      const result = await client.query({
+        text: sql,
+        values: [searchName]
+      })
+      res.json({elections: result.rows})
+    }
+    else {
+      res.status(401).json({message: "Le type de tri n'est pas accepté ! "})
+    }
+
+
+})
+
+router.post('/resultats/detailElection', async (req, res) => {  
+
+    const election = req.body.election
+
+    if (election.type === "Referundum") {
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE id_election = $1"
+      const result = await client.query({
+        text: sql,
+        values: [election.id]
+      })
+      res.json({elections: result.rows})
+    }
+    else if (election.type !== undefined) {
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE id_election = $1"
+      const result = await client.query({
+        text: sql,
+        values: [election.id]
+      })
+      res.json({elections: result.rows}) 
+    }
+    else {
+      res.status(401).json({message: "Le type de tri n'est pas accepté ! "})
+    }
+})
+
+// NBR TOTAL VOTANT
+
+router.post('/resultats/nbrVotant', async (req, res) => {  
+
+
+    const id_election = req.body.id
+    const getTotalVote = "SELECT count(*) FROM avote WHERE id_election = $1"
+    const resultGetTotalVote = await client.query({
+      text: getTotalVote,
+      values: [id_election]
+    })
+
+    res.json({totalVote: resultGetTotalVote.rows[0].count})
+})
+
 
 // POUR ADMIN ZEBI
 
@@ -1016,8 +1072,6 @@ router.post('/admin/elections/generate', async (req, res) => {
     
           oldElection.listes.splice(position, 1)
         }
-
-      
       }
       else if (oldElection.type === "Regionales") {
         
@@ -1050,6 +1104,25 @@ router.post('/admin/elections/generate', async (req, res) => {
             }
           }
         }
+      }
+
+      // CREATION DE LA TABLE ORGANISE
+
+      const getCpOrganise = "SELECT code_postal_bureau FROM organise WHERE id_election = $1"
+      const resultGetCpOrganise = await client.query({
+        text: getCpOrganise,
+        values: [oldElection.id]
+      })
+      
+      const code_postal_organise = resultGetCpOrganise.rows
+      
+      for (let x = 0; x < code_postal_organise.length; x++) {
+        
+        let createOrganise = "INSERT INTO organise (id_election, code_postal_bureau) VALUES ($1, $2)"
+        await client.query({
+          text: createOrganise,
+          values: [id_election, code_postal_organise[x].code_postal_bureau]
+        })   
       }
 
       res.json({popup: "Le 2nd tour de l'éléction présidentielle a été créée !"})
