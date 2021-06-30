@@ -1,6 +1,6 @@
 <template>
 
-    <div>
+    <div class="limiter">
         <!--  AFFICHAGE SELON SI UNE ELECTION EST SELECTIONNEE OU NON  -->
         <div v-if="!electionInDetail">
             <h2>Cliquez sur une élection pour voir les résultats</h2>
@@ -75,6 +75,7 @@
                 </div>                
             </div>
         </div>
+
         
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
 
@@ -256,6 +257,10 @@ module.exports = {
 
 <style scoped>
 
+.limiter {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
 h2 {
   font-family: 'open sans', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
   font-size: 28px;
