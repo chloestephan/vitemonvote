@@ -48,12 +48,14 @@
               <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
                 <div class="ligne">
                   <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat'" required>
+                  <p v-if="candidats[index1].length > 1" @click="deleteCandidat(index1, index2)">❌</p>
                 </div>
               </div>
 
               <button v-if="typeElection!=='Presidentielle'" type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
-              <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+              <button v-if="candidats.length > 1" type="button" @click="supprimerListe">❌ Supprimer la liste</button>
             </div>
+            <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
             <hr>
           </div>
           <button type="button" @click="creerEletion">Valider</button>
@@ -103,7 +105,10 @@ module.exports = {
     ajouterCandidat(index){
       this.candidats[index].push('')
     },
-
+    supprimerListe(index){
+      this.candidats.splice(index, 1)
+      this.nomListes.splice(index, 1)
+    },
     ajouterListe(){
       this.candidats.push([''])
     },
