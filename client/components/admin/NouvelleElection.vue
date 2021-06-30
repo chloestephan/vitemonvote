@@ -14,7 +14,7 @@
           <option value="Legislatives">Legislatives</option>-->
           <option value="Presidentielle">Presidentielle</option>
           <option value="Europeennes">Européennes</option>
-          <option value="Referundum">Referundum</option>
+          <option value="Referundum">Referendum</option>
         </select>
 
         <div v-if="typeElection!==''">
