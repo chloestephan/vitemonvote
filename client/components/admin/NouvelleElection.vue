@@ -31,13 +31,32 @@
           <input type="date" id="start" name="premierTourDate" v-model="date">
 
           <input v-if="typeElection==='Municipales'" type="text" v-model="codePostaux[0]" placeholder="Code postal" required>
+
           <div v-if="typeElection==='Regionales'">
-            <div v-for="(codePostal, index) in codePostaux" :key="index">
-              <input type="text" v-model="codePostaux[index]" placeholder="Code postal de la région" required>
-            </div>
-            <button type="button" @click="ajouterCode">Ajouter un autre code postal</button>
+            <label for="nom-region"><h3>Choisir la région :</h3></label>
+            <select name="nomRegion" id="nom-region" class="box" v-model="nomRegion">
+              <option value="">Choisir une option</option>
+              <option value="Bretagne">Bretagne</option>
+              <option value="Ile-de-France">Ile-de-France</option>
+              <option value="Normandie">Normandie</option>
+              <option value="Hauts-de-France">Hauts-de-France</option>
+              <option value="Grand Est">Grand Est</option>
+              <option value="Pays de la Loire">Pays de la Loire</option>
+              <option value="Centre-Val de Loire">Centre-Val de Loire</option>
+              <option value="Bourgogne-Franche-Comté">Bourgogne-Franche-Comté</option>
+              <option value="Nouvelle-Aquitaine">Nouvelle-Aquitaine</option>
+              <option value="Auvergne-Rhône-Alpes">Auvergne-Rhône-Alpes</option>
+              <option value="Occitanie">Occitanie</option>
+              <option value="Provence-Alpes-Côte d'Azur">Provence-Alpes-Côte d'Azur</option>
+              <option value="Corse">Corse</option>
+              <option value="La Réunion">La Réunion</option>
+              <option value="Mayotte">Mayotte</option>
+              <option value="Guyane">Guyane</option>
+              <option value="Martinique">Martinique</option>
+              <option value="Guadeloupe">Guadeloupe</option>
+            </select>
           </div>
-          
+
           <div v-if="typeElection==='Departementales'">
             
             <input type="text" v-model="numDepartement" placeholder="Numéro du département" required>
@@ -98,6 +117,7 @@ module.exports = {
       nom:'',
       date: null,
       typeElection: '',
+      nomRegion: '',
       codePostaux: [''],
       nomListes: [''],
       candidats: [],
@@ -115,6 +135,7 @@ module.exports = {
         candidats: this.candidats,
         typeElection: this.typeElection,
         code_postaux: this.codePostaux,
+        region: this.nomRegion,
       }
     }
   },

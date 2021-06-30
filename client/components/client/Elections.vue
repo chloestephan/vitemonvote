@@ -78,7 +78,7 @@
         
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
 
-        <h2 v-else class="noElection">Aucun résultat disponible !</h2>
+        <h2 v-else class="noElection">Aucune élection disponible !</h2>
 
         <!--  POPUP AVANT VOTE  -->
 

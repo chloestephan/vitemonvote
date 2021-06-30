@@ -159,6 +159,63 @@ router.get('/admin/admins', async (req, res) =>{
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
+function codePostalRegion (region) {
+  if (region === 'Bretagne') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '22%' OR code_postal LIKE '29%' OR code_postal LIKE '35%' OR code_postal LIKE '56%'"
+  }
+  else if (region === 'Ile-de-France') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '75%' OR code_postal LIKE '77%' OR code_postal LIKE '78%' OR code_postal LIKE '91%' OR code_postal LIKE '92%' OR code_postal LIKE '93%' OR code_postal LIKE '94%' OR code_postal LIKE '95%'"
+  }
+  else if (region === 'Normandie') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '14%' OR code_postal LIKE '27%' OR code_postal LIKE '50%' OR code_postal LIKE '61%' OR code_postal LIKE '76%'"
+  }
+  else if (region === 'Hauts-de-France') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '02%' OR code_postal LIKE '59%' OR code_postal LIKE '60%' OR code_postal LIKE '62%' OR code_postal LIKE '80%'"
+  }
+  else if (region === 'Grand Est') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '08%' OR code_postal LIKE '10%' OR code_postal LIKE '51%' OR code_postal LIKE '52%' OR code_postal LIKE '54%' OR code_postal LIKE '55%' OR code_postal LIKE '57%' OR code_postal LIKE '67%' OR code_postal LIKE '68%' OR code_postal LIKE '88%'"
+  }
+  else if (region === 'Pays de la Loire') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '44%' OR code_postal LIKE '49%' OR code_postal LIKE '53%' OR code_postal LIKE '72%' OR code_postal LIKE '85%'"
+  }
+  else if (region === 'Centre-Val de Loire') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '18%' OR code_postal LIKE '28%' OR code_postal LIKE '36%' OR code_postal LIKE '37%' OR code_postal LIKE '41%' OR code_postal LIKE '45%'"
+  }
+  else if (region === 'Bourgogne-Franche-Comté') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '21%' OR code_postal LIKE '25%' OR code_postal LIKE '39%' OR code_postal LIKE '58%' OR code_postal LIKE '70%' OR code_postal LIKE '71%' OR code_postal LIKE '89%' OR code_postal LIKE '90%'"
+  }
+  else if (region === 'Nouvelle-Aquitaine') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '16%' OR code_postal LIKE '17%' OR code_postal LIKE '19%' OR code_postal LIKE '23%' OR code_postal LIKE '24%' OR code_postal LIKE '33%' OR code_postal LIKE '40%' OR code_postal LIKE '47%' OR code_postal LIKE '64%' OR code_postal LIKE '79%' OR code_postal LIKE '86%' OR code_postal LIKE '87%'"
+  }
+  else if (region === 'Auvergne-Rhône-Alpes') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '01%' OR code_postal LIKE '03%' OR code_postal LIKE '07%' OR code_postal LIKE '15%' OR code_postal LIKE '26%' OR code_postal LIKE '38%' OR code_postal LIKE '42%' OR code_postal LIKE '43%' OR code_postal LIKE '63%' OR code_postal LIKE '69%' OR code_postal LIKE '73%' OR code_postal LIKE '74%'"
+  }
+  else if (region === 'Occitanie') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '09%' OR code_postal LIKE '11%' OR code_postal LIKE '12%' OR code_postal LIKE '30%' OR code_postal LIKE '31%' OR code_postal LIKE '32%' OR code_postal LIKE '34%' OR code_postal LIKE '46%' OR code_postal LIKE '48%' OR code_postal LIKE '65%' OR code_postal LIKE '66%' OR code_postal LIKE '81%' OR code_postal LIKE '82%'"
+  }
+  else if (region === 'Provence-Alpes-Côte d\'Azur') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '04%' OR code_postal LIKE '05%' OR code_postal LIKE '06%' OR code_postal LIKE '13%' OR code_postal LIKE '83%' OR code_postal LIKE '84%'"
+  }
+  else if (region === 'Corse') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '20%'"
+  }
+  else if (region === 'La Réunion') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '974%'"
+  }
+  else if (region === 'Mayotte') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '976%'"
+  }
+  else if (region === 'Guyane') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '973%'"
+  }
+  else if (region === 'Martinique') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '972%'"
+  }
+  else if (region === 'Guadeloupe') {
+    return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '971%'"
+  }
+}
+
 router.post('/admin/election', async(req, res) =>{
   if (req.session.admin === true){
     const nom = req.body.nom
@@ -200,18 +257,11 @@ router.post('/admin/election', async(req, res) =>{
     }
     if(typeElection === "Municipales"){
       code_postaux = req.body.code_postaux
-      console.log({code_postal: code_postaux})
     }
 
-    if(typeElection === "Regionales"){
-      sql = "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE $1"
-      for(let i = 1; i < req.body.code_postaux.length; i++){
-        sql += " OR code_postal LIKE $" + (i+1)
-      }
+    if(typeElection === "Regionales") {
 
-      for(let i = 0; i < req.body.code_postaux.length; i++){
-        code_postaux.push(req.body.code_postaux[i] + "%")
-      }
+      sql = codePostalRegion(req.body.region)
       result = await client.query({
         text: sql,
         values: code_postaux
@@ -223,13 +273,6 @@ router.post('/admin/election', async(req, res) =>{
         code_postaux.push(result.rows[i].code_postal)
       }
     }
-
-    if(typeElection === "Regionales"){
-      
-    }
-
-    console.log({election: id_election})
-    console.log({code_postal: code_postaux})
     for(let i = 0; i < code_postaux.length; i++){
       sql = "INSERT INTO organise VALUES ($1, $2)"
       await client.query({
@@ -271,12 +314,9 @@ router.post('/admin/election', async(req, res) =>{
 router.post('/admin/electeurs', async(req, res) => {
   if (req.session.admin === true){
     const electeurs = req.body.electeurs
-    console.log({oui: electeurs})
 
     const sql = "INSERT INTO electeur VALUES ($1, $2, $3, $4)"
-    console.log("L218")
     for(let i = 0; i < electeurs.length; i++){
-      console.log({test: electeurs[i]})
       await client.query({
         text: sql,
         values: [electeurs[i][0], electeurs[i][1], null, electeurs[i][2]]
