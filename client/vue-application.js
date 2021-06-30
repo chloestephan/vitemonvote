@@ -1,5 +1,6 @@
 const Home = window.httpVueLoader('./components/Home.vue')
 const Login = window.httpVueLoader('./components/SeConnecter.vue')
+const Resultats = window.httpVueLoader('./components/Resultats.vue')
 const Admin = window.httpVueLoader('./components/Admin.vue')
 const commentVoter = window.httpVueLoader('./components/CommentVoter.vue')
 
@@ -13,6 +14,7 @@ const LoginElection = window.httpVueLoader('./components/client/Elections.vue')
 const routes = [
   { path: '/', component: Home},
   { path: '/commentVoter', component: commentVoter},
+  { path: '/resultats', component: Resultats},
   { path: '/user', component: Login,
     children: [
       {path: 'elections', component: LoginElection},
