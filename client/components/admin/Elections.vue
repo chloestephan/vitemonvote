@@ -27,8 +27,6 @@
                 <div> <strong>Type d'élection : </strong> {{ election.type }}</div>
                 <div> <strong>Date du vote : </strong> {{ election.jour }} / {{ election.mois }} / {{ election.année }}</div>
                 <div> <strong>Tour : </strong> {{ election.tour }}</div>
-                <div v-if="election.resultats_visibles"><strong>RESULTATS DISPONIBLES</strong></div>
-                <div v-else class="dernier"><strong>VOTE DISPONIBLES</strong></div>
             </li>
         </ul>
 
