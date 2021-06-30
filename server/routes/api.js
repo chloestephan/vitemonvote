@@ -1070,7 +1070,7 @@ router.post('/resultats/detailElection', async (req, res) => {
     const election = req.body.election
 
     if (election.type === "Referundum") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE id_election = $1"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE id_election = $1  ORDER BY nbr_votes DESC"
       const result = await client.query({
         text: sql,
         values: [election.id]
@@ -1078,7 +1078,7 @@ router.post('/resultats/detailElection', async (req, res) => {
       res.json({elections: result.rows})
     }
     else if (election.type !== undefined) {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE id_election = $1"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE id_election = $1 ORDER BY nbr_votes DESC"
       const result = await client.query({
         text: sql,
         values: [election.id]
