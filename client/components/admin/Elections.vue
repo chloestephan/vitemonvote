@@ -77,7 +77,7 @@
                 <button v-else class="btnAction" @click="hideResult(elections[0])">Cacher les résultats</button>
                 <button class="btnAction" @click="popupConfirmation(elections[0])">Supprimer l'élection</button>
                 
-                <button class="btnAction" v-if="elections[0].type !== 'Referundum' && elections[0].tour !== 2 && elections[0].resultats_visibles" @click="generation = !generation">Génération du prochain tour</button>
+                <button class="btnAction" v-if="elections[0].type !== 'Referundum' && elections[0].type !== 'Europeennes' && elections[0].tour !== 2 && elections[0].resultats_visibles" @click="generation = !generation">Génération du prochain tour</button>
                 <div v-if="generation && elections[0].resultats_visibles">
                     <form @submit.prevent="generateNewElection(elections[0])">
                         <input type="text" placeholder="Nom de l'élection" required v-model="newElectionName">

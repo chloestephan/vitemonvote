@@ -97,7 +97,7 @@
         <div :class="[{displayPop : isError}, {displayPop : voted}]" class="overlay">
             <div class="popup">
                 <h2 v-if="isError">Erreur</h2>
-                <h2 v-else>Confirmation de vote</h2>
+                <h2 v-else>A voté</h2>
                 <br>
                 <p>{{ popup }}</p>
                 <button @click="closePopup" class="cross">

@@ -104,6 +104,18 @@
           <button type="button" @click="creerEletion">Valider</button>
         </div>
       </div>
+
+        <div :class="[{displayPop : isGenerated}]" class="overlay">
+            <div class="popup">
+                <h2>Confirmation</h2>
+                <br>
+                <p>{{ popup }}</p>
+                <button @click="closePopup" class="cross">
+                    X
+                </button>
+            </div>
+        </div>
+
     </div>
   </div>
 </template>
@@ -122,6 +134,8 @@ module.exports = {
       nomListes: [''],
       candidats: [],
       numDepartement: null,
+      isGenerated: false,
+      popup: '',
     }
   },
 
@@ -189,9 +203,13 @@ module.exports = {
     async creerEletion(){
       if (this.isDone()){
         const result = await axios.post('/api/admin/election', this.election)
-        alert(result.data.message)
+        this.popup = result.data.message
+        this.isGenerated = true
       }
     },
+    closePopup() {
+      this.isGenerated = false
+    },    
   },
 
 }

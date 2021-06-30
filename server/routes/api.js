@@ -305,7 +305,7 @@ router.post('/admin/election', async(req, res) =>{
       values: [req.session.adminId, id_election]
     })
         
-    res.json({message: "Election créée."})
+    res.json({message: "L'élection a bien été créée !"})
     return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
@@ -626,7 +626,7 @@ router.post('/admin/elections/generate', async (req, res) => {
 
     const totalVote = resultGetTotalVote.rows[0].count
 
-    if (oldElection.type === "Presidentielle" || oldElection.type === "Regionales") {
+    if (oldElection.type === "Presidentielle" || oldElection.type === "Regionales" || oldElection.type === "Municipales") {
 
       for (let i = 0; i < oldElection.listes.length; i++) {
         if (totalVote <= oldElection.listes[i].nbr_votes * 2) {
@@ -687,10 +687,8 @@ router.post('/admin/elections/generate', async (req, res) => {
 
           oldElection.listes.splice(position, 1)
         }
-
-
       }
-      else if (oldElection.type === "Regionales") {
+      else if (oldElection.type === "Regionales" || oldElection.type === "Municipales") {
 
         for(let i = 0; i < oldElection.listes.length; i++) {
 
@@ -722,8 +720,7 @@ router.post('/admin/elections/generate', async (req, res) => {
           }
         }
       }
-
-      res.json({popup: "Le 2nd tour de l'éléction présidentielle a été créée !"})
+      res.json({popup: "Le 2nd tour de l'éléction a été créée !"})
     }
     else {
       res.json({popup: "En sah j'ai pas fait cette élection pour le moment, respire un coup ça sera fait soon"})
