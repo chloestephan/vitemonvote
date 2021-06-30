@@ -1016,8 +1016,6 @@ router.post('/admin/elections/generate', async (req, res) => {
     
           oldElection.listes.splice(position, 1)
         }
-
-      
       }
       else if (oldElection.type === "Regionales") {
         
@@ -1050,6 +1048,25 @@ router.post('/admin/elections/generate', async (req, res) => {
             }
           }
         }
+      }
+
+      // CREATION DE LA TABLE ORGANISE
+
+      const getCpOrganise = "SELECT code_postal_bureau FROM organise WHERE id_election = $1"
+      const resultGetCpOrganise = await client.query({
+        text: getCpOrganise,
+        values: [oldElection.id]
+      })
+      
+      const code_postal_organise = resultGetCpOrganise.rows
+      
+      for (let x = 0; x < code_postal_organise.length; x++) {
+        
+        let createOrganise = "INSERT INTO organise (id_election, code_postal_bureau) VALUES ($1, $2)"
+        await client.query({
+          text: createOrganise,
+          values: [id_election, code_postal_organise[x].code_postal_bureau]
+        })   
       }
 
       res.json({popup: "Le 2nd tour de l'éléction présidentielle a été créée !"})

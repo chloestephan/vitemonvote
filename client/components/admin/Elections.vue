@@ -369,7 +369,7 @@ module.exports = {
             }
         },
         async generateNewElection(election) {
-
+            console.log("EHOEHO")
             const informationElection = {
                 oldElection: election,
                 newName: this.newElectionName,
@@ -378,7 +378,7 @@ module.exports = {
             const result = await axios.post('api/admin/elections/generate', informationElection)  
              this.displayPopup(result.data.popup)
         },
-        popupConfirmation(election) {
+        popupConfirmation() {
             this.wantsToDelete = true
         },
         confirmation() {
