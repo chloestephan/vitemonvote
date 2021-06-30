@@ -73,10 +73,10 @@
                     </ul>
                 </div>
                 <hr>
-                <button class="btnAction" @click="openVote(elections[0])">Ouvrir les votes</button>
-                <button class="btnAction" @click="closeVote(elections[0])">Fermer les votes</button>
-                <button class="btnAction" @click="showResult(elections[0])">Afficher les résultats</button>
-                <button class="btnAction" @click="hideResult(elections[0])">Cacher les résultats</button>
+                <button v-if="!isOpen" class="btnAction" @click="openVote(elections[0])">Ouvrir les votes</button>
+                <button v-else class="btnAction" @click="closeVote(elections[0])">Fermer les votes</button>
+                <button v-if="!isShow" class="btnAction" @click="showResult(elections[0])">Afficher les résultats</button>
+                <button v-else class="btnAction" @click="hideResult(elections[0])">Cacher les résultats</button>
                 <button class="btnAction" @click="popupConfirmation(elections[0])">Supprimer l'élection</button>
                 
                 <button class="btnAction" v-if="elections[0].type !== 'Referundum' && elections[0].tour !== 2 && elections[0].resultats_visibles" @click="generation = !generation">Génération du prochain tour</button>
@@ -146,7 +146,9 @@ module.exports = {
             newElectionDate: '',
             wantsToDelete: false,
             confirmDelete: false,
-            electionToDelete: -1
+            electionToDelete: -1,
+            isOpen: false,
+            isShow: false,
         }
     },
     mounted: async function() {
@@ -234,6 +236,7 @@ module.exports = {
                         jour: date[2],
                         tour: election[i].tour,
                         type: election[i].type_election,
+                        ouvert: election[i].ouvert,
                         resultats_visibles: election[i].resultats_visibles,
                         listes: this.listes
                     })
@@ -266,6 +269,9 @@ module.exports = {
                     }
                 }
             }
+
+            this.isOpen = this.elections[0].ouvert
+            this.isShow = this.elections[0].resultats_visibles
         },
         showAll() {
             this.idSelected = -1
@@ -336,6 +342,8 @@ module.exports = {
             id_election: election.id,
           }
           const result = await axios.post('/api/admin/elections/openVote', information)
+          this.isOpen = true
+          this.detailElection(election.id)
           this.displayPopup(result.data.popup)
         },
         async closeVote(election) {
@@ -343,6 +351,8 @@ module.exports = {
             id_election: election.id,
           }
           const result = await axios.post('/api/admin/elections/closeVote', information)
+          this.isOpen = false
+          this.detailElection(election.id)
           this.displayPopup(result.data.popup)
         },
         async showResult(election) {
@@ -350,6 +360,8 @@ module.exports = {
             id_election: election.id,
           }
           const result = await axios.post('/api/admin/elections/showResult', information)
+          this.isShow = true
+          this.detailElection(election.id)
           this.displayPopup(result.data.popup)
         },
         async hideResult(election) {
@@ -357,6 +369,8 @@ module.exports = {
             id_election: election.id,
           }
           const result = await axios.post('/api/admin/elections/hideResult', information)
+          this.isShow = false
+          this.detailElection(election.id)
           this.displayPopup(result.data.popup)
         },
         displayPopup(popup) {
@@ -391,11 +405,11 @@ module.exports = {
                 const information = {
                     electionToDelete: this.elections[0]
                 }
-                
                 const result = await axios.post('api/admin/elections/delete', information)
                 this.displayPopup(result.data.popup)
                 this.confirmDelete = false
             }
+            this.showAll()
         }
     }
 }

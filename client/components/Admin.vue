@@ -64,22 +64,13 @@ module.exports = {
     created: async function () {
         const result = await axios.get('/api/admin/me')
         this.isUserConnected = result.data.admin
-        console.log(result.data.admin)
     },
-    
-    
     mounted() {
-      window.addEventListener('beforeunload', e => this.beforeunloadHandler(e))
       window.addEventListener('unload', e => this.unloadHandler(e))
     }, 
-    
     destroyed() {
-      window.removeEventListener('beforeunload', e => this.beforeunloadHandler(e))
       window.removeEventListener('unload', e => this.unloadHandler(e))
     },
-    
-    
-
     methods: {
         async loginUser(){
             if(this.email !== '' && this.password !== ''){
