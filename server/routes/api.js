@@ -208,12 +208,10 @@ router.post('/admin/election', async(req, res) =>{
       for(let i = 1; i < req.body.code_postaux.length; i++){
         sql += " OR code_postal LIKE $" + (i+1)
       }
-      console.log({Requete_SQL: sql})
 
       for(let i = 0; i < req.body.code_postaux.length; i++){
         code_postaux.push(req.body.code_postaux[i] + "%")
       }
-      console.log({code_postaux: code_postaux})
       result = await client.query({
         text: sql,
         values: code_postaux
@@ -225,17 +223,12 @@ router.post('/admin/election', async(req, res) =>{
         code_postaux.push(result.rows[i].code_postal)
       }
     }
-
-    console.log({election: id_election})
-    console.log({code_postal: code_postaux})
     for(let i = 0; i < code_postaux.length; i++){
       sql = "INSERT INTO organise VALUES ($1, $2)"
       await client.query({
         text: sql,
         values: [id_election, code_postaux[i]]
       })
-      console.log("organise" + i)
-      console.log({code_postal: code_postaux[i]})
     }
 
     for(let i = 0; i < nomListes.length; i++){
@@ -294,15 +287,11 @@ router.post('/admin/electeur', async(req, res) => {
     const email = req.body.email
     const code_postal = req.body.code_postal
 
-    console.log({carte: num_carte_electeur, email: email, poste: code_postal})
-
     const sql = "SELECT * FROM electeur WHERE lower(num_carte_electeur) LIKE lower($1) AND lower(email) LIKE lower($2) AND code_postal LIKE $3"
     const result = await client.query({
       text: sql,
       values: [num_carte_electeur + "%", email + "%", code_postal + "%"]
     })
-    console.log("EHO")
-    console.log({result: result.rows})
     res.json(result.rows)
     return
   }
@@ -394,7 +383,7 @@ router.post('/admin/elections/detailElection', async (req, res) => {
     const id_admin = req.session.adminId
 
     if (election.type === "Referundum") {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE id_admin = $1 AND id_election = $2"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE id_admin = $1 AND id_election = $2 ORDER BY nbr_votes DESC"
       const result = await client.query({
         text: sql,
         values: [id_admin, election.id]
@@ -402,7 +391,7 @@ router.post('/admin/elections/detailElection', async (req, res) => {
       res.json({elections: result.rows})
     }
     else if (election.type !== undefined) {
-      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE id_admin = $1 AND id_election = $2"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE id_admin = $1 AND id_election = $2 ORDER BY nbr_votes DESC"
       const result = await client.query({
         text: sql,
         values: [id_admin, election.id]
