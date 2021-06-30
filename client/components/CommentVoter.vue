@@ -59,13 +59,28 @@
             <div class='row'>
               <div class='column'>
                 <div class='blue-column'>
-                   <img src="\img/resultats.png" alt="Image d'une carte électorale française tenue devant une urne d'un bureau de vote."/>
+                   <img src="\img/selectionVote.png" alt="Image d'une carte électorale française tenue devant une urne d'un bureau de vote."/>
                 </div>
               </div>
               <div class='column'>
                 <div class='green-column'>
-                  <h2>Troisième étape : Voter !</h2>
-                  <p>Une fois connecté, vous n'avez plus qu'à voter pour l'élection en cours.</p>
+                  <h2>Troisième étape : Sélectionner l'élection</h2>
+                  <p>Vous pouvez sélectionner pour quelle élection vous souhaitez voter.</p>
+                </div>
+            </div>
+          </div>
+
+          <div class='some-page-wrapper'>
+            <div class='row'>
+              <div class='column'>
+                <div class='blue-column'>
+                   <img src="\img/voter.png" alt="Image d'une carte électorale française tenue devant une urne d'un bureau de vote."/>
+                </div>
+              </div>
+              <div class='column'>
+                <div class='green-column'>
+                  <h2>Quatrième étape : Voter !</h2>
+                  <p>Vous pouvez finalement choisir pour quelle liste vous souhaitez voter.</p>
                 </div>
             </div>
           </div>
