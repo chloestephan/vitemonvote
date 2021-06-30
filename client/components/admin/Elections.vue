@@ -59,7 +59,7 @@
 
                           <div v-else>
                                 <div> <strong>Nom de la liste : </strong> {{ liste.nom_liste }}</div>
-                                <div v-if="elections[0].resultats_visibles"> <strong>Taux de vote : </strong> {{ liste.pourcentage }} %</div>
+                                <div v-if="elections[0].resultats_visibles"> <strong>Résultats : </strong> {{ liste.pourcentage }} %</div>
                                 <div v-if="elections[0].type === 'Presidentielle'"> <strong>Candidat : </strong> </div>
                                 <div v-else> <strong>Candidats : </strong> </div>
                                 <ul class="liste_candidats">
@@ -82,7 +82,7 @@
                 <button class="btnAction" v-if="elections[0].type !== 'Referundum' && elections[0].tour !== 2 && elections[0].resultats_visibles" @click="generation = !generation">Génération du prochain tour</button>
                 <div v-if="generation && elections[0].resultats_visibles">
                     <form @submit.prevent="generateNewElection(elections[0])">
-                        <input type="text" placeholder="Nom de l'éléction" required v-model="newElectionName">
+                        <input type="text" placeholder="Nom de l'élection" required v-model="newElectionName">
                         <label for="start"><h3>Date du prochain tour :</h3></label>
                         <input type="date" id="start" name="premierTourDate" required v-model="newElectionDate">
                         <button type="submit">Générer</button>
