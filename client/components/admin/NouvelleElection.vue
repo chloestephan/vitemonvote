@@ -10,8 +10,8 @@
           <option value="">Choisir une option</option>
           <option value="Municipales">Municipales</option>
           <option value="Regionales">Regionales</option>
-          <!--<option value="Departementales">Départementales</option>
-          <option value="Legislatives">Legislatives</option>-->
+          <option value="Departementales">Départementales</option>
+          <option value="Legislatives">Legislatives</option>
           <option value="Presidentielle">Presidentielle</option>
           <option value="Europeennes">Européennes</option>
           <option value="Referundum">Referendum</option>
@@ -37,8 +37,14 @@
             </div>
             <button type="button" @click="ajouterCode">Ajouter un autre code postal</button>
           </div>
-
-          <div v-if="typeElection!=='Referundum'">
+          
+          <div v-if="typeElection==='Departementales'">
+            
+            <input type="text" v-model="numDepartement" placeholder="Numéro du département" required>
+            
+          </div>
+          <!-- EN TRAVAUX -->
+          <div v-if="typeElection!=='Referundum' && typeElection!=='Departementales'">
             <div v-for="(liste, index1) in candidats" :key="index1" class="">
               <h2>Nouvelle liste</h2>
               <hr>
@@ -58,6 +64,24 @@
             <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
             <hr>
           </div>
+          <div v-if="typeElection=='Departementales'">
+            <div v-for="(liste, index1) in candidats" :key="index1" class="">
+              <h2>Nouvelle liste</h2>
+              <hr>
+              <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
+              <div class="ligne">
+                <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][0]" :placeholder="'Candidat'" required>
+              </div>
+              <div class="ligne">
+                <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][1]" :placeholder="'Candidat'" required>
+              </div>
+              <button v-if="candidats.length > 1" type="button" @click="supprimerListe">❌ Supprimer la liste</button>
+            </div>
+            <button v-if="typeElection!=='Presidentielle' && typeElection!=='Departementales'" type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
+            <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
+            <hr> 
+          </div>
+          
           <button type="button" @click="creerEletion">Valider</button>
         </div>
       </div>
@@ -76,7 +100,8 @@ module.exports = {
       typeElection: '',
       codePostaux: [''],
       nomListes: [''],
-      candidats: []
+      candidats: [],
+      numDepartement: null,
     }
   },
 

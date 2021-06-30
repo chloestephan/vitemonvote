@@ -226,6 +226,10 @@ router.post('/admin/election', async(req, res) =>{
       }
     }
 
+    if(typeElection === "Regionales"){
+      
+    }
+
     console.log({election: id_election})
     console.log({code_postal: code_postaux})
     for(let i = 0; i < code_postaux.length; i++){
