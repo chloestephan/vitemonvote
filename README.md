@@ -21,7 +21,7 @@ Toutefois, si le lien ne fonctionne pas, il est possible de lancer le projet dep
     -> Pour lancer Vite Mon Vote, il faut aller trouver le dossier contenant le projet et lancer la fênetre PowerShell sur ce dossier (maj + clic droit). Ensuite, dans cette fenêtre, entrez les consignes "npm install" puis "npm start".  
     -> Enfin, entrez dans le navigateur souhaité "localhost:3000".  
 
-- Pour peupler la base de données :
+- Pour peupler la base de données :  
     -> Dans la partie "Admin", se connecter à l'aide des identifiants suivant : "admin", "admin".  
     -> Aller dans l'onglet "Electeurs" on nous pouvons maintenant ajouter les électeurs et les bureaux de vote dans les espaces prévus pour à l'aide des documents "electeurs.csv" et "bureaux.csv".  
 
