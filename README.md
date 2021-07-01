@@ -11,13 +11,13 @@ Le projet est accessible sur serveur à l'adresse suivante : http://91.167.32.20
 Toutefois, si le lien ne fonctionne pas, il est possible de lancer le projet depuis son ordinateur en suivant les étapes suivantes : 
 
 - télécharger le fichier .zip comprenant le projet dans sa totalité.
-- Sur PgAdmin 4 pour construire la base de données associée au projet : 
+- Sur PgAdmin 4 pour construire la base de données associée au projet :  
     -> créer une base de données nommée "vitemonvote";  
     -> ouvrir les Query Tools associé à cette base de données;  
     -> trouver le document nommé "bdd.sql" et copier-coller son contenu dans les Query Tools;  
     -> on peut maintenant valider le script SQL en l'éxecutant.
 
-- La base de données est maintenant créée, nous pouvons la peupler en allant directement sur Vite Mon Vote.
+- La base de données est maintenant créée, nous pouvons la peupler en allant directement sur Vite Mon Vote.  
     -> Pour lancer Vite Mon Vote, il faut aller trouver le dossier contenant le projet et lancer la fênetre PowerShell sur ce dossier (maj + clic droit). Ensuite, dans cette fenêtre, entrez les consignes "npm install" puis "npm start".  
     -> Enfin, entrez dans le navigateur souhaité "localhost:3000".  
 
