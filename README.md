@@ -12,24 +12,24 @@ Toutefois, si le lien ne fonctionne pas, il est possible de lancer le projet dep
 
 - télécharger le fichier .zip comprenant le projet dans sa totalité.
 - Sur PgAdmin 4 pour construire la base de données associée au projet : 
-    -> créer une base de données nommée "vitemonvote";
-    -> ouvrir les Query Tools associé à cette base de données;
-    -> trouver le document nommé "bdd.sql" et copier-coller son contenu dans les Query Tools;
+    -> créer une base de données nommée "vitemonvote";  
+    -> ouvrir les Query Tools associé à cette base de données;  
+    -> trouver le document nommé "bdd.sql" et copier-coller son contenu dans les Query Tools;  
     -> on peut maintenant valider le script SQL en l'éxecutant.
 
 - La base de données est maintenant créée, nous pouvons la peupler en allant directement sur Vite Mon Vote.
-    -> Pour lancer Vite Mon Vote, il faut aller trouver le dossier contenant le projet et lancer la fênetre PowerShell sur ce dossier (maj + clic droit). Ensuite, dans cette fenêtre, entrez les consignes "npm install" puis "npm start".
-    -> Enfin, entrez dans le navigateur souhaité "localhost:3000".
+    -> Pour lancer Vite Mon Vote, il faut aller trouver le dossier contenant le projet et lancer la fênetre PowerShell sur ce dossier (maj + clic droit). Ensuite, dans cette fenêtre, entrez les consignes "npm install" puis "npm start".  
+    -> Enfin, entrez dans le navigateur souhaité "localhost:3000".  
 
 - Pour peupler la base de données :
-    -> Dans la partie "Admin", se connecter à l'aide des identifiants suivant : "admin", "admin".
-    -> Aller dans l'onglet "Electeurs" on nous pouvons maintenant ajouter les électeurs et les bureaux de vote dans les espaces prévus pour à l'aide des documents "bureaux.csv" et "electeurs.csv".
+    -> Dans la partie "Admin", se connecter à l'aide des identifiants suivant : "admin", "admin".  
+    -> Aller dans l'onglet "Electeurs" on nous pouvons maintenant ajouter les électeurs et les bureaux de vote dans les espaces prévus pour à l'aide des documents "electeurs.csv" et "bureaux.csv".  
 
 - La base de données est maintenant créée et peuplée, nous pouvons donc maintenant créer des élections et les manipuler comme nous le souhaitons !
 
 # Explorer Vite Mon Vote
 
-Pour se connecter en tant qu'administrateur, il est possible d'utiliser les indentifiants "admin", "admin".
+Pour se connecter en tant qu'administrateur, il est possible d'utiliser les indentifiants "admin", "admin".  
 Pour se connecter en tant qu'utilisateur, il est aussi possible d'utiliser les identifiants "admin", "admin".
 
 # Contributeurs
