@@ -222,6 +222,7 @@ router.post('/admin/election', async(req, res) =>{
     const date = req.body.date
     const tour = req.body.tour
     const typeElection = req.body.typeElection
+    console.log({type: typeElection})
     let tour_precedent = null
     if (tour !== 1){
       tour_precedent = req.body.precedent_tour
@@ -245,7 +246,8 @@ router.post('/admin/election', async(req, res) =>{
     const id_election = result.rows[0].id_election
 
     let code_postaux = []
-    if(typeElection === "Presidentielle" || typeElection === "Europeennes"){
+    if(typeElection === "Presidentielle" || typeElection === "Europeennes" || typeElection === "Referundum"){
+      console.log("In code postal")
       sql = "SELECT code_postal FROM bureaudevote"
       result = await client.query({
         text: sql
@@ -254,6 +256,7 @@ router.post('/admin/election', async(req, res) =>{
       for(let i = 0; i < result.rowCount; i++){
         code_postaux.push(result.rows[i].code_postal)
       }
+      console.log({code_postaux: code_postaux})
     }
     if(typeElection === "Municipales"){
       code_postaux = req.body.code_postaux

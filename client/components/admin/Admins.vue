@@ -85,7 +85,7 @@ module.exports = {
                 this.administrateurs = result.data.admin
                 this.popup = result.data.popup
 
-                if (this.popup === "L'admin a bien été créée !") {
+                if (this.popup === "L'admin a bien été créé !") {
                     this.isNoError = true
                 }
                 else if (!(this.popup === undefined)) {

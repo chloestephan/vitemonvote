@@ -300,6 +300,7 @@ module.exports = {
             this.wantsToVote = false
             this.isError = false
             this.voted = false
+            this.showAll()
         },
         popupConfirmation(election, liste) {
             this.wantsToVote = true
