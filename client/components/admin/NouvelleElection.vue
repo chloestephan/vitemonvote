@@ -10,8 +10,8 @@
           <option value="">Choisir une option</option>
           <option value="Municipales">Municipales</option>
           <option value="Regionales">Regionales</option>
-          <option value="Departementales">Départementales</option>
-          <option value="Legislatives">Legislatives</option>
+          <!--<option value="Departementales">Départementales</option>
+          <option value="Legislatives">Legislatives</option>-->
           <option value="Presidentielle">Presidentielle</option>
           <option value="Europeennes">Européennes</option>
           <option value="Referundum">Referendum</option>
@@ -62,7 +62,8 @@
             <input type="text" v-model="numDepartement" placeholder="Numéro du département" required>
             
           </div>
-          <!-- EN TRAVAUX -->
+         
+
           <div v-if="typeElection!=='Referundum' && typeElection!=='Departementales'">
             <div v-for="(liste, index1) in candidats" :key="index1" class="">
               <h2>Nouvelle liste</h2>
@@ -70,10 +71,10 @@
 
               <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
 
-              <div v-for="(candidat, index2) in candidats[index1]" :key=index2 class="">
+              <div v-for="(candidat, index2) in candidats[index1]" :key=index2>
                 <div class="ligne">
                   <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat'" required>
-                  <p v-if="candidats[index1].length > 1" @click="deleteCandidat(index1, index2)">❌</p>
+                  <p v-if="candidats[index1].length > 1" @click="deleteCandidat(index1, index2)" class="supprimer">❌</p>
                 </div>
               </div>
 
@@ -339,5 +340,12 @@ button {
   display:flex;
 }
 
+.supprimer {
+  margin-top: 15px;
+}
+
+.supprimer:hover {
+  cursor: pointer;
+}
 
 </style>
