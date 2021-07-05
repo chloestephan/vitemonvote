@@ -39,12 +39,12 @@ router.post('/admin/login', async (req, res) => {
   })
 
   if(result.rowCount === 0){
-    res.json({ popup: "L'email utilisé et/ou le mot de passe sont incorretes !"})
+    res.json({ popup: "L'email utilisé et/ou le mot de passe sont incorrects !"})
     return
   }
 
   if (! await bcrypt.compare(password, result.rows[0].password)){
-    res.json({connected: false, popup: "L'email et/ou le mot de passe sont incorrectes !"})
+    res.json({connected: false, popup: "L'email et/ou le mot de passe sont incorrects !"})
     return
   }
 
@@ -90,7 +90,7 @@ router.post('/admin/register', async (req, res) =>{
     })
 
     const result2 = await client.query({text: "SELECT id, email FROM admins"})
-    res.json({admin: result2.rows, popup: "L'admin a bien été créée !"})
+    res.json({admin: result2.rows, popup: "L'admin a bien été créé(e) !"})
     return
   }
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
@@ -122,7 +122,7 @@ router.delete('/admin/:id', async (req, res) => {
       })
   
       const result = await client.query({text: "SELECT id, email FROM admins"})
-      res.json({admin: result.rows, popup: "L'admin a bien été supprimé !"})
+      res.json({admin: result.rows, popup: "L'admin a bien été supprimé(e) !"})
       return
     }
     else {
@@ -146,7 +146,7 @@ router.delete('/admin/:id', async (req, res) => {
       })
 
       const result = await client.query({text: "SELECT id, email FROM admins"})
-      res.json({admin: result.rows, popup: "L'admin a bien été supprimé !"})
+      res.json({admin: result.rows, popup: "L'admin a bien été supprimé(e) !"})
       return
     }
   }
@@ -246,7 +246,7 @@ router.post('/admin/election', async(req, res) =>{
     })
 
     if (resultVerifBureauDeVote.rowCount === 0) {
-      res.json({message: 'Les bureaux de vote n\'ont pas été chargés ! Veuillez les importer dans l\'onglet électeurs avant de créer une élection ! '})                  // POPUP
+      res.json({message: "Les bureaux de vote n'ont pas été chargés ! Veuillez les importer dans l'onglet électeurs avant de créer une élection !"})                  // POPUP
       return
     }
 
@@ -543,8 +543,8 @@ router.post('/admin/elections/openVote', async (req, res) => {
       let mailOptions = {
         from: 'vitemonvote@gmail.com',
         to: email[i].email,
-        subject: 'Ouverture des votes',
-        text: 'Nous tenons à vous dire que l\'élection : ' + nom + ' est ouverte, vous pouvez dès maintenant voter sur notre site.'
+        subject: 'Ouverture des votes - ViteMonVote',
+        text: "Nous tenons à vous dire que l'élection : " + nom + " est ouverte, vous pouvez dès maintenant voter sur notre site."
       }
     
       transporter.sendMail(mailOptions, function(err, data) {
@@ -812,10 +812,7 @@ router.post('/admin/elections/generate', async (req, res) => {
           }
         }
       }
-      res.json({popup: "Le 2nd tour de l'éléction a été créée !"})
-    }
-    else {
-      res.json({popup: "En sah j'ai pas fait cette élection pour le moment, respire un coup ça sera fait soon"})
+      res.json({popup: "Le 2nd tour de l'éléction a été créé !"})
     }
   }
   else {
@@ -876,26 +873,26 @@ router.post('/user/register', async (req, res) => {
   const hash = await bcrypt.hash(password, 10)
   
   if (numCarteElec.length !== 9) {  // On regarde si la syntaxe du num est correcte
-    res.json({popup: 'Le numéro de la carte électorale est incorrect !'})                  // POPUP
+    res.json({popup: 'Les informations données sont incorrectes !'})                  // POPUP
     return
   }
   else {
     for (let i = 0; i < numCarteElec.length; i++) {
       if (!isDigit(numCarteElec[i])) {
-        res.json({popup: 'Le numéro de la carte électorale est incorrect !'})                  // POPUP
+        res.json({popup: 'Les informations données sont incorrectes !'})                  // POPUP
         return
       }
     }
   }
 
   if (codePostal.length !== 5) {  // On regarde si la syntaxe du codePostal est correcte
-    res.json({popup: 'Le code postal est incorrect !'})                  // POPUP
+    res.json({popup: 'Les informations données sont incorrectes !'})                  // POPUP
     return
   }
   else {
     for (let i = 0; i < codePostal.length; i++) {
       if (!isDigit(codePostal[i])) {
-        res.json({popup: 'Le code postal est incorrect !'})                  // POPUP
+        res.json({popup: 'Les informations données sont incorrectes !'})                  // POPUP
         return
       }
     }
@@ -904,7 +901,7 @@ router.post('/user/register', async (req, res) => {
   const splitEmail = email.split('@')  // On regarde si la syntaxe du mail est correcte
 
   if (splitEmail[0] === "" || splitEmail[1] === undefined || splitEmail[1] === "" || splitEmail[2] !== undefined) {
-    res.json({popup: 'L\'adresse mail est incorrect !'})                  // POPUP
+    res.json({popup: 'Les informations données sont incorrectes !'})                  // POPUP
     return
   }
 
@@ -966,12 +963,12 @@ router.post('/user/login', async (req, res) => {
   })
 
   if(result.rowCount === 0){
-    res.json({ popup: 'L\'email et/ou le mot de passe sont incorrectes !'})                // POPUP
+    res.json({ popup: "L'email utilisé et/ou le mot de passe sont incorrects !"})                // POPUP
     return
   }
 
   if (! await bcrypt.compare(password, result.rows[0].password)){
-    res.json({popup: 'L\'email et/ou le mot de passe sont incorrectes !'})                               // POPUP
+    res.json({ popup: "L'email utilisé et/ou le mot de passe sont incorrects !"})                               // POPUP
     return
   }
   
