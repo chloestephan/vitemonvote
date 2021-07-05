@@ -338,7 +338,11 @@ module.exports = {
         async openVote(election) {
           const information = {
             id_election: election.id,
+            type_election: election.type,
+            nom_election: election.nom,
+            tour_election: election.tour,
           }
+          
           const result = await axios.post('/api/admin/elections/openVote', information)
           this.isOpen = true
           this.detailElection(election.id)

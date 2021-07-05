@@ -17,7 +17,10 @@ client.connect()
 
 module.exports = router
 
-//Start of admin part
+/*******************************************/
+/*              PARTIE ADMIN               */
+/*******************************************/
+
 router.get('/admin/me', async (req, res) => {
   if(req.session.admin === true){
     res.json({admin: true})
@@ -237,25 +240,19 @@ router.post('/admin/election', async(req, res) =>{
       nomListes = ['Oui', 'Non']
     }
 
-    if (typeElection === 'Municipales') {
-      code_postal = req.body.code_postaux
-      if (code_postal.length !== 5) {  // On regarde si la syntaxe du codePostal est correcte
-        res.json({message: 'Le code postal est incorrect !'})                  // POPUP
-        return
-      }
-      else {
-        for (let i = 0; i < code_postal.length; i++) {
-          if (!isDigit(code_postal[i])) {
-            res.json({message: 'Le code postal est incorrect !'})                  // POPUP
-            return
-          }
-        }
-      }
+    const verifBureauDeVote = "SELECT * FROM bureauDeVote"
+    const resultVerifBureauDeVote = await client.query({
+      text: verifBureauDeVote,
+    })
+
+    if (resultVerifBureauDeVote.rowCount === 0) {
+      res.json({message: 'Les bureaux de vote n\'ont pas été chargés ! Veuillez les importer dans l\'onglet électeurs avant de créer une élection ! '})                  // POPUP
+      return
     }
 
-    if (typeElection === 'Departementales') {
-      code_postal = req.body.code_postaux
-      if (code_postal.length !== 2) {  // On regarde si la syntaxe du codePostal est correcte
+    if (typeElection === 'Municipales') {
+      code_postal = req.body.code_postaux[0]
+      if (code_postal.length !== 5) {  // On regarde si la syntaxe du codePostal est correcte
         res.json({message: 'Le code postal est incorrect !'})                  // POPUP
         return
       }
@@ -492,11 +489,73 @@ router.post('/admin/elections/openVote', async (req, res) => {
   if (req.session.admin) {
 
     const id_election = req.body.id_election
+    const type = req.body.type_election
+    const tour = req.body.tour_election
+    const nom = req.body.nom_election
+
     const sql = "UPDATE elections SET ouvert = true, resultats_visibles = false WHERE id_election = $1"
     const result = await client.query({
       text: sql,
       values: [id_election]
     })
+
+    let getEmail = ""
+
+    if (type === 'Presidentielle' || type === 'Referundum' || type === 'Europeennes') {
+      getEmail = "SELECT email FROM electeur"
+    }
+    else {
+      const getCodePostal = "SELECT code_postal_bureau FROM organise WHERE id_election = $1"
+      const resultGetCodePostal = await client.query({
+        text: getCodePostal,
+        values: [id_election]
+      })
+      code_postaux = resultGetCodePostal.rows
+  
+      getEmail = "SELECT email FROM electeur WHERE "
+  
+      for (let i = 0; i < code_postaux.length; i++) {
+        getEmail += "code_postal = '" + code_postaux[i].code_postal_bureau + "' "
+        if (i !== code_postaux.length - 1) {
+          getEmail += "OR "
+        }
+      }    
+    }
+  
+    const resultGetEmail = await client.query({
+      text: getEmail,
+    })
+
+    email = resultGetEmail.rows
+
+    for (let i = 0; i < email.length; i++) {
+      
+      let transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'vitemonvote@gmail.com',
+          pass: 'E8PFMEgb#nS#',
+        }
+      })
+    
+      let mailOptions = {
+        from: 'vitemonvote@gmail.com',
+        to: email[i].email,
+        subject: 'Ouverture des votes',
+        text: 'Nous tenons à vous dire que l\'élection : ' + nom + ' est ouverte, vous pouvez dès maintenant voter sur notre site.'
+      }
+    
+      transporter.sendMail(mailOptions, function(err, data) {
+        if (err) {
+          console.log("Error occurs", err)
+          res.json({popup: 'Le mail donné n\'existe pas !'})
+          return
+        } 
+      })
+
+    }
     res.json({popup: "Les votes sont ouverts pour cette élection !"})
   }
   else {
@@ -764,8 +823,6 @@ router.post('/admin/elections/generate', async (req, res) => {
   }
 })
 
-//End of admin part
-
 /*******************************************/
 /*              PARTIE CLIENT              */
 /*******************************************/
@@ -864,7 +921,7 @@ router.post('/user/register', async (req, res) => {
       secure: false,
       auth: {
         user: 'vitemonvote@gmail.com',
-        pass: 'NomenclatureSquad',
+        pass: 'E8PFMEgb#nS#',
       }
     })
   
