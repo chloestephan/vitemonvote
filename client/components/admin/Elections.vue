@@ -381,7 +381,6 @@ module.exports = {
             }
         },
         async generateNewElection(election) {
-            console.log("EHOEHO")
             const informationElection = {
                 oldElection: election,
                 newName: this.newElectionName,

@@ -10,8 +10,10 @@
           <option value="">Choisir une option</option>
           <option value="Municipales">Municipales</option>
           <option value="Regionales">Regionales</option>
-          <!--<option value="Departementales">Départementales</option>
-          <option value="Legislatives">Legislatives</option>-->
+          <!--
+          <option value="Departementales">Départementales</option>
+          <option value="Legislatives">Legislatives</option>
+          -->
           <option value="Presidentielle">Presidentielle</option>
           <option value="Europeennes">Européennes</option>
           <option value="Referundum">Referendum</option>
@@ -108,7 +110,7 @@
 
         <div :class="[{displayPop : isGenerated}]" class="overlay">
             <div class="popup">
-                <h2>Confirmation</h2>
+                <h2> {{ popupTitle }} </h2>
                 <br>
                 <p>{{ popup }}</p>
                 <button @click="closePopup" class="cross">
@@ -137,6 +139,7 @@ module.exports = {
       numDepartement: null,
       isGenerated: false,
       popup: '',
+      popupTitle: ''
     }
   },
 
@@ -173,11 +176,9 @@ module.exports = {
     ajouterListe(){
       this.candidats.push([''])
     },
-
     ajouterCode(){
       this.codePostaux.push('')
     },
-
     isDone(){
       if (this.nom != ''){
         if (this.date != null){
@@ -200,12 +201,20 @@ module.exports = {
       }
       return false
     },
-
     async creerEletion(){
       if (this.isDone()){
+        this.isGenerated = true
+        this.popupTitle = "En cours..."
+        this.popup = "L'élection est en cours de création..."
         const result = await axios.post('/api/admin/election', this.election)
         this.popup = result.data.message
-        this.isGenerated = true
+        
+        if (this.popup === "L'élection a bien été créée !") {
+          this.popupTitle = "Confirmation"
+        }
+        else {
+          this.popupTitle = "Erreur"
+        }
       }
     },
     closePopup() {

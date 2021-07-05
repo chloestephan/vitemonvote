@@ -42,8 +42,9 @@
                 <div class="intro">
                     <div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[0].type }} </div><p id="separation">|</p>
                     <div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[0].jour }} / {{ elections[0].mois }} / {{ elections[0].année }} </div><p id="separation">|</p>
-                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[0].tour }} </div><p v-if="elections[0].resultats_visibles" id="separation">|</p>
-                    <div class="presentation"> <strong class="titre">Nombre de votants : </strong> {{ totalVote }} </div>
+                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[0].tour }} </div><p id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Nombre de votants : </strong> {{ totalVote }} </div><p id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Abstention : </strong> {{ abstention }} % </div>
                     <br>
                 </div>
 
@@ -76,7 +77,6 @@
             </div>
         </div>
 
-        
         <!--  AFFICHAGE SI AUCUNE ELECTION DISPO  -->
 
         <h2 v-else class="noElection">Aucun résultat disponible !</h2>
@@ -94,6 +94,7 @@ module.exports = {
             listes: [{}],
             candidats: [{}],
             totalVote: -1,
+            abstention: -1,
             electionInDetail: false,
             noSorted: true,
             idSelected: -1,
@@ -201,15 +202,26 @@ module.exports = {
             }
 
             const info = {
-                id: this.elections[0].id
+                id: this.elections[0].id,
+                type: this.elections[0].type
             }
 
             const result = await axios.post('/api/resultats/nbrVotant', info)
             this.totalVote = result.data.totalVote
+            this.abstention = result.data.abstention
+            console.log(result.data)
+            if (this.abstention === null) {
+                this.abstention = 100
+            }
 
             for (let i = 0; i < this.elections[0].listes.length; i++) {  // On calcule le pourcentage de chaques listes et on fixe le nombre de décimal à 2
                 let pourcentage = this.elections[0].listes[i].nbr_votes / this.totalVote * 100
-                this.elections[0].listes[i].pourcentage = pourcentage.toFixed(2)
+                if (isNaN(pourcentage)) {
+                    this.elections[0].listes[i].pourcentage = 0
+                }
+                else {
+                    this.elections[0].listes[i].pourcentage = pourcentage.toFixed(2)
+                }
             }
         },
         showAll() {
@@ -477,7 +489,7 @@ ul {
 }
 
 .presentation {
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 20px;
 }
 

@@ -230,18 +230,6 @@ module.exports = {
                     }
                 }
             }
-
-            const info = {
-                id: this.elections[0].id
-            }
-
-            const result = await axios.post('/api/user/elections/nbrVotant', info)
-            this.totalVote = result.data.totalVote
-
-            for (let i = 0; i < this.elections[0].listes.length; i++) {  // On calcule le pourcentage de chaques listes et on fixe le nombre de décimal à 2
-                let pourcentage = this.elections[0].listes[i].nbr_votes / this.totalVote * 100
-                this.elections[0].listes[i].pourcentage = pourcentage.toFixed(2)
-            }
         },
         showAll() {
             this.idSelected = -1
@@ -295,6 +283,7 @@ module.exports = {
                 }
                 this.confirmVote = false
             }
+            this.showAll()
         },
         closePopup() {
             this.wantsToVote = false

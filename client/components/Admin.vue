@@ -107,11 +107,6 @@ module.exports = {
         closePopup() {
             this.isError = false
         },
-        /*
-        beforeunloadHandler(){
-          this.LogOut();
-        },
-        */
         unloadHandler(e){
           this.LogOut();
         }

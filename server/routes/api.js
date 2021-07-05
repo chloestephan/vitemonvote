@@ -222,7 +222,7 @@ router.post('/admin/election', async(req, res) =>{
     const date = req.body.date
     const tour = req.body.tour
     const typeElection = req.body.typeElection
-    console.log({type: typeElection})
+    
     let tour_precedent = null
     if (tour !== 1){
       tour_precedent = req.body.precedent_tour
@@ -237,6 +237,38 @@ router.post('/admin/election', async(req, res) =>{
       nomListes = ['Oui', 'Non']
     }
 
+    if (typeElection === 'Municipales') {
+      code_postal = req.body.code_postaux
+      if (code_postal.length !== 5) {  // On regarde si la syntaxe du codePostal est correcte
+        res.json({message: 'Le code postal est incorrect !'})                  // POPUP
+        return
+      }
+      else {
+        for (let i = 0; i < code_postal.length; i++) {
+          if (!isDigit(code_postal[i])) {
+            res.json({message: 'Le code postal est incorrect !'})                  // POPUP
+            return
+          }
+        }
+      }
+    }
+
+    if (typeElection === 'Departementales') {
+      code_postal = req.body.code_postaux
+      if (code_postal.length !== 2) {  // On regarde si la syntaxe du codePostal est correcte
+        res.json({message: 'Le code postal est incorrect !'})                  // POPUP
+        return
+      }
+      else {
+        for (let i = 0; i < code_postal.length; i++) {
+          if (!isDigit(code_postal[i])) {
+            res.json({message: 'Le code postal est incorrect !'})                  // POPUP
+            return
+          }
+        }
+      }
+    }
+
     let sql = "INSERT INTO elections(nom, date, tour, tour_precedent, type_election, id_admin, ouvert, resultats_visibles) VALUES ($1, $2, $3, $4, $5, $6, false, false) RETURNING id_election"
     let result = await client.query({
       text: sql,
@@ -247,7 +279,6 @@ router.post('/admin/election', async(req, res) =>{
 
     let code_postaux = []
     if(typeElection === "Presidentielle" || typeElection === "Europeennes" || typeElection === "Referundum"){
-      console.log("In code postal")
       sql = "SELECT code_postal FROM bureaudevote"
       result = await client.query({
         text: sql
@@ -256,7 +287,6 @@ router.post('/admin/election', async(req, res) =>{
       for(let i = 0; i < result.rowCount; i++){
         code_postaux.push(result.rows[i].code_postal)
       }
-      console.log({code_postaux: code_postaux})
     }
     if(typeElection === "Municipales"){
       code_postaux = req.body.code_postaux
@@ -958,23 +988,6 @@ router.post('/user/elections/detailElection', async (req, res) => {
   }
 })
 
-// NBR TOTAL VOTANT
-
-router.post('/user/elections/nbrVotant', async (req, res) => {  
-
-  if (req.session.user) {
-
-    const id_election = req.body.id
-    const getTotalVote = "SELECT count(*) FROM avote WHERE id_election = $1"
-    const resultGetTotalVote = await client.query({
-      text: getTotalVote,
-      values: [id_election]
-    })
-
-    res.json({totalVote: resultGetTotalVote.rows[0].count})
-  }
-})
-
 // VOTE
 
 router.post('/user/elections/vote', async (req, res) => {   
@@ -1141,13 +1154,51 @@ router.post('/resultats/detailElection', async (req, res) => {
 
 router.post('/resultats/nbrVotant', async (req, res) => {  
 
+  const id_election = req.body.id
+  const type_election = req.body.type
 
-    const id_election = req.body.id
-    const getTotalVote = "SELECT count(*) FROM avote WHERE id_election = $1"
-    const resultGetTotalVote = await client.query({
-      text: getTotalVote,
+  const getTotalVote = "SELECT count(*) FROM avote WHERE id_election = $1"
+  const resultGetTotalVote = await client.query({
+    text: getTotalVote,
+    values: [id_election]
+  })
+
+  const totalVote = resultGetTotalVote.rows[0].count
+
+  if (type_election === 'Presidentielle' || type_election === 'Referundum' || type_election === 'Europeennes') {
+    let getTotalVotants = "SELECT count(*) FROM ELECTEUR"
+    const resultGetTotalVotants = await client.query({
+      text: getTotalVotants,
+    })
+    const totalVotants = resultGetTotalVotants.rows[0].count
+    const abstention = ( (totalVotants - totalVote) / totalVotants ) * 100
+
+    res.json({totalVote: totalVote, abstention: abstention})
+    return
+  }
+  else {
+    const getCodePostal = "SELECT code_postal_bureau FROM organise WHERE id_election = $1"
+    const resultGetCodePostal = await client.query({
+      text: getCodePostal,
       values: [id_election]
     })
+    code_postaux = resultGetCodePostal.rows
 
-    res.json({totalVote: resultGetTotalVote.rows[0].count})
+    let getTotalVotants = "SELECT count(*) FROM electeur WHERE "
+
+    for (let i = 0; i < code_postaux.length; i++) {
+      getTotalVotants += "code_postal = '" + code_postaux[i].code_postal_bureau + "' "
+      if (i !== code_postaux.length - 1) {
+        getTotalVotants += "OR "
+      }
+    }
+    const resultGetTotalVotants = await client.query({
+      text: getTotalVotants,
+    })
+    const totalVotants = resultGetTotalVotants.rows[0].count
+    const abstention = ( (totalVotants - totalVote) / totalVotants ) * 100
+    
+    res.json({totalVote: totalVote, abstention: abstention})
+    return
+  }
 })
