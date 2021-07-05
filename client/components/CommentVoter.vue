@@ -31,8 +31,8 @@
               </div>
               <div class='column'>
                 <div class='green-column'>
-                  <h2>Première étape : récuperez vos identifiants.</h2>
-                  <p>Vous êtes reconnu en tant que personne pouvant voter par les informations suivantes : votre numéro d'électeur sur votre carte électorale,
+                  <h2>Première étape : récupérez vos identifiants.</h2>
+                  <p>Vous êtes reconnu(e) en tant que personne pouvant voter par les informations suivantes : votre numéro d'électeur sur votre carte électorale,
                       votre code postal et votre adresse email. Nous nous assurons ensuite que vous êtes en effet sur nos listes électorales
                       et pouvez donc voter. Une fois cette validation faite, vous recevez vos identifiants de connexion par email. 
                   </p>
@@ -50,7 +50,7 @@
               <div class='column'>
                 <div class='green-column'>
                   <h2>Deuxième étape : se connecter.</h2>
-                  <p>Vous n'avez plus à vos déplacer aux bureaux de vote, à attendre et à respecter scrupuleusement les règles afin de ne pas annuler votre vote. Vous pouvez voter confortablement depuis chez vous, et ce en toute sécurité.</p>
+                  <p>Vous n'avez plus à vous déplacer aux bureaux de vote, à attendre et à respecter scrupuleusement les règles afin de ne pas annuler votre vote. Vous pouvez voter confortablement depuis chez vous, et ce en toute sécurité.</p>
                 </div>
             </div>
           </div>

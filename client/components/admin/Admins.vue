@@ -67,7 +67,7 @@ module.exports = {
             this.administrateurs = result.data.admin
             this.popup = result.data.popup
 
-            if (this.popup === "L'admin a bien été supprimé !") {
+            if (this.popup === "L'admin a bien été supprimé(e) !") {
                 this.isNoError = true
             }
             else if (!(this.popup === undefined)) {
@@ -85,7 +85,7 @@ module.exports = {
                 this.administrateurs = result.data.admin
                 this.popup = result.data.popup
 
-                if (this.popup === "L'admin a bien été créé !") {
+                if (this.popup === "L'admin a bien été créé(e) !") {
                     this.isNoError = true
                 }
                 else if (!(this.popup === undefined)) {
