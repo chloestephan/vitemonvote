@@ -42,7 +42,7 @@
                 <div class="intro">
                     <div class="presentation"> <strong class="titre">Type d'élection : </strong> {{ elections[0].type }} </div><p id="separation">|</p>
                     <div class="presentation"> <strong class="titre">Date du vote : </strong> {{ elections[0].jour }} / {{ elections[0].mois }} / {{ elections[0].année }} </div><p id="separation">|</p>
-                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[0].tour }} </div><p v-if="elections[0].resultats_visibles" id="separation">|</p>
+                    <div class="presentation"> <strong class="titre">Tour : </strong> {{ elections[0].tour }} </div>
                     <br>
                 </div>
 

@@ -128,4 +128,5 @@ CREATE TABLE public.Acces(
 )WITHOUT OIDS;
 
 INSERT INTO admins(email, password) VALUES ('admin', '$2b$10$OwYLLwN.wross8t4LYhbjOaYCfa158eUxF2t/5YE0adZNHlI4otSe');
-INSERT INTO Electeur(num_carte_electeur, email, password, code_postal) VALUES ('111111111', 'tristan94000@gmail.com','$2b$10$OwYLLwN.wross8t4LYhbjOaYCfa158eUxF2t/5YE0adZNHlI4otSe', '94440');
+INSERT INTO Electeur(num_carte_electeur, email, password, code_postal) VALUES ('111111111', 'admin','$2b$10$OwYLLwN.wross8t4LYhbjOaYCfa158eUxF2t/5YE0adZNHlI4otSe', '75002');
+INSERT INTO Electeur(num_carte_electeur, email, password, code_postal) VALUES ('111111112', 'tristan94000@gmail.com','$2b$10$OwYLLwN.wross8t4LYhbjOaYCfa158eUxF2t/5YE0adZNHlI4otSe', '94440');

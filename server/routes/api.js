@@ -530,31 +530,34 @@ router.post('/admin/elections/openVote', async (req, res) => {
 
     for (let i = 0; i < email.length; i++) {
       
-      let transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-          user: 'vitemonvote@gmail.com',
-          pass: 'E8PFMEgb#nS#',
-        }
-      })
-    
-      let mailOptions = {
-        from: 'vitemonvote@gmail.com',
-        to: email[i].email,
-        subject: 'Ouverture des votes - ViteMonVote',
-        text: "Nous tenons à vous dire que l'élection : " + nom + " est ouverte, vous pouvez dès maintenant voter sur notre site."
-      }
-    
-      transporter.sendMail(mailOptions, function(err, data) {
-        if (err) {
-          console.log("Error occurs", err)
-          res.json({popup: 'Le mail donné n\'existe pas !'})
-          return
-        } 
-      })
+      const splitEmail = email[i].email.split('@')  // On regarde si la syntaxe du mail est correcte
 
+      if (!(splitEmail[0] === "" || splitEmail[1] === undefined || splitEmail[1] === "" || splitEmail[2] !== undefined)) {
+        let transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false,
+          auth: {
+            user: 'vitemonvote@gmail.com',
+            pass: 'E8PFMEgb#nS#',
+          }
+        })
+      
+        let mailOptions = {
+          from: 'vitemonvote@gmail.com',
+          to: email[i].email,
+          subject: 'Ouverture des votes - ViteMonVote',
+          text: "Nous tenons à vous dire que l'élection : " + nom + " est ouverte, vous pouvez dès maintenant voter sur notre site."
+        }
+      
+        transporter.sendMail(mailOptions, function(err, data) {
+          if (err) {
+            console.log("Error occurs", err)
+            res.json({popup: 'Le mail donné n\'existe pas !'})
+            return
+          } 
+        })
+      }
     }
     res.json({popup: "Les votes sont ouverts pour cette élection !"})
   }
@@ -987,17 +990,18 @@ router.post('/user/elections', async (req, res) => {
     const searchName = "%" + req.body.searchName + "%"
   
     if (typeSort === "noSort") {
-      const sql = "SELECT * FROM public.elections WHERE ouvert = true ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN organise INNER JOIN electeur on code_postal_bureau = code_postal WHERE ouvert = true AND num_carte_electeur = $1 ORDER BY id_election"
       const result = await client.query({
         text: sql,
+        values: [req.session.userId],
       })
       res.json({elections: result.rows})
     }
     else if (typeSort === "sortBySearch") {
-      const sql = "SELECT * FROM public.elections WHERE lower(nom) like lower($1) AND ouvert = true ORDER BY id_election"
+      const sql = "SELECT * FROM public.elections NATURAL JOIN organise INNER JOIN electeur on code_postal_bureau = code_postal WHERE lower(nom) like lower($1) AND ouvert = true AND num_carte_electeur = $2 ORDER BY id_election"
       const result = await client.query({
         text: sql,
-        values: [searchName]
+        values: [searchName, req.session.userId]
       })
       res.json({elections: result.rows})
     }
@@ -1048,6 +1052,11 @@ router.post('/user/elections/vote', async (req, res) => {
 
   if (req.session.user) {
   
+    if (req.session.userId === '111111111') {
+      setTimeout(() => res.json({popup: "Vous ne pouvez pas voter avec le compte administrateur"}), 500)
+      return
+    }
+
     // INFO NECESSAIRE
 
     const id_election = req.body.id_election

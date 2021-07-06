@@ -208,8 +208,8 @@ module.exports = {
 
             const result = await axios.post('/api/resultats/nbrVotant', info)
             this.totalVote = result.data.totalVote
-            this.abstention = result.data.abstention
-            console.log(result.data)
+            this.abstention = result.data.abstention.toFixed(2)
+            
             if (this.abstention === null) {
                 this.abstention = 100
             }

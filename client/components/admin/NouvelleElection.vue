@@ -75,7 +75,7 @@
 
               <div v-for="(candidat, index2) in candidats[index1]" :key=index2>
                 <div class="ligne">
-                  <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][index2]" :placeholder="'Candidat'" required>
+                  <input class="nouveauCandidat" type="text" v-model="candidats[index1][index2]" :placeholder="'Candidat'" required>
                   <p v-if="candidats[index1].length > 1" @click="deleteCandidat(index1, index2)" class="supprimer">❌</p>
                 </div>
               </div>
@@ -92,10 +92,10 @@
               <hr>
               <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
               <div class="ligne">
-                <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][0]" :placeholder="'Candidat'" required>
+                <input class="nouveauCandidat" type="text" v-model="candidats[index1][0]" :placeholder="'Candidat'" required>
               </div>
               <div class="ligne">
-                <input class="nouveauCandidat" type="text"  class="" v-model="candidats[index1][1]" :placeholder="'Candidat'" required>
+                <input class="nouveauCandidat" type="text" v-model="candidats[index1][1]" :placeholder="'Candidat'" required>
               </div>
               <button v-if="candidats.length > 1" type="button" @click="supprimerListe">❌ Supprimer la liste</button>
             </div>
@@ -154,12 +154,20 @@ module.exports = {
         typeElection: this.typeElection,
         code_postaux: this.codePostaux,
         region: this.nomRegion,
+        currentDate: ''
       }
     }
   },
 
   created: function(){
     this.candidats.push([''])
+
+    const time = Date.now()
+    const today = new Date(time)
+    const date = today.getDate()
+    const month = today.getMonth() + 1
+    const year = today.getFullYear()
+    this.currentDate = year + '-' + month + '-' + date
   },
 
   methods:{
@@ -202,17 +210,48 @@ module.exports = {
       return false
     },
     async creerEletion(){
+
       if (this.isDone()){
-        this.isGenerated = true
-        this.popupTitle = "En cours..."
-        this.popup = "L'élection est en cours de création..."
-        const result = await axios.post('/api/admin/election', this.election)
-        this.popup = result.data.message
-        
-        if (this.popup === "L'élection a bien été créée !") {
-          this.popupTitle = "Confirmation"
+
+        const splitDateElection = this.date.split('-')
+        const splitCurrentDate = this.currentDate.split('-')
+
+        const electionDate = parseInt(splitDateElection[2])
+        const electionMonth = parseInt(splitDateElection[1])
+        const electionYear = parseInt(splitDateElection[0])
+
+        const currentDate = parseInt(splitCurrentDate[2])
+        const currentMonth = parseInt(splitCurrentDate[1])
+        const currentYear = parseInt(splitCurrentDate[0])
+
+        let isError = false
+
+        if (currentYear < electionYear || 
+        (currentYear === electionYear && currentMonth < electionMonth) ||
+        (currentYear === electionYear && currentMonth === electionMonth && currentDate <= electionDate)) {
+          isError = false
         }
         else {
+          isError = true
+        }
+
+        if (!isError) {
+          this.isGenerated = true
+          this.popupTitle = "En cours..."
+          this.popup = "L'élection est en cours de création..."
+          const result = await axios.post('/api/admin/election', this.election)
+          this.popup = result.data.message
+          
+          if (this.popup === "L'élection a bien été créée !") {
+            this.popupTitle = "Confirmation"
+          }
+          else {
+            this.popupTitle = "Erreur"
+          }
+        }
+        else {
+          this.isGenerated = true
+          this.popup = "La date choisie n'est pas valide !"
           this.popupTitle = "Erreur"
         }
       }
