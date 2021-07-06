@@ -154,7 +154,7 @@ module.exports = {
 
             const findId = (element) => element.id === idElection // On cherche l'id de l'élection sélectionnée
             this.idSelected = this.elections.findIndex(findId)
-            this.electionInDetail = true
+            
 
             const information = {
                 election: this.elections[this.idSelected]
@@ -163,6 +163,7 @@ module.exports = {
             const result = await axios.post('/api/user/elections/detailElection', information)  // On récupère les informations
 
             if (result.data.popup === undefined) {
+                this.electionInDetail = true
                 this.elections = [{}]
                 this.listes = [{}]
                 this.candidats = [{}]
