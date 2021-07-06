@@ -2,6 +2,8 @@
     <div class="site-container">
         <div class="limiter">
 
+            <!-- Affichage si personne n'est connecté -->
+
             <div v-if="!isUserConnected" class="container">
 
                 <div class="getPassword">
@@ -31,6 +33,8 @@
 
             </div>
 
+            <!-- Affichage si une personne est connectée -->
+
             <div v-else>
                 <nav class="navbar">
                     <ul class="nav-links">
@@ -40,6 +44,8 @@
                 </nav>
             <router-view></router-view>
             </div>
+
+            <!-- POPUP D'ERREUR LORS DE LA CONNEXION/RECUPERATION MDP -->
 
             <div :class="[{displayPop : isError}, {displayPop : mailSent}]" class="overlay">
                 <div class="popup">
@@ -89,6 +95,9 @@ module.exports = {
 
     methods: {
         async getPassword() {
+
+            // récuparation du MDP
+
             this.popup = ''
             if (this.email !== '' && this.numCarteElec !== '' && this.codePostal !== '') {
                 const user = {
@@ -97,20 +106,24 @@ module.exports = {
                     email: this.emailRegister,
                 }
 
-                const result = await axios.post('/api/user/register', user)
+                const result = await axios.post('/api/user/register', user)  // On regarde si les infos sont correctes avant d'envoyer le mail
                 this.popup = result.data.popup
-                if (this.popup === "Un mot de passe vous a été envoyé sur votre adresse mail. Veuillez le saisir pour vous connecter !") {
+
+                if (this.popup === "Un mot de passe vous a été envoyé sur votre adresse mail. Veuillez le saisir pour vous connecter !") {  // Popup de confirmation
                     this.mailSent = true
                     this.emailRegister = ''
                     this.codePostal = ''
                     this.numCarteElec = ''
                 }
-                else if (this.popup !== undefined) {
+                else if (this.popup !== undefined) { // Popup d'erreur
                     this.isError = true
                 }
             }
         },
         async loginUser() {
+
+            // connexion
+
             this.popup = ''
             if (this.email !== '' && this.password !== '') {
                 const user = {
@@ -132,6 +145,9 @@ module.exports = {
             this.mailSent = false
         },
         async LogOut(){
+
+            // Déconnexion
+
             const user = {
                 email: this.email,
                 password: this.password,

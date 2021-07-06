@@ -1021,6 +1021,17 @@ router.post('/user/elections/detailElection', async (req, res) => {
   if (req.session.user) {
     const election = req.body.election
 
+    const getAvote = "SELECT * FROM avote WHERE id_election = $1 AND num_carte_electeur = $2"
+    const resultGetAvote = await client.query({
+      text: getAvote,
+      values: [election.id, req.session.userId]
+    })
+
+    if (resultGetAvote.rowCount !== 0) {
+      res.json({popup: "Vous avez déjà voté, vous ne pouvez pas voter plusieurs fois !"})
+      return
+    }
+
     if (election.type === "Referundum") {
       const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE id_election = $1"
       const result = await client.query({
@@ -1159,7 +1170,7 @@ router.post('/user/elections/vote', async (req, res) => {
   }
 })
 
-// TRI DES ELECTIONS
+// TRI DES RESULTATS
 
 router.post('/resultats', async (req, res) => {  
 

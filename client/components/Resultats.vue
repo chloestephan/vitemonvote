@@ -25,9 +25,6 @@
                 <div> <strong>Type d'élection : </strong> {{ election.type }}</div>
                 <div> <strong>Date du vote : </strong> {{ election.jour }} / {{ election.mois }} / {{ election.année }}</div>
                 <div> <strong>Tour : </strong> {{ election.tour }}</div>
-
-                <!--  AFFICHAGE SELON LA DISPO DES RESULT OU DES VOTES  -->
-
                 <div><strong>RESULTATS DISPONIBLES</strong></div>
             </li>
         </ul>
@@ -103,22 +100,27 @@ module.exports = {
         }
     },
     mounted: async function() {
-        
+         
+        // FONCTION QUI RECUPERE LES INFORMATIONS DES ELECTIONS
+
         const sort = {
             typeSort: "noSort"
         }
 
-        const result = await axios.post('/api/resultats', sort)
+        const result = await axios.post('/api/resultats', sort) // On récupère les infos de la BDD
 
         this.elections.pop()
         this.listes.pop()
         this.candidats.pop()
 
-        this.fillElection(result.data.elections)
+        this.fillElection(result.data.elections)  // On remplit le tableau élection
     },
     methods: {
         async detailElection(idElection) {
-            const findId = (element) => element.id === idElection
+
+            // FONCTION POUR REMPLIR LES ELECTIONS AVEC LES INFORMATIONS DETAILLEES
+
+            const findId = (element) => element.id === idElection // On cherche l'id de l'élection sélectionnée
             this.idSelected = this.elections.findIndex(findId)
             this.electionInDetail = true
 
@@ -126,7 +128,7 @@ module.exports = {
                 election: this.elections[this.idSelected]
             }
 
-            const result = await axios.post('/api/resultats/detailElection', information)
+            const result = await axios.post('/api/resultats/detailElection', information)  // On récupère les informations
 
             this.elections = [{}]
             this.listes = [{}]
@@ -136,11 +138,14 @@ module.exports = {
             this.listes.pop()
             this.candidats.pop()
 
-            this.fillDetailedElection(result.data.elections)
+            this.fillDetailedElection(result.data.elections)  // On remplit le tableau élection
         },
         fillElection(elections) {
+
+            // FONCTION POUR REMPLIR LES ELECTIONS AVEC LES INFORMATIONS
+
             for (var i = 0; i < elections.length; i++) {
-                var date = elections[i].date.substring(0,10).split('-')
+                var date = elections[i].date.substring(0,10).split('-')  // On split la date pour la mettre dans un bon format
             
                 this.elections.push({
                     id: elections[i].id_election,
@@ -155,16 +160,19 @@ module.exports = {
             }
         },
         async fillDetailedElection(election) {
+            
+            // FONCTION QUI RECUPERE LES INFORMATIONS DES ELECTIONS
+
             for (var i = 0; i < election.length; i++) {
                 var date = election[i].date.substring(0,10).split('-')
                 
-                if (election.type !== "Referundum") {
+                if (election.type !== "Referundum") {  // Un referundum n'a pas de candidat
                     this.candidats.push({
                         nom_complet: election[i].nom_complet
                     })
                 }
 
-                if ( (i === election.length - 1) || ( election[i].id_liste !== election[i + 1].id_liste ) ) {
+                if ( (i === election.length - 1) || ( election[i].id_liste !== election[i + 1].id_liste ) ) {  // On remplit les listes avec les infos
                     this.listes.push({
                         id_election: election[i].id_election,
                         id_liste: election[i].id_liste,
@@ -177,7 +185,7 @@ module.exports = {
                     this.candidats.pop()
                 }
 
-                if ( (i === election.length - 1) || (election[i].id_election !== election[i + 1].id_election) ) {
+                if ( (i === election.length - 1) || (election[i].id_election !== election[i + 1].id_election) ) { // On remplit l'election avec les infos
                     this.elections.push({
                         id: election[i].id_election,
                         nom: election[i].nom,
@@ -206,7 +214,7 @@ module.exports = {
                 type: this.elections[0].type
             }
 
-            const result = await axios.post('/api/resultats/nbrVotant', info)
+            const result = await axios.post('/api/resultats/nbrVotant', info)  // On regarde le nbr total de vote et le nbr total de votant pour avoir l'abstention
             this.totalVote = result.data.totalVote
             this.abstention = result.data.abstention.toFixed(2)
             
@@ -225,12 +233,18 @@ module.exports = {
             }
         },
         showAll() {
+            
+            // Annule la recherche et donc récupère les infos de toutes les élections
+
             this.idSelected = -1
             this.electionInDetail = false
             this.noSorted = false
             this.noSort()
         },
         async sort (typeOfSort) {
+            
+            // Recupère les infos selon un type de tri
+
             this.elections = [{}]
             this.listes = [{}]
             this.candidats = [{}]

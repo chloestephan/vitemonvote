@@ -1,7 +1,9 @@
 <template>
 
     <div>
+
         <!--  AFFICHAGE SELON SI UNE ELECTION EST SELECTIONNEE OU NON  -->
+
         <div v-if="!electionInDetail">
             <h2>Cliquez sur une élection pour voter</h2>
             <br>
@@ -25,10 +27,7 @@
                 <div> <strong>Type d'élection : </strong> {{ election.type }}</div>
                 <div> <strong>Date du vote : </strong> {{ election.jour }} / {{ election.mois }} / {{ election.année }}</div>
                 <div> <strong>Tour : </strong> {{ election.tour }}</div>
-
-                <!--  AFFICHAGE SELON LA DISPO DES RESULT OU DES VOTES  -->
-
-                <div><strong>VOTE DISPONIBLES</strong></div>
+                <div> <strong>VOTE OUVERT</strong></div>
             </li>
         </ul>
 
@@ -134,21 +133,26 @@ module.exports = {
     },
     mounted: async function() {
         
+        // FONCTION QUI RECUPERE LES INFORMATIONS DES ELECTIONS
+
         const sort = {
             typeSort: "noSort"
         }
 
-        const result = await axios.post('/api/user/elections', sort)
+        const result = await axios.post('/api/user/elections', sort)  // On récupère les infos de la BDD
 
         this.elections.pop()
         this.listes.pop()
         this.candidats.pop()
 
-        this.fillElection(result.data.elections)
+        this.fillElection(result.data.elections)  // On remplit le tableau élection
     },
     methods: {
         async detailElection(idElection) {
-            const findId = (element) => element.id === idElection
+
+            // FONCTION POUR REMPLIR LES ELECTIONS AVEC LES INFORMATIONS DETAILLEES
+
+            const findId = (element) => element.id === idElection // On cherche l'id de l'élection sélectionnée
             this.idSelected = this.elections.findIndex(findId)
             this.electionInDetail = true
 
@@ -156,21 +160,31 @@ module.exports = {
                 election: this.elections[this.idSelected]
             }
 
-            const result = await axios.post('/api/user/elections/detailElection', information)
+            const result = await axios.post('/api/user/elections/detailElection', information)  // On récupère les informations
 
-            this.elections = [{}]
-            this.listes = [{}]
-            this.candidats = [{}]
+            if (result.data.popup === undefined) {
+                this.elections = [{}]
+                this.listes = [{}]
+                this.candidats = [{}]
 
-            this.elections.pop()
-            this.listes.pop()
-            this.candidats.pop()
+                this.elections.pop()
+                this.listes.pop()
+                this.candidats.pop()
 
-            this.fillDetailedElection(result.data.elections)
+                this.fillDetailedElection(result.data.elections)  // On remplit le tableau élection
+            }
+            else {
+                this.popup = result.data.popup
+                this.isError = true
+                this.showAll()
+            }
         },
         fillElection(elections) {
+
+            // FONCTION POUR REMPLIR LES ELECTIONS AVEC LES INFORMATIONS
+
             for (var i = 0; i < elections.length; i++) {
-                var date = elections[i].date.substring(0,10).split('-')
+                var date = elections[i].date.substring(0,10).split('-')  // On split la date pour la mettre dans un bon format
             
                 this.elections.push({
                     id: elections[i].id_election,
@@ -185,16 +199,19 @@ module.exports = {
             }
         },
         async fillDetailedElection(election) {
+
+            // FONCTION QUI RECUPERE LES INFORMATIONS DES ELECTIONS
+
             for (var i = 0; i < election.length; i++) {
                 var date = election[i].date.substring(0,10).split('-')
                 
-                if (election.type !== "Referundum") {
+                if (election.type !== "Referundum") {  // Un referundum n'a pas de candidat
                     this.candidats.push({
                         nom_complet: election[i].nom_complet
                     })
                 }
 
-                if ( (i === election.length - 1) || ( election[i].id_liste !== election[i + 1].id_liste ) ) {
+                if ( (i === election.length - 1) || ( election[i].id_liste !== election[i + 1].id_liste ) ) {  // On remplit les listes avec les infos
                     this.listes.push({
                         id_election: election[i].id_election,
                         id_liste: election[i].id_liste,
@@ -207,7 +224,7 @@ module.exports = {
                     this.candidats.pop()
                 }
 
-                if ( (i === election.length - 1) || (election[i].id_election !== election[i + 1].id_election) ) {
+                if ( (i === election.length - 1) || (election[i].id_election !== election[i + 1].id_election) ) { // On remplit l'election avec les infos
                     this.elections.push({
                         id: election[i].id_election,
                         nom: election[i].nom,
@@ -232,12 +249,18 @@ module.exports = {
             }
         },
         showAll() {
+
+            // Annule la recherche et donc récupère les infos de toutes les élections
+
             this.idSelected = -1
             this.electionInDetail = false
             this.noSorted = false
             this.noSort()
         },
         async sort (typeOfSort) {
+
+            // Recupère les infos selon un type de tri
+
             this.elections = [{}]
             this.listes = [{}]
             this.candidats = [{}]
@@ -257,7 +280,7 @@ module.exports = {
         },
         sortBySearch() {
             this.sort("sortBySearch")
-            this.noSorted = false
+            this.noSorted = false 
         },
         noSort() {
             if (!this.noSorted) {
@@ -266,16 +289,19 @@ module.exports = {
             }
         },
         async vote() {
+
+            // VOTE
+
             if (this.confirmVote) {
                 const information = {
                     id_election: this.idElectionVote,
                     id_liste: this.idListeVote,
                 }
-                const result = await axios.post('/api/user/elections/vote', information)
+                const result = await axios.post('/api/user/elections/vote', information)  // Va update les infos sur la bdd pour prendre en compte le vote
 
                 this.popup = result.data.popup
 
-                if (this.popup === "Le vote a été pris en compte ! Merci de votre participation !") {
+                if (this.popup === "Le vote a été pris en compte ! Merci de votre participation !") {  // Popup de confirmation ou d'erreur
                     this.voted = true
                 }
                 else if (this.popup !== undefined) {
@@ -283,7 +309,7 @@ module.exports = {
                 }
                 this.confirmVote = false
             }
-            this.showAll()
+            this.showAll()  // annule la recherche
         },
         closePopup() {
             this.wantsToVote = false
@@ -291,12 +317,12 @@ module.exports = {
             this.voted = false
             this.showAll()
         },
-        popupConfirmation(election, liste) {
+        popupConfirmation(election, liste) {  // Popup de confirmation avant de voter
             this.wantsToVote = true
             this.idElectionVote = election.id
             this.idListeVote = liste.id_liste
         },
-        confirmation() {
+        confirmation() {  // Confirmation de l'envie de voter
            this.confirmVote = true
            this.wantsToVote = false
            this.vote()
