@@ -21,7 +21,7 @@ module.exports = router
 /*              PARTIE ADMIN               */
 /*******************************************/
 
-router.get('/admin/me', async (req, res) => {
+router.get('/admin/me', async (req, res) => { // S'il n'y a pas d'admin connecté, l'utilisateur est envoyé à la page de connexion admin.
   if(req.session.admin === true){
     res.json({admin: true})
     return
@@ -29,7 +29,7 @@ router.get('/admin/me', async (req, res) => {
   res.json({admin: false})
 })
 
-router.post('/admin/login', async (req, res) => {
+router.post('/admin/login', async (req, res) => { //L'admin rentre son identifiant et son mot de passe pour se connecter.
   const email = req.body.email
   const password = req.body.password
   const sql = "SELECT * FROM admins WHERE email=$1"
@@ -38,23 +38,27 @@ router.post('/admin/login', async (req, res) => {
     values: [email]
   })
 
-  if(result.rowCount === 0){
+  if(result.rowCount === 0){ // Si aucun admin ne correspond à l'email rentré 
+
     res.json({ popup: "L'email utilisé et/ou le mot de passe sont incorrects !"})
     return
+
   }
 
-  if (! await bcrypt.compare(password, result.rows[0].password)){
+  if (! await bcrypt.compare(password, result.rows[0].password)){ // Si le mot de passe est incorrect
+
     res.json({connected: false, popup: "L'email et/ou le mot de passe sont incorrects !"})
     return
+
   }
 
   req.session.adminId = result.rows[0].id
   req.session.admin = true
   
-  res.json({connected: true, message: 'You are now logged in as an admin.'})
+  res.json({connected: true, message: 'You are now logged in as an admin.'}) // Si les données rentrées sont bonnes, l'admin est connecté.
 })
 
-router.post('/admin/logout', async (req, res) => {
+router.post('/admin/logout', async (req, res) => { // L'utilisateur se déconnecte.
   const email = req.body.email
   const password = req.body.password
   req.email = ''
@@ -65,7 +69,7 @@ router.post('/admin/logout', async (req, res) => {
 })
 
 //admin management
-router.post('/admin/register', async (req, res) =>{
+router.post('/admin/register', async (req, res) =>{ // Un nouvel admin est créé 
   if (req.session.admin === true){
     const email = req.body.email
     const password = req.body.password
@@ -77,13 +81,13 @@ router.post('/admin/register', async (req, res) =>{
     })
 
     if(result1.rowCount !== 0){
-      res.json({ popup: "Cet admin existe déjà !"})
+      res.json({ popup: "Cet admin existe déjà !"}) // on ne peux pas créer deux fois le meme admin.
       return
     }
 
     const hash = await bcrypt.hash(password, 10)
 
-    const sql2 = "INSERT INTO admins (email, password) VALUES ($1, $2)"
+    const sql2 = "INSERT INTO admins (email, password) VALUES ($1, $2)" // Les informations sont rentrées dans la bdd
     await client.query({
       text: sql2,
       values: [email, hash]
@@ -96,31 +100,31 @@ router.post('/admin/register', async (req, res) =>{
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.delete('/admin/:id', async (req, res) => {
+router.delete('/admin/:id', async (req, res) => { // Supprimer un compte admin
   if (req.session.admin === true){
     const deleteAdmin = req.params.id
     if (deleteAdmin === req.session.adminId){
-      res.status(401).json({message: "You can't delete the current admin"})
+      res.status(401).json({message: "You can't delete the current admin"}) // Le compte actif ne peut pas être supprimé
       return
     }
     else if (deleteAdmin === '1') {
       const result = await client.query({text: "SELECT id, email FROM admins"})
-      res.json({admin: result.rows, popup: "Vous ne pouvez pas supprimer le super admin !"})
+      res.json({admin: result.rows, popup: "Vous ne pouvez pas supprimer le super admin !"}) // L'admin principal ne peux pas être supprimé.
       return      
     }
-    const haveElection = "SELECT * FROM acces WHERE id_election = $1"
+    const haveElection = "SELECT * FROM acces WHERE id_election = $1" 
     const resultHaveElection = await client.query({
       text: haveElection,
       values: [deleteAdmin]
     })
     
     if (resultHaveElection.rowCount === 0) {
-      const sql = "DELETE FROM admins WHERE id=$1"
+      const sql = "DELETE FROM admins WHERE id=$1" // les informations sont supprimées de la bdd.
       await client.query({
         text: sql,
         values: [deleteAdmin]
       })
-  
+
       const result = await client.query({text: "SELECT id, email FROM admins"})
       res.json({admin: result.rows, popup: "L'admin a bien été supprimé(e) !"})
       return
@@ -153,7 +157,7 @@ router.delete('/admin/:id', async (req, res) => {
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.get('/admin/admins', async (req, res) =>{
+router.get('/admin/admins', async (req, res) =>{ // Pour savoir qui est connecté parmi les admins
   if (req.session.admin === true){
     const result = await client.query({text: "SELECT id, email FROM admins"})
     res.json({currentId: req.session.adminId, administrateurs: result.rows})
@@ -162,6 +166,7 @@ router.get('/admin/admins', async (req, res) =>{
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
+// Pour récupérer les élécteurs selon la région séléctionnée et leur code postal :
 function codePostalRegion (region) {
   if (region === 'Bretagne') {
     return "SELECT code_postal FROM bureaudevote WHERE code_postal LIKE '22%' OR code_postal LIKE '29%' OR code_postal LIKE '35%' OR code_postal LIKE '56%'"
@@ -219,7 +224,7 @@ function codePostalRegion (region) {
   }
 }
 
-router.post('/admin/election', async(req, res) =>{
+router.post('/admin/election', async(req, res) =>{ // Création d'une éléction selon le choix du type d'éléction.
   if (req.session.admin === true){
     const nom = req.body.nom
     const date = req.body.date
@@ -232,7 +237,7 @@ router.post('/admin/election', async(req, res) =>{
     }
     let nomListes
     let candidats
-    if(typeElection!=='Referundum'){
+    if(typeElection!=='Referundum'){ //Si c'est un référendum, les listes seront "oui" et "non".
       nomListes = req.body.nomListes
       candidats = req.body.candidats
     }
@@ -245,9 +250,11 @@ router.post('/admin/election', async(req, res) =>{
       text: verifBureauDeVote,
     })
 
-    if (resultVerifBureauDeVote.rowCount === 0) {
+    if (resultVerifBureauDeVote.rowCount === 0) { // Vérification des bureaux de vote
+
       res.json({message: "Les bureaux de vote n'ont pas été chargés ! Veuillez les importer dans l'onglet électeurs avant de créer une élection !"})                  // POPUP
       return
+
     }
 
     if (typeElection === 'Municipales') {
@@ -265,7 +272,7 @@ router.post('/admin/election', async(req, res) =>{
         }
       }
     }
-
+    //Insertion d'une nouvelle éléction dans la bdd
     let sql = "INSERT INTO elections(nom, date, tour, tour_precedent, type_election, id_admin, ouvert, resultats_visibles) VALUES ($1, $2, $3, $4, $5, $6, false, false) RETURNING id_election"
     let result = await client.query({
       text: sql,
@@ -273,6 +280,8 @@ router.post('/admin/election', async(req, res) =>{
     })
 
     const id_election = result.rows[0].id_election
+
+    // récupération des codes postaux des élécteurs
 
     let code_postaux = []
     if(typeElection === "Presidentielle" || typeElection === "Europeennes" || typeElection === "Referundum"){
@@ -303,7 +312,7 @@ router.post('/admin/election', async(req, res) =>{
         code_postaux.push(result.rows[i].code_postal)
       }
     }
-    for(let i = 0; i < code_postaux.length; i++){
+    for(let i = 0; i < code_postaux.length; i++){ // Recupere le code postal du bureau
       sql = "INSERT INTO organise VALUES ($1, $2)"
       await client.query({
         text: sql,
@@ -311,7 +320,8 @@ router.post('/admin/election', async(req, res) =>{
       })
     }
 
-    for(let i = 0; i < nomListes.length; i++){
+    for(let i = 0; i < nomListes.length; i++){ // initialisation des listes
+
       sql = "INSERT INTO liste(nom_liste, id_election, nbr_votes) VALUES ($1, $2, $3) RETURNING id_liste"
       result = await client.query({
         text: sql,
@@ -327,9 +337,10 @@ router.post('/admin/election', async(req, res) =>{
           })
         }
       }
+
     }
 
-    sql = "INSERT INTO acces VALUES ($1, $2)"
+    sql = "INSERT INTO acces VALUES ($1, $2)" // Donne l'acces à une éléction à l'administrateur actuellement connecté.
     await client.query({
       text: sql,
       values: [req.session.adminId, id_election]
@@ -341,11 +352,11 @@ router.post('/admin/election', async(req, res) =>{
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.post('/admin/electeurs', async(req, res) => {
+router.post('/admin/electeurs', async(req, res) => { // Importer des élécteurs
   if (req.session.admin === true){
     const electeurs = req.body.electeurs
 
-    const sql = "INSERT INTO electeur VALUES ($1, $2, $3, $4)"
+    const sql = "INSERT INTO electeur VALUES ($1, $2, $3, $4)"// Insert dans la bdd l'identifiant, le mail et le code postal de l'élécteur
     for(let i = 0; i < electeurs.length; i++){
       await client.query({
         text: sql,
@@ -358,12 +369,13 @@ router.post('/admin/electeurs', async(req, res) => {
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.post('/admin/electeur', async(req, res) => {
+router.post('/admin/electeur', async(req, res) => { // Rechercher un élécteur
   if (req.session.admin === true){
     const num_carte_electeur = req.body.num_carte_electeur
     const email = req.body.email
     const code_postal = req.body.code_postal
-
+    
+    // Requete SQL pour retrouver un élécteur
     const sql = "SELECT * FROM electeur WHERE lower(num_carte_electeur) LIKE lower($1) AND lower(email) LIKE lower($2) AND code_postal LIKE $3"
     const result = await client.query({
       text: sql,
@@ -375,7 +387,7 @@ router.post('/admin/electeur', async(req, res) => {
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.delete('/admin/electeur/:id', async (req, res) => {
+router.delete('/admin/electeur/:id', async (req, res) => { // Supprimer un élécteur
   if (req.session.admin === true){
     const id = req.params.id
     const sql = "DELETE FROM electeur WHERE num_carte_electeur=$1"
@@ -389,7 +401,7 @@ router.delete('/admin/electeur/:id', async (req, res) => {
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.post('/admin/bureaux', async (req, res) => {
+router.post('/admin/bureaux', async (req, res) => { // Importer les bureaux de vote
   if (req.session.admin === true){
     const bureaux = req.body.bureaux
     const sql = "INSERT INTO bureaudevote VALUES ($1, $2) ON CONFLICT DO NOTHING"
@@ -405,14 +417,14 @@ router.post('/admin/bureaux', async (req, res) => {
   res.status(400).json({message: "L'utilisateur n'a pas les droits administrateurs."})
 })
 
-router.post('/admin/elections', async (req, res) => {
+router.post('/admin/elections', async (req, res) => { // Récuperation des informations de la bdd pour l'affichage des éléctions
 
   if (req.session.admin) {
     const typeSort = req.body.typeSort
     const searchName = "%" + req.body.searchName + "%"
     const id_admin = req.session.adminId
 
-    if (typeSort === "noSort") {
+    if (typeSort === "noSort") { // Pas d'ordre
       const sql = "SELECT * FROM public.elections WHERE id_admin = $1 ORDER BY id_election"
       const result = await client.query({
         text: sql,
@@ -420,7 +432,7 @@ router.post('/admin/elections', async (req, res) => {
       })
       res.json({elections: result.rows})
     }
-    else if (typeSort === "sortBySearch") {
+    else if (typeSort === "sortBySearch") { // Rehercher une éléction
       const sql = "SELECT * FROM public.elections WHERE lower(nom) like lower($1) AND id_admin = $2 ORDER BY id_election"
       const result = await client.query({
         text: sql,
@@ -428,7 +440,7 @@ router.post('/admin/elections', async (req, res) => {
       })
       res.json({elections: result.rows})
     }
-    else if (typeSort === "sortByVote") {
+    else if (typeSort === "sortByVote") { // Trier par vote
       const sql = "SELECT * FROM public.elections WHERE resultats_visibles = false AND id_admin = $1 ORDER BY id_election"
       const result = await client.query({
         text: sql,
@@ -436,7 +448,7 @@ router.post('/admin/elections', async (req, res) => {
       })
       res.json({elections: result.rows})
     }
-    else if (typeSort === "sortByResult") {
+    else if (typeSort === "sortByResult") { // Trier par résultats
       const sql = "SELECT * FROM public.elections WHERE resultats_visibles = true AND id_admin = $1 ORDER BY id_election"
       const result = await client.query({
         text: sql,
@@ -453,13 +465,13 @@ router.post('/admin/elections', async (req, res) => {
   }
 })
 
-router.post('/admin/elections/detailElection', async (req, res) => {
+router.post('/admin/elections/detailElection', async (req, res) => { //Afficher l'éléction en détail
 
   if (req.session.admin) {
     const election = req.body.election
     const id_admin = req.session.adminId
 
-    if (election.type === "Referundum") {
+    if (election.type === "Referundum") { // Affichage différent si l'éléction est un référendum
       const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE id_admin = $1 AND id_election = $2 ORDER BY nbr_votes DESC"
       const result = await client.query({
         text: sql,
@@ -484,7 +496,7 @@ router.post('/admin/elections/detailElection', async (req, res) => {
   }
 })
 
-router.post('/admin/elections/openVote', async (req, res) => {
+router.post('/admin/elections/openVote', async (req, res) => { // Ouvrir les votes sur une élection
 
   if (req.session.admin) {
 
@@ -498,6 +510,8 @@ router.post('/admin/elections/openVote', async (req, res) => {
       text: sql,
       values: [id_election]
     })
+
+    // On recherche les mails des élécteurs afin de leur annoncer l'ouverture de l'élection
 
     let getEmail = ""
 
@@ -542,6 +556,8 @@ router.post('/admin/elections/openVote', async (req, res) => {
             pass: 'E8PFMEgb#nS#',
           }
         })
+
+        // Syntaxe du mail, puis envoi du mail
       
         let mailOptions = {
           from: 'vitemonvote@gmail.com',
@@ -566,7 +582,7 @@ router.post('/admin/elections/openVote', async (req, res) => {
   }
 })
 
-router.post('/admin/elections/closeVote', async (req, res) => {
+router.post('/admin/elections/closeVote', async (req, res) => { // Fermeture de l'élection
 
   if (req.session.admin) {
 
@@ -583,7 +599,7 @@ router.post('/admin/elections/closeVote', async (req, res) => {
   }
 })
 
-router.post('/admin/elections/showResult', async (req, res) => {
+router.post('/admin/elections/showResult', async (req, res) => { // Affichage des résultats de l'élection
 
   if (req.session.admin) {
 
@@ -600,7 +616,7 @@ router.post('/admin/elections/showResult', async (req, res) => {
   }
 })
 
-router.post('/admin/elections/nbrVotant', async (req, res) => {
+router.post('/admin/elections/nbrVotant', async (req, res) => { // Retourne le nombre de personnes ayant voté sur une élection
 
   if (req.session.admin) {
 
@@ -615,7 +631,7 @@ router.post('/admin/elections/nbrVotant', async (req, res) => {
   }
 })
 
-router.post('/admin/elections/hideResult', async (req, res) => {
+router.post('/admin/elections/hideResult', async (req, res) => { // Cacher les résultats
 
   if (req.session.admin) {
 
@@ -632,7 +648,7 @@ router.post('/admin/elections/hideResult', async (req, res) => {
   }
 })
 
-router.post('/admin/elections/delete', async (req, res) => {
+router.post('/admin/elections/delete', async (req, res) => { // Supprimer une élection
 
   if (req.session.admin) {
 
@@ -827,7 +843,7 @@ router.post('/admin/elections/generate', async (req, res) => {
 /*              PARTIE CLIENT              */
 /*******************************************/
 
-router.get('/user/me', async (req, res) => {
+router.get('/user/me', async (req, res) => { // On vérifie si l'user est connecté ; s'il ne l'est pas, il est renvoyé à la page de connexion
   if(req.session.user === true){
     res.json({user: true})
     return
@@ -835,7 +851,7 @@ router.get('/user/me', async (req, res) => {
   res.json({user: false})
 })
 
-router.post('/user/logout', async (req, res) => {
+router.post('/user/logout', async (req, res) => { // Déconnexion de l'utilisateur
   const email = req.body.email
   const password = req.body.password
   req.email = ''
@@ -847,7 +863,7 @@ router.post('/user/logout', async (req, res) => {
 
 // Generation de password
 
-function generateP() {
+function generateP() { // Mot de passe aléatoire qui sera envoyé par mail
   var pass = '';
   var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + 
           'abcdefghijklmnopqrstuvwxyz0123456789@#$';
@@ -914,6 +930,8 @@ router.post('/user/register', async (req, res) => {
     values: [numCarteElec, email, codePostal]
   })
 
+  // Création du mail, puis envoi du mail
+
   if (result.rowCount !== 0) {    
     let transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
@@ -955,7 +973,7 @@ router.post('/user/register', async (req, res) => {
 
 // Login
 
-router.post('/user/login', async (req, res) => {
+router.post('/user/login', async (req, res) => { // Connexion de l'utilisateur
   const email = req.body.email
   const password = req.body.password
 
@@ -971,7 +989,7 @@ router.post('/user/login', async (req, res) => {
   }
 
   if (! await bcrypt.compare(password, result.rows[0].password)){
-    res.json({ popup: "L'email utilisé et/ou le mot de passe sont incorrects !"})                               // POPUP
+    res.json({ popup: "L'email utilisé et/ou le mot de passe sont incorrects !"})                // POPUP
     return
   }
   
@@ -989,7 +1007,7 @@ router.post('/user/elections', async (req, res) => {
     const typeSort = req.body.typeSort
     const searchName = "%" + req.body.searchName + "%"
   
-    if (typeSort === "noSort") {
+    if (typeSort === "noSort") { // Pas de tri
       const sql = "SELECT * FROM public.elections NATURAL JOIN organise INNER JOIN electeur on code_postal_bureau = code_postal WHERE ouvert = true AND num_carte_electeur = $1 ORDER BY id_election"
       const result = await client.query({
         text: sql,
@@ -997,7 +1015,7 @@ router.post('/user/elections', async (req, res) => {
       })
       res.json({elections: result.rows})
     }
-    else if (typeSort === "sortBySearch") {
+    else if (typeSort === "sortBySearch") { // Recherche d'une élection
       const sql = "SELECT * FROM public.elections NATURAL JOIN organise INNER JOIN electeur on code_postal_bureau = code_postal WHERE lower(nom) like lower($1) AND ouvert = true AND num_carte_electeur = $2 ORDER BY id_election"
       const result = await client.query({
         text: sql,
@@ -1016,7 +1034,7 @@ router.post('/user/elections', async (req, res) => {
 
 })
 
-router.post('/user/elections/detailElection', async (req, res) => {  
+router.post('/user/elections/detailElection', async (req, res) => {  // Comme pour le coté admin, affichage des détails de l'élection en cliquant dessus.
 
   if (req.session.user) {
     const election = req.body.election
@@ -1027,12 +1045,12 @@ router.post('/user/elections/detailElection', async (req, res) => {
       values: [election.id, req.session.userId]
     })
 
-    if (resultGetAvote.rowCount !== 0) {
+    if (resultGetAvote.rowCount !== 0) { // Si l'utilisateur tente de voter alors qu'il l'a déjà fait :
       res.json({popup: "Vous avez déjà voté, vous ne pouvez pas voter plusieurs fois !"})
       return
     }
 
-    if (election.type === "Referundum") {
+    if (election.type === "Referundum") { // Affichage d'un référendum
       const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste WHERE id_election = $1"
       const result = await client.query({
         text: sql,
@@ -1040,7 +1058,7 @@ router.post('/user/elections/detailElection', async (req, res) => {
       })
       res.json({elections: result.rows})
     }
-    else if (election.type !== undefined) {
+    else if (election.type !== undefined) { // Affichages des autres élections
       const sql = "SELECT * FROM public.elections NATURAL JOIN public.liste NATURAL JOIN public.candidat WHERE id_election = $1"
       const result = await client.query({
         text: sql,
@@ -1059,7 +1077,7 @@ router.post('/user/elections/detailElection', async (req, res) => {
 
 // VOTE
 
-router.post('/user/elections/vote', async (req, res) => {   
+router.post('/user/elections/vote', async (req, res) => { // Ce qu'il se passe lorsque l'utilisateur clique sur voter :
 
   if (req.session.user) {
   
@@ -1082,7 +1100,7 @@ router.post('/user/elections/vote', async (req, res) => {
 
     const code_postal = resultGetCP.rows[0].code_postal
     
-    // ON VERIF SI LE VOTE EST BIEN OUVERT SINON C'EST UN HACKER T'AS VU
+    // ON VERIF SI LE VOTE EST BIEN OUVERT SINON C'EST UN HACKER
 
     const verifIsOpen = "SELECT * FROM elections WHERE id_election = $1 AND ouvert = true AND resultats_visibles = false"
     const resultVerifIsOpen = await client.query({
@@ -1199,7 +1217,7 @@ router.post('/resultats', async (req, res) => {
 
 })
 
-router.post('/resultats/detailElection', async (req, res) => {  
+router.post('/resultats/detailElection', async (req, res) => {  // Affichage des résultats pour l'utilisateur
 
     const election = req.body.election
 
@@ -1226,7 +1244,7 @@ router.post('/resultats/detailElection', async (req, res) => {
 
 // NBR TOTAL VOTANT
 
-router.post('/resultats/nbrVotant', async (req, res) => {  
+router.post('/resultats/nbrVotant', async (req, res) => {  // Retourne le nombre de votants
 
   const id_election = req.body.id
   const type_election = req.body.type
