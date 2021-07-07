@@ -284,7 +284,7 @@ router.post('/admin/election', async(req, res) =>{ // Création d'une éléction
     // récupération des codes postaux des élécteurs
 
     let code_postaux = []
-    if(typeElection === "Presidentielle" || typeElection === "Europeennes" || typeElection === "Referundum"){
+    if(typeElection === "Presidentielle" || typeElection === "Europeennes" || typeElection === "Referundum"){ // Ici, tout le monde vote.
       sql = "SELECT code_postal FROM bureaudevote"
       result = await client.query({
         text: sql
@@ -298,7 +298,7 @@ router.post('/admin/election', async(req, res) =>{ // Création d'une éléction
       code_postaux = req.body.code_postaux
     }
 
-    if(typeElection === "Regionales") {
+    if(typeElection === "Regionales") { // Pour les regionales, nous avons besoin de plusieurs codes postaux dans une seule région
 
       sql = codePostalRegion(req.body.region)
       result = await client.query({
@@ -1249,7 +1249,7 @@ router.post('/resultats/nbrVotant', async (req, res) => {  // Retourne le nombre
   const id_election = req.body.id
   const type_election = req.body.type
 
-  const getTotalVote = "SELECT count(*) FROM avote WHERE id_election = $1"
+  const getTotalVote = "SELECT count(*) FROM avote WHERE id_election = $1" // Compte le nombre de personnes ayant voté
   const resultGetTotalVote = await client.query({
     text: getTotalVote,
     values: [id_election]
@@ -1257,7 +1257,7 @@ router.post('/resultats/nbrVotant', async (req, res) => {  // Retourne le nombre
 
   const totalVote = resultGetTotalVote.rows[0].count
 
-  if (type_election === 'Presidentielle' || type_election === 'Referundum' || type_election === 'Europeennes') {
+  if (type_election === 'Presidentielle' || type_election === 'Referundum' || type_election === 'Europeennes') { // Compte le nombre total d'electeurs
     let getTotalVotants = "SELECT count(*) FROM ELECTEUR"
     const resultGetTotalVotants = await client.query({
       text: getTotalVotants,
@@ -1269,7 +1269,7 @@ router.post('/resultats/nbrVotant', async (req, res) => {  // Retourne le nombre
     return
   }
   else {
-    const getCodePostal = "SELECT code_postal_bureau FROM organise WHERE id_election = $1"
+    const getCodePostal = "SELECT code_postal_bureau FROM organise WHERE id_election = $1" // Compte le nombre d'élécteurs correspondant à une élection
     const resultGetCodePostal = await client.query({
       text: getCodePostal,
       values: [id_election]
@@ -1288,7 +1288,7 @@ router.post('/resultats/nbrVotant', async (req, res) => {  // Retourne le nombre
       text: getTotalVotants,
     })
     const totalVotants = resultGetTotalVotants.rows[0].count
-    const abstention = ( (totalVotants - totalVote) / totalVotants ) * 100
+    const abstention = ( (totalVotants - totalVote) / totalVotants ) * 100 // Genere l'abstention
     
     res.json({totalVote: totalVote, abstention: abstention})
     return
