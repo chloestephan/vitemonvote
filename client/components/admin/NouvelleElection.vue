@@ -5,6 +5,7 @@
       <hr>
 
       <div>
+        <!-- Menu déroulant pour choisir le type d'élection -->
         <label for="type-election"><h3>Choisir le type d'élection :</h3></label>
         <select name="typeElection" id="type-election" class="box" v-model="typeElection">
           <option value="">Choisir une option</option>
@@ -20,12 +21,12 @@
         </select>
 
         <div v-if="typeElection!==''">
-          <div v-if="typeElection!=='Referundum'">
+          <div v-if="typeElection!=='Referundum'"> <!-- Création d'un réferendum -->
             <input type="text" v-model="nom" placeholder="Nom de l'élection" required>
 
             <label for="start"><h3>Date et lieu du premier tour :</h3></label>
           </div>
-          <div v-else>
+          <div v-else> <!-- Autres -->
             <input type="text" v-model="nom" placeholder="Question du referundum" required>
 
             <label for="start"><h3>Date du referundum :</h3></label>
@@ -34,7 +35,7 @@
 
           <input v-if="typeElection==='Municipales'" type="text" v-model="codePostaux[0]" placeholder="Code postal" required>
 
-          <div v-if="typeElection==='Regionales'">
+          <div v-if="typeElection==='Regionales'"> <!-- Choix de la région si élection régionale -->
             <label for="nom-region"><h3>Choisir la région :</h3></label>
             <select name="nomRegion" id="nom-region" class="box" v-model="nomRegion">
               <option value="">Choisir une option</option>
@@ -59,14 +60,10 @@
             </select>
           </div>
 
-          <div v-if="typeElection==='Departementales'">
-            
-            <input type="text" v-model="numDepartement" placeholder="Numéro du département" required>
-            
-          </div>
-         
+          
 
-          <div v-if="typeElection!=='Referundum' && typeElection!=='Departementales'">
+
+          <div v-if="typeElection!=='Referundum'"> <!-- Form pour les autres élections --> 
             <div v-for="(liste, index1) in candidats" :key="index1" class="">
               <h2>Nouvelle liste</h2>
               <hr>
@@ -85,23 +82,6 @@
             </div>
             <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
             <hr>
-          </div>
-          <div v-if="typeElection=='Departementales'">
-            <div v-for="(liste, index1) in candidats" :key="index1" class="">
-              <h2>Nouvelle liste</h2>
-              <hr>
-              <input type="text" class="nom-liste" v-model="nomListes[index1]" placeholder="Nom de la liste" required>
-              <div class="ligne">
-                <input class="nouveauCandidat" type="text" v-model="candidats[index1][0]" :placeholder="'Candidat'" required>
-              </div>
-              <div class="ligne">
-                <input class="nouveauCandidat" type="text" v-model="candidats[index1][1]" :placeholder="'Candidat'" required>
-              </div>
-              <button v-if="candidats.length > 1" type="button" @click="supprimerListe">❌ Supprimer la liste</button>
-            </div>
-            <button v-if="typeElection!=='Presidentielle' && typeElection!=='Departementales'" type="button" @click="ajouterCandidat(index1)">➕ Ajouter un candidat</button>
-            <button type="button" @click="ajouterListe">➕ Ajouter une liste</button>
-            <hr> 
           </div>
           
           <button type="button" @click="creerEletion">Valider</button>
@@ -171,23 +151,23 @@ module.exports = {
   },
 
   methods:{
-    deleteCandidat(index1, index2){
+    deleteCandidat(index1, index2){ // Suppresion d'un candidat pendant le remplissage du form
       this.candidats[index1].splice(index2, 1)
     },
-    ajouterCandidat(index){
+    ajouterCandidat(index){ // Bouton pour ajouter un candidat à une liste
       this.candidats[index].push('')
     },
-    supprimerListe(index){
+    supprimerListe(index){ // Suppresion d'une liste pendant le remplissage du form
       this.candidats.splice(index, 1)
       this.nomListes.splice(index, 1)
     },
-    ajouterListe(){
+    ajouterListe(){ // Bouton pour ajouter une nouvelle liste
       this.candidats.push([''])
     },
-    ajouterCode(){
+    ajouterCode(){ // Ajout d'un code postal
       this.codePostaux.push('')
     },
-    isDone(){
+    isDone(){ // Fonction vérifiant si le formulaire est correctement rempli
       if (this.nom != ''){
         if (this.date != null){
           if (this.typeElection != ''){
@@ -209,9 +189,11 @@ module.exports = {
       }
       return false
     },
-    async creerEletion(){
+    async creerEletion(){ // L'élection est génerée
 
       if (this.isDone()){
+
+        // Récuperation de la date
 
         const splitDateElection = this.date.split('-')
         const splitCurrentDate = this.currentDate.split('-')
@@ -235,14 +217,14 @@ module.exports = {
           isError = true
         }
 
-        if (!isError) {
+        if (!isError) { // Pop-up lorsque l'on appuie sur le bouton pour créer l'élection
           this.isGenerated = true
           this.popupTitle = "En cours..."
           this.popup = "L'élection est en cours de création..."
           const result = await axios.post('/api/admin/election', this.election)
           this.popup = result.data.message
           
-          if (this.popup === "L'élection a bien été créée !") {
+          if (this.popup === "L'élection a bien été créée !") { 
             this.popupTitle = "Confirmation"
           }
           else {
