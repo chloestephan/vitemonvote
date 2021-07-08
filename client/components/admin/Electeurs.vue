@@ -74,7 +74,6 @@ module.exports = {
         for (let line = 0; line < fileText.length; line++) {
           fileText[line] = fileText[line].split(';')
         }
-        console.log(fileText)
 
         for(let i = 0; i < fileText.length; i++) {
           final.push(fileText[i][2])
@@ -83,7 +82,6 @@ module.exports = {
         for(let i = 0; i < final.length; i += 1000){
           const intermediare = final.slice(i, i + 1000)
 
-          console.log(intermediare)
           const bureaux = {
             bureaux: intermediare
           }
@@ -105,22 +103,17 @@ module.exports = {
         for (let line = 0; line < fileText.length; line++) {
           fileText[line] = fileText[line].split(';')
         }
-        console.log(fileText)
 
         function checkElecteurs(electeurs) {
           for (let i = 0; i < electeurs.length; i++){
-            console.log({electeur: electeurs[i]})
-            console.log({length: electeurs[i].length})
             if( electeurs[i].length !== 3){
               return false
             }
-            console.log("first")
             for(let j = 0; j < electeurs[i]; j++){
               if( electeurs[i][j] == ''){
                 return false
               }
             }
-            console.log("second")
           }
           return true
         }

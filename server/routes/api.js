@@ -355,9 +355,10 @@ router.post('/admin/election', async(req, res) =>{ // Création d'une éléction
 router.post('/admin/electeurs', async(req, res) => { // Importer des élécteurs
   if (req.session.admin === true){
     const electeurs = req.body.electeurs
-
-    const sql = "INSERT INTO electeur VALUES ($1, $2, $3, $4)"// Insert dans la bdd l'identifiant, le mail et le code postal de l'élécteur
+    
+    const sql = "INSERT INTO electeur VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING"// Insert dans la bdd l'identifiant, le mail et le code postal de l'élécteur
     for(let i = 0; i < electeurs.length; i++){
+
       await client.query({
         text: sql,
         values: [electeurs[i][0], electeurs[i][1], null, electeurs[i][2]]
@@ -887,7 +888,7 @@ function isDigit(c) {
 router.post('/user/register', async (req, res) => {
   const email = req.body.email
   const numCarteElec = req.body.numCarteElec
-  const codePostal = req.body.codePostal
+  let codePostal = req.body.codePostal
   const password = generateP()
   const hash = await bcrypt.hash(password, 10)
   
@@ -924,7 +925,9 @@ router.post('/user/register', async (req, res) => {
     return
   }
 
-  const sqlVerif = "SELECT * FROM public.Electeur WHERE num_carte_electeur=$1 AND email=$2 AND code_postal=$3"
+  codePostal += '%'
+
+  const sqlVerif = "SELECT * FROM public.Electeur WHERE num_carte_electeur=$1 AND email=$2 AND code_postal like $3"
   const result = await client.query({
     text: sqlVerif,
     values: [numCarteElec, email, codePostal]
